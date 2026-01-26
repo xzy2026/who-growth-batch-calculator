@@ -271,6 +271,48 @@
             text-align: center;
             font-size: 14px;
         }
+
+        .footer {
+            background: linear-gradient(135deg, #366092 0%, #4a7ba7 100%);
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .footer p {
+            margin: 5px 0;
+            opacity: 0.9;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .footer a:hover {
+            opacity: 0.8;
+        }
+
+        .footer-logo {
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .footer-logo img {
+            height: 50px;
+            width: auto;
+            opacity: 0.95;
+            filter: brightness(0) invert(1);
+            transition: opacity 0.3s;
+        }
+
+        .footer-logo img:hover {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -346,6 +388,16 @@
             <div class="status-bar" id="statusBar">
                 共 0 行数据
             </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-logo">
+                <img src="assets/logo.png" alt="Logo" onerror="this.style.display='none'">
+            </div>
+            <p>本计算器基于《7岁以下儿童生长标准》（WS/T 423-2022）</p>
+            <p>数据仅供参考，如有疑问请咨询专业医疗机构</p>
+            <p>享智云幼儿智能体侧</p>
+            <p>&copy; 2026 儿童生长标准批量计算器 | 版本 1.0</p>
         </div>
     </div>
 

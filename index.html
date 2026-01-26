@@ -1,16 +1,1378 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Header Layout</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>7岁以下儿童生长标准批量计算器</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #abbaec 0%, #ddc4f4 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #366092 0%, #4a7ba7 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .mode-btn {
+            padding: 10px 20px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .mode-btn.active {
+            background: #366092;
+            color: white;
+            border-color: #366092;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+        }
+
+        .btn-primary {
+            background: #366092;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4a7ba7;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #34ce57;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #e4606d;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-warning:hover {
+            background: #ffcd39;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            overflow-y: auto;
+            max-height: calc(100vh - 250px);
+            min-height: 450px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        /* 确保水平滚动条始终可见 */
+        .table-container::-webkit-scrollbar {
+            height: 12px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 6px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* 水平滚动条始终显示在底部 */
+        .table-container {
+            scrollbar-width: thin;
+            scrollbar-color: #888 #f1f1f1;
+        }
+
+        table {
+            width: 100%;
+            min-width: 2000px; /* 确保表格宽度足够，触发水平滚动 */
+            border-collapse: collapse;
+            background: white;
+            font-size: 13px;
+        }
+
+        th {
+            background: #366092;
+            color: white;
+            padding: 10px 6px;
+            text-align: center;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            white-space: nowrap;
+            font-size: 11px;
+            line-height: 1.3;
+        }
+
+        td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        tr:hover {
+            background: #f0f0f0;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            min-width: 60px;
+        }
+        
+        select {
+            min-width: 70px;
+        }
+        
+        .weight-input, .height-input {
+            min-width: 80px;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #366092;
+        }
+
+        .result-cell {
+            background: #e8f4f8;
+            font-weight: bold;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #366092;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .info-box h3 {
+            margin-bottom: 10px;
+            color: #366092;
+        }
+
+        .status-bar {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #366092 0%, #4a7ba7 100%);
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .footer p {
+            margin: 5px 0;
+            opacity: 0.9;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .footer a:hover {
+            opacity: 0.8;
+        }
+
+        .footer-logo {
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .footer-logo img {
+            height: 50px;
+            width: auto;
+            opacity: 0.95;
+            filter: brightness(0) invert(1);
+            transition: opacity 0.3s;
+        }
+
+        .footer-logo img:hover {
+            opacity: 1;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <img src="assets/logo.png" alt="Logo" class="logo">
-        <h1>Welcome to Who Growth Batch Calculator</h1>
-    </header>
-    <!-- Other body content -->
+    <div class="container">
+        <div class="header">
+            <h1>7岁以下儿童生长标准批量计算器</h1>
+            <p>支持批量输入和导出Excel表格（根据WS/T 423-2022标准）</p>
+        </div>
+        
+        <div class="content">
+            <div class="info-box">
+                <h3>使用说明</h3>
+                <p>1. 选择计算模式（百分位数值或标准差数值）</p>
+                <p>2. 点击"导入Excel"按钮可从Excel文件导入数据（支持姓名、性别、出生日期、测查日期、体重、身高、头围等）</p>
+                <p>3. 或点击"添加行"按钮手动添加儿童数据行</p>
+                <p>4. 输入儿童信息（性别和出生日期为必填项）</p>
+                <p>5. 点击"批量计算"按钮计算所有数据（导入Excel后会自动计算）</p>
+                <p>6. 点击"导出Excel"按钮导出结果</p>
+            </div>
+
+            <div class="toolbar">
+                <div class="mode-selector">
+                    <button class="mode-btn active" onclick="setMode('percentile')">百分位数值</button>
+                    <button class="mode-btn" onclick="setMode('std')">标准差数值</button>
+                </div>
+                <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display: none;" onchange="importExcel(event)">
+                <button class="btn btn-info" onclick="document.getElementById('excelFileInput').click()">导入Excel</button>
+                <button class="btn btn-primary" onclick="addRow()">添加行</button>
+                <button class="btn btn-success" onclick="calculateAll()">批量计算</button>
+                <button class="btn btn-warning" onclick="exportExcel()">导出Excel</button>
+                <button class="btn btn-danger" onclick="clearAll()">清空所有</button>
+            </div>
+
+            <div class="table-container">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">序号</th>
+                            <th style="width: 100px;">姓名</th>
+                            <th style="width: 70px;">性别</th>
+                            <th style="width: 110px;">出生日期</th>
+                            <th style="width: 100px;">实足年龄</th>
+                            <th style="width: 110px;">测查日期</th>
+                            <th style="width: 90px;">体重(kg)</th>
+                            <th style="width: 100px;">标准体重(kg)</th>
+                            <th style="width: 80px;">评价值</th>
+                            <th style="width: 85px;">评价结果</th>
+                            <th style="width: 90px;">身高(cm)</th>
+                            <th style="width: 100px;">标准身高(cm)</th>
+                            <th style="width: 80px;">评价值</th>
+                            <th style="width: 85px;">评价结果</th>
+                            <th style="width: 70px;">BMI</th>
+                            <th style="width: 85px;">评价结果</th>
+                            <th style="width: 110px;">年龄别体重</th>
+                            <th style="width: 85px;">评价结果</th>
+                            <th style="width: 110px;">年龄别身高</th>
+                            <th style="width: 85px;">评价结果</th>
+                            <th style="width: 110px;">身高别体重</th>
+                            <th style="width: 85px;">评价结果</th>
+                            <th style="width: 110px;">年龄别BMI</th>
+                            <th style="width: 85px;">评价结果</th>
+                            <th style="width: 70px;">头围</th>
+                            <th style="width: 110px;">年龄别头围</th>
+                            <th style="width: 85px;">评价结果</th>
+                            <th style="width: 60px;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="status-bar" id="statusBar">
+                共 0 行数据
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-logo">
+                <img src="assets/logo.png" alt="Logo" onerror="this.style.display='none'">
+            </div>
+            <p>本计算器基于《7岁以下儿童生长标准》（WS/T 423-2022）</p>
+            <p>数据仅供参考，如有疑问请咨询专业医疗机构</p>
+            <p>享智云幼儿智能体侧</p>
+            <p>&copy; 2026 儿童生长标准批量计算器 | 版本 1.0</p>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'percentile';
+        let rowCount = 0;
+
+        // 数据表（核心数据）
+        const ageWeightBoy = {
+            0: {P3: 2.8, P10: 3.0, P25: 3.2, P50: 3.5, P75: 3.7, P90: 4.0, P97: 4.2},
+            1: {P3: 3.7, P10: 3.9, P25: 4.2, P50: 4.6, P75: 4.9, P90: 5.2, P97: 5.6},
+            2: {P3: 4.7, P10: 5.0, P25: 5.4, P50: 5.8, P75: 6.2, P90: 6.7, P97: 7.1},
+            3: {P3: 5.5, P10: 5.9, P25: 6.3, P50: 6.8, P75: 7.3, P90: 7.8, P97: 8.3},
+            6: {P3: 6.9, P10: 7.4, P25: 7.9, P50: 8.4, P75: 9.1, P90: 9.7, P97: 10.3},
+            12: {P3: 8.3, P10: 8.8, P25: 9.4, P50: 10.1, P75: 10.8, P90: 11.5, P97: 12.3},
+            24: {P3: 10.4, P10: 11.0, P25: 11.7, P50: 12.6, P75: 13.5, P90: 14.4, P97: 15.4},
+            36: {P3: 12.0, P10: 12.8, P25: 13.6, P50: 14.6, P75: 15.8, P90: 16.9, P97: 18.0},
+            48: {P3: 13.6, P10: 14.5, P25: 15.5, P50: 16.7, P75: 18.1, P90: 19.4, P97: 20.8},
+            60: {P3: 15.3, P10: 16.4, P25: 17.6, P50: 19.1, P75: 20.7, P90: 22.4, P97: 24.2},
+            72: {P3: 17.1, P10: 18.3, P25: 19.8, P50: 21.6, P75: 23.6, P90: 25.7, P97: 27.9},
+            75: {P3: 17.5, P10: 18.8, P25: 20.3, P50: 22.2, P75: 24.3, P90: 26.5, P97: 28.9},
+            78: {P3: 17.8, P10: 19.2, P25: 20.8, P50: 22.8, P75: 25.0, P90: 27.3, P97: 29.8},
+            81: {P3: 18.2, P10: 19.7, P25: 21.3, P50: 23.4, P75: 25.7, P90: 28.0, P97: 30.6}
+        };
+
+        const ageWeightGirl = {
+            0: {P3: 2.7, P10: 2.9, P25: 3.1, P50: 3.3, P75: 3.6, P90: 3.8, P97: 4.1},
+            1: {P3: 3.5, P10: 3.7, P25: 4.0, P50: 4.3, P75: 4.6, P90: 4.9, P97: 5.3},
+            2: {P3: 4.4, P10: 4.7, P25: 5.0, P50: 5.4, P75: 5.8, P90: 6.2, P97: 6.6},
+            3: {P3: 5.1, P10: 5.4, P25: 5.8, P50: 6.2, P75: 6.7, P90: 7.2, P97: 7.6},
+            6: {P3: 6.4, P10: 6.8, P25: 7.2, P50: 7.8, P75: 8.4, P90: 9.0, P97: 9.6},
+            12: {P3: 7.7, P10: 8.2, P25: 8.8, P50: 9.4, P75: 10.1, P90: 10.9, P97: 11.6},
+            24: {P3: 9.8, P10: 10.4, P25: 11.1, P50: 11.9, P75: 12.9, P90: 13.8, P97: 14.8},
+            36: {P3: 11.5, P10: 12.3, P25: 13.1, P50: 14.1, P75: 15.3, P90: 16.4, P97: 17.7},
+            48: {P3: 13.1, P10: 14.0, P25: 15.0, P50: 16.2, P75: 17.6, P90: 18.9, P97: 20.5},
+            60: {P3: 14.7, P10: 15.8, P25: 16.9, P50: 18.4, P75: 20.0, P90: 21.6, P97: 23.4},
+            72: {P3: 16.3, P10: 17.6, P25: 19.0, P50: 20.7, P75: 22.7, P90: 24.7, P97: 26.8},
+            75: {P3: 16.7, P10: 18.0, P25: 19.5, P50: 21.3, P75: 23.3, P90: 25.4, P97: 27.6},
+            78: {P3: 17.0, P10: 18.4, P25: 19.9, P50: 21.8, P75: 24.0, P90: 26.1, P97: 28.5},
+            81: {P3: 17.4, P10: 18.8, P25: 20.4, P50: 22.4, P75: 24.6, P90: 26.8, P97: 29.3}
+        };
+
+        const ageHeightBoy = {
+            0: {P3: 47.6, P10: 48.7, P25: 49.9, P50: 51.2, P75: 52.5, P90: 53.6, P97: 54.8},
+            1: {P3: 51.3, P10: 52.5, P25: 53.8, P50: 55.1, P75: 56.5, P90: 57.7, P97: 59.0},
+            2: {P3: 54.9, P10: 56.2, P25: 57.5, P50: 59.0, P75: 60.4, P90: 61.7, P97: 63.0},
+            3: {P3: 58.0, P10: 59.4, P25: 60.7, P50: 62.2, P75: 63.7, P90: 65.1, P97: 66.4},
+            6: {P3: 64.2, P10: 65.7, P25: 67.1, P50: 68.7, P75: 70.3, P90: 71.8, P97: 73.2},
+            12: {P3: 71.7, P10: 73.3, P25: 74.9, P50: 76.7, P75: 78.5, P90: 80.1, P97: 81.6},
+            24: {P3: 82.4, P10: 84.2, P25: 86.1, P50: 88.2, P75: 90.3, P90: 92.2, P97: 94.0},
+            36: {P3: 90.9, P10: 93.0, P25: 95.1, P50: 97.5, P75: 99.9, P90: 102.0, P97: 104.1},
+            48: {P3: 97.6, P10: 99.9, P25: 102.3, P50: 104.9, P75: 107.5, P90: 109.8, P97: 112.2},
+            60: {P3: 104.1, P10: 106.6, P25: 109.1, P50: 112.0, P75: 114.8, P90: 117.4, P97: 119.9},
+            72: {P3: 110.3, P10: 113.0, P25: 115.7, P50: 118.8, P75: 121.9, P90: 124.6, P97: 127.3},
+            75: {P3: 111.7, P10: 114.5, P25: 117.3, P50: 120.4, P75: 123.5, P90: 126.3, P97: 129.1},
+            78: {P3: 113.1, P10: 116.0, P25: 118.8, P50: 122.0, P75: 125.2, P90: 128.0, P97: 130.8},
+            81: {P3: 114.5, P10: 117.4, P25: 120.3, P50: 123.5, P75: 126.7, P90: 129.6, P97: 132.5}
+        };
+
+        const ageHeightGirl = {
+            0: {P3: 46.8, P10: 47.9, P25: 49.1, P50: 50.3, P75: 51.6, P90: 52.7, P97: 53.8},
+            1: {P3: 50.4, P10: 51.6, P25: 52.8, P50: 54.1, P75: 55.4, P90: 56.6, P97: 57.8},
+            2: {P3: 53.8, P10: 55.0, P25: 56.3, P50: 57.7, P75: 59.1, P90: 60.4, P97: 61.6},
+            3: {P3: 56.7, P10: 58.0, P25: 59.3, P50: 60.8, P75: 62.2, P90: 63.5, P97: 64.8},
+            6: {P3: 62.7, P10: 64.1, P25: 65.5, P50: 67.1, P75: 68.7, P90: 70.1, P97: 71.5},
+            12: {P3: 70.4, P10: 71.9, P25: 73.5, P50: 75.2, P75: 77.0, P90: 78.6, P97: 80.1},
+            24: {P3: 81.2, P10: 83.0, P25: 84.9, P50: 87.0, P75: 89.1, P90: 90.9, P97: 92.8},
+            36: {P3: 89.7, P10: 91.8, P25: 93.9, P50: 96.2, P75: 98.5, P90: 100.7, P97: 102.7},
+            48: {P3: 96.5, P10: 98.8, P25: 101.1, P50: 103.7, P75: 106.3, P90: 108.6, P97: 110.9},
+            60: {P3: 103.0, P10: 105.5, P25: 108.0, P50: 110.8, P75: 113.6, P90: 116.1, P97: 118.6},
+            72: {P3: 109.0, P10: 111.7, P25: 114.5, P50: 117.5, P75: 120.6, P90: 123.3, P97: 126.0},
+            75: {P3: 110.3, P10: 113.0, P25: 115.8, P50: 118.8, P75: 121.9, P90: 124.6, P97: 127.3},
+            78: {P3: 111.6, P10: 114.3, P25: 117.1, P50: 120.1, P75: 123.2, P90: 125.9, P97: 128.6},
+            81: {P3: 112.9, P10: 115.6, P25: 118.4, P50: 121.4, P75: 124.5, P90: 127.2, P97: 129.9}
+        };
+
+        const ageBMIBoy = {
+            0: {P3: 11.2, P10: 11.8, P25: 12.5, P50: 13.2, P75: 14.0, P90: 14.8, P97: 15.5},
+            1: {P3: 13.0, P10: 13.6, P25: 14.3, P50: 15.1, P75: 16.0, P90: 16.8, P97: 17.6},
+            3: {P3: 14.9, P10: 15.7, P25: 16.5, P50: 17.4, P75: 18.5, P90: 19.5, P97: 20.5},
+            6: {P3: 15.3, P10: 16.1, P25: 16.9, P50: 17.9, P75: 18.9, P90: 20.0, P97: 21.1},
+            12: {P3: 14.9, P10: 15.5, P25: 16.3, P50: 17.1, P75: 18.1, P90: 19.1, P97: 20.1},
+            24: {P3: 14.1, P10: 14.7, P25: 15.3, P50: 16.1, P75: 17.0, P90: 17.9, P97: 18.8},
+            36: {P3: 13.7, P10: 14.2, P25: 14.8, P50: 15.5, P75: 16.3, P90: 17.2, P97: 18.1},
+            48: {P3: 13.4, P10: 14.0, P25: 14.6, P50: 15.3, P75: 16.1, P90: 17.0, P97: 17.9},
+            60: {P3: 13.3, P10: 13.8, P25: 14.5, P50: 15.3, P75: 16.2, P90: 17.1, P97: 18.2},
+            72: {P3: 13.2, P10: 13.8, P25: 14.5, P50: 15.4, P75: 16.4, P90: 17.5, P97: 18.8}
+        };
+
+        const ageBMIGirl = {
+            0: {P3: 11.1, P10: 11.7, P25: 12.3, P50: 13.1, P75: 13.8, P90: 14.5, P97: 15.3},
+            1: {P3: 12.7, P10: 13.3, P25: 13.9, P50: 14.7, P75: 15.5, P90: 16.3, P97: 17.1},
+            3: {P3: 14.4, P10: 15.1, P25: 15.8, P50: 16.7, P75: 17.7, P90: 18.7, P97: 19.8},
+            6: {P3: 14.9, P10: 15.6, P25: 16.4, P50: 17.3, P75: 18.4, P90: 19.4, P97: 20.5},
+            12: {P3: 14.5, P10: 15.1, P25: 15.8, P50: 16.7, P75: 17.6, P90: 18.5, P97: 19.6},
+            24: {P3: 13.8, P10: 14.4, P25: 15.0, P50: 15.8, P75: 16.6, P90: 17.4, P97: 18.4},
+            36: {P3: 13.4, P10: 13.9, P25: 14.5, P50: 15.3, P75: 16.1, P90: 16.9, P97: 17.9},
+            48: {P3: 13.1, P10: 13.7, P25: 14.3, P50: 15.1, P75: 15.9, P90: 16.8, P97: 17.8},
+            60: {P3: 13.0, P10: 13.5, P25: 14.2, P50: 15.0, P75: 15.9, P90: 16.9, P97: 18.0},
+            72: {P3: 12.9, P10: 13.5, P25: 14.1, P50: 15.0, P75: 16.0, P90: 17.1, P97: 18.3}
+        };
+
+        // 身高别体重数据表（0-2岁：身长别体重，2-7岁：身高别体重）
+        const lengthWeightBoy0_2 = {
+            45: {P3: 2.0, P10: 2.1, P25: 2.2, P50: 2.3, P75: 2.5, P90: 2.6, P97: 2.7},
+            50: {P3: 2.8, P10: 2.9, P25: 3.1, P50: 3.3, P75: 3.5, P90: 3.7, P97: 3.9},
+            55: {P3: 3.9, P10: 4.1, P25: 4.3, P50: 4.6, P75: 4.9, P90: 5.2, P97: 5.5},
+            60: {P3: 5.2, P10: 5.4, P25: 5.7, P50: 6.1, P75: 6.5, P90: 6.8, P97: 7.2},
+            65: {P3: 6.4, P10: 6.7, P25: 7.1, P50: 7.5, P75: 7.9, P90: 8.4, P97: 8.9},
+            70: {P3: 7.5, P10: 7.8, P25: 8.2, P50: 8.7, P75: 9.2, P90: 9.7, P97: 10.3},
+            75: {P3: 8.4, P10: 8.8, P25: 9.2, P50: 9.7, P75: 10.3, P90: 10.9, P97: 11.5},
+            80: {P3: 9.3, P10: 9.7, P25: 10.1, P50: 10.7, P75: 11.3, P90: 11.9, P97: 12.6},
+            85: {P3: 10.2, P10: 10.6, P25: 11.1, P50: 11.7, P75: 12.3, P90: 13.0, P97: 13.7},
+            90: {P3: 11.2, P10: 11.6, P25: 12.1, P50: 12.8, P75: 13.5, P90: 14.2, P97: 14.9},
+            95: {P3: 12.2, P10: 12.7, P25: 13.2, P50: 13.9, P75: 14.7, P90: 15.4, P97: 16.2},
+            100: {P3: 13.3, P10: 13.9, P25: 14.5, P50: 15.2, P75: 16.0, P90: 16.8, P97: 17.7}
+        };
+
+        const lengthWeightGirl0_2 = {
+            45: {P3: 2.0, P10: 2.1, P25: 2.2, P50: 2.3, P75: 2.5, P90: 2.6, P97: 2.8},
+            50: {P3: 2.8, P10: 2.9, P25: 3.1, P50: 3.3, P75: 3.5, P90: 3.7, P97: 3.9},
+            55: {P3: 3.9, P10: 4.1, P25: 4.3, P50: 4.6, P75: 4.9, P90: 5.1, P97: 5.4},
+            60: {P3: 5.1, P10: 5.4, P25: 5.6, P50: 6.0, P75: 6.3, P90: 6.7, P97: 7.1},
+            65: {P3: 6.2, P10: 6.5, P25: 6.9, P50: 7.3, P75: 7.7, P90: 8.1, P97: 8.6},
+            70: {P3: 7.2, P10: 7.6, P25: 7.9, P50: 8.4, P75: 8.9, P90: 9.4, P97: 9.9},
+            75: {P3: 8.1, P10: 8.5, P25: 8.9, P50: 9.4, P75: 9.9, P90: 10.5, P97: 11.1},
+            80: {P3: 9.0, P10: 9.4, P25: 9.8, P50: 10.3, P75: 10.9, P90: 11.5, P97: 12.2},
+            85: {P3: 9.9, P10: 10.3, P25: 10.8, P50: 11.3, P75: 12.0, P90: 12.6, P97: 13.3},
+            90: {P3: 10.9, P10: 11.3, P25: 11.8, P50: 12.4, P75: 13.1, P90: 13.8, P97: 14.6},
+            95: {P3: 11.9, P10: 12.4, P25: 12.9, P50: 13.6, P75: 14.4, P90: 15.1, P97: 16.0},
+            100: {P3: 13.1, P10: 13.6, P25: 14.2, P50: 14.9, P75: 15.8, P90: 16.6, P97: 17.5}
+        };
+
+        const heightWeightBoy2_7 = {
+            75: {P3: 8.5, P10: 8.9, P25: 9.4, P50: 9.9, P75: 10.5, P90: 11.0, P97: 11.7},
+            80: {P3: 9.4, P10: 9.8, P25: 10.3, P50: 10.8, P75: 11.5, P90: 12.1, P97: 12.7},
+            85: {P3: 10.3, P10: 10.8, P25: 11.2, P50: 11.8, P75: 12.5, P90: 13.2, P97: 13.9},
+            90: {P3: 11.3, P10: 11.8, P25: 12.3, P50: 12.9, P75: 13.6, P90: 14.3, P97: 15.1},
+            95: {P3: 12.3, P10: 12.8, P25: 13.4, P50: 14.1, P75: 14.8, P90: 15.6, P97: 16.4},
+            100: {P3: 13.5, P10: 14.1, P25: 14.7, P50: 15.4, P75: 16.2, P90: 17.0, P97: 17.9},
+            105: {P3: 14.8, P10: 15.4, P25: 16.0, P50: 16.8, P75: 17.7, P90: 18.7, P97: 19.7},
+            110: {P3: 16.1, P10: 16.7, P25: 17.5, P50: 18.4, P75: 19.4, P90: 20.5, P97: 21.6},
+            115: {P3: 17.0, P10: 17.8, P25: 18.8, P50: 19.9, P75: 21.1, P90: 22.4, P97: 23.8},
+            120: {P3: 18.5, P10: 19.5, P25: 20.6, P50: 22.0, P75: 23.5, P90: 25.0, P97: 26.8},
+            125: {P3: 20.2, P10: 21.4, P25: 22.7, P50: 24.3, P75: 26.2, P90: 28.1, P97: 30.2},
+            130: {P3: 21.8, P10: 23.2, P25: 24.8, P50: 26.8, P75: 29.0, P90: 31.3, P97: 33.9}
+        };
+
+        const heightWeightGirl2_7 = {
+            75: {P3: 8.3, P10: 8.6, P25: 9.0, P50: 9.5, P75: 10.1, P90: 10.6, P97: 11.2},
+            80: {P3: 9.1, P10: 9.5, P25: 9.9, P50: 10.5, P75: 11.1, P90: 11.7, P97: 12.3},
+            85: {P3: 10.0, P10: 10.5, P25: 10.9, P50: 11.5, P75: 12.1, P90: 12.8, P97: 13.5},
+            90: {P3: 11.0, P10: 11.5, P25: 12.0, P50: 12.6, P75: 13.3, P90: 14.0, P97: 14.8},
+            95: {P3: 12.1, P10: 12.6, P25: 13.1, P50: 13.8, P75: 14.6, P90: 15.3, P97: 16.2},
+            100: {P3: 13.2, P10: 13.8, P25: 14.4, P50: 15.1, P75: 16.0, P90: 16.8, P97: 17.8},
+            105: {P3: 14.4, P10: 15.0, P25: 15.7, P50: 16.5, P75: 17.5, P90: 18.4, P97: 19.5},
+            110: {P3: 15.7, P10: 16.4, P25: 17.1, P50: 18.1, P75: 19.1, P90: 20.2, P97: 21.4},
+            115: {P3: 17.0, P10: 17.8, P25: 18.8, P50: 19.9, P75: 21.1, P90: 22.4, P97: 23.8},
+            120: {P3: 18.5, P10: 19.5, P25: 20.6, P50: 22.0, P75: 23.5, P90: 25.0, P97: 26.8},
+            125: {P3: 20.2, P10: 21.4, P25: 22.7, P50: 24.3, P75: 26.2, P90: 28.1, P97: 30.2},
+            130: {P3: 21.8, P10: 23.2, P25: 24.8, P50: 26.8, P75: 29.0, P90: 31.3, P97: 33.9}
+        };
+
+        // 年龄别头围数据表
+        const ageHeadBoy = {
+            0: {P3: 31.9, P10: 32.7, P25: 33.4, P50: 34.3, P75: 35.2, P90: 36.0, P97: 36.8},
+            1: {P3: 34.8, P10: 35.5, P25: 36.2, P50: 37.0, P75: 37.8, P90: 38.5, P97: 39.2},
+            3: {P3: 38.3, P10: 39.0, P25: 39.7, P50: 40.5, P75: 41.3, P90: 42.0, P97: 42.7},
+            6: {P3: 41.1, P10: 41.8, P25: 42.5, P50: 43.4, P75: 44.2, P90: 44.9, P97: 45.7},
+            12: {P3: 43.8, P10: 44.6, P25: 45.3, P50: 46.1, P75: 47.0, P90: 47.8, P97: 48.6},
+            24: {P3: 46.0, P10: 46.7, P25: 47.5, P50: 48.3, P75: 49.2, P90: 50.0, P97: 50.8},
+            36: {P3: 47.0, P10: 47.7, P25: 48.5, P50: 49.3, P75: 50.2, P90: 51.1, P97: 51.9}
+        };
+
+        const ageHeadGirl = {
+            0: {P3: 31.5, P10: 32.3, P25: 33.1, P50: 33.9, P75: 34.8, P90: 35.6, P97: 36.3},
+            1: {P3: 34.2, P10: 34.9, P25: 35.6, P50: 36.3, P75: 37.1, P90: 37.8, P97: 38.5},
+            3: {P3: 37.5, P10: 38.1, P25: 38.8, P50: 39.5, P75: 40.3, P90: 41.0, P97: 41.6},
+            6: {P3: 40.0, P10: 40.7, P25: 41.4, P50: 42.2, P75: 43.0, P90: 43.8, P97: 44.5},
+            12: {P3: 42.8, P10: 43.5, P25: 44.3, P50: 45.1, P75: 45.9, P90: 46.7, P97: 47.5},
+            24: {P3: 45.0, P10: 45.7, P25: 46.5, P50: 47.3, P75: 48.2, P90: 49.0, P97: 49.8},
+            36: {P3: 46.1, P10: 46.8, P25: 47.6, P50: 48.5, P75: 49.4, P90: 50.3, P97: 51.1}
+        };
+
+        // 设置模式
+        function setMode(mode) {
+            currentMode = mode;
+            const buttons = document.querySelectorAll('.mode-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // 添加行
+        function addRow() {
+            rowCount++;
+            const tbody = document.getElementById('tableBody');
+            const row = document.createElement('tr');
+            row.id = `row-${rowCount}`;
+            
+            const today = new Date().toISOString().split('T')[0];
+            
+            row.innerHTML = `
+                <td>${rowCount}</td>
+                <td><input type="text" class="name-input" placeholder="姓名"></td>
+                <td>
+                    <select class="gender-input">
+                        <option value="">请选择</option>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                </td>
+                <td><input type="date" class="birth-date-input"></td>
+                <td class="age-cell result-cell"></td>
+                <td><input type="date" class="check-date-input" value="${today}"></td>
+                <td><input type="number" class="weight-input" step="0.1" min="10" max="70" placeholder="10-70"></td>
+                <td class="std-weight-cell result-cell"></td>
+                <td class="weight-eval-value-cell result-cell"></td>
+                <td class="weight-eval-result-cell result-cell"></td>
+                <td><input type="number" class="height-input" step="0.1" min="60" max="160" placeholder="60-160"></td>
+                <td class="std-height-cell result-cell"></td>
+                <td class="height-eval-value-cell result-cell"></td>
+                <td class="height-eval-result-cell result-cell"></td>
+                <td class="bmi-cell result-cell"></td>
+                <td class="bmi-eval-result-cell result-cell"></td>
+                <td class="age-weight-cell result-cell"></td>
+                <td class="age-weight-eval-result-cell result-cell"></td>
+                <td class="age-height-cell result-cell"></td>
+                <td class="age-height-eval-result-cell result-cell"></td>
+                <td class="height-weight-cell result-cell"></td>
+                <td class="height-weight-eval-result-cell result-cell"></td>
+                <td class="age-bmi-cell result-cell"></td>
+                <td class="age-bmi-eval-result-cell result-cell"></td>
+                <td><input type="number" class="head-circ-input" step="0.1" placeholder="3岁以下"></td>
+                <td class="age-head-cell result-cell"></td>
+                <td class="age-head-eval-result-cell result-cell"></td>
+                <td><button class="delete-btn" onclick="deleteRow(${rowCount})">删除</button></td>
+            `;
+            
+            tbody.appendChild(row);
+            updateStatus();
+        }
+
+        // 删除行
+        function deleteRow(id) {
+            const row = document.getElementById(`row-${id}`);
+            if (row) {
+                row.remove();
+                updateRowNumbers();
+                updateStatus();
+            }
+        }
+
+        // 更新行号
+        function updateRowNumbers() {
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach((row, index) => {
+                row.querySelector('td:first-child').textContent = index + 1;
+            });
+        }
+
+        // 更新状态栏
+        function updateStatus() {
+            const rowCount = document.querySelectorAll('#tableBody tr').length;
+            document.getElementById('statusBar').textContent = `共 ${rowCount} 行数据`;
+        }
+
+        // 计算年龄（月）
+        // 使用新方法：先计算年数和月数，再调整，最后转换为总月数
+        function calculateAgeMonths(birthDate, checkDate) {
+            if (!birthDate) return null;
+            const birth = new Date(birthDate);
+            const check = checkDate ? new Date(checkDate) : new Date();
+            
+            // 步骤1：计算整年数
+            let 整年数 = check.getFullYear() - birth.getFullYear();
+            
+            // 步骤2：计算整月数
+            let 整月数 = check.getMonth() - birth.getMonth();
+            
+            // 步骤3：如果测查日 < 出生日，则整月数减1（因为不足一个月）
+            if (check.getDate() < birth.getDate()) {
+                整月数--;
+            }
+            
+            // 步骤4：调整整年数和整月数，使整月数在0-11之间
+            if (整月数 < 0) {
+                整年数--;
+                整月数 += 12;
+            }
+            
+            // 返回总月数
+            return 整年数 * 12 + 整月数;
+        }
+
+        // 格式化年龄
+        function formatAge(months) {
+            if (months === null) return '';
+            const years = Math.floor(months / 12);
+            const monthsRemain = months % 12;
+            return `${years}岁${monthsRemain}月`;
+        }
+
+        // 线性插值
+        function linearInterpolate(key, k1, v1, k2, v2) {
+            if (k1 === k2) return v1;
+            return v1 + (v2 - v1) * (key - k1) / (k2 - k1);
+        }
+
+        // 查找最接近的键
+        function findClosestKeys(keys, target) {
+            keys = keys.sort((a, b) => a - b);
+            if (target <= keys[0]) return [keys[0], keys[0]];
+            if (target >= keys[keys.length - 1]) return [keys[keys.length - 1], keys[keys.length - 1]];
+            for (let i = 0; i < keys.length - 1; i++) {
+                if (target >= keys[i] && target <= keys[i + 1]) {
+                    return [keys[i], keys[i + 1]];
+                }
+            }
+            return [keys[0], keys[keys.length - 1]];
+        }
+
+        // 获取百分位数值
+        function getPercentileValue(table, key, percentile) {
+            if (!table || key === null) return null;
+            const keys = Object.keys(table).map(k => parseInt(k));
+            if (key in table) {
+                return table[key][percentile];
+            }
+            const [k1, k2] = findClosestKeys(keys, key);
+            const v1 = table[k1][percentile];
+            const v2 = table[k2][percentile];
+            return linearInterpolate(key, k1, v1, k2, v2);
+        }
+
+        // 计算百分位
+        function calculatePercentile(value, table, key) {
+            if (value === null || key === null) return null;
+            const keys = Object.keys(table).map(k => parseInt(k));
+            let tableEntry;
+            if (key in table) {
+                tableEntry = table[key];
+            } else {
+                const [k1, k2] = findClosestKeys(keys, key);
+                const percentiles = ['P3', 'P10', 'P25', 'P50', 'P75', 'P90', 'P97'];
+                tableEntry = {};
+                percentiles.forEach(p => {
+                    const v1 = table[k1][p];
+                    const v2 = table[k2][p];
+                    tableEntry[p] = linearInterpolate(key, k1, v1, k2, v2);
+                });
+            }
+            const percentiles = ['P3', 'P10', 'P25', 'P50', 'P75', 'P90', 'P97'];
+            if (value < tableEntry.P3) return '<P3';
+            if (value > tableEntry.P97) return '>P97';
+            for (let i = 0; i < percentiles.length - 1; i++) {
+                const p1 = percentiles[i];
+                const p2 = percentiles[i + 1];
+                if (value >= tableEntry[p1] && value <= tableEntry[p2]) {
+                    let pValue;
+                    if (i === 0) pValue = 3 + (value - tableEntry[p1]) / (tableEntry[p2] - tableEntry[p1]) * 7;
+                    else if (i === 1) pValue = 10 + (value - tableEntry[p1]) / (tableEntry[p2] - tableEntry[p1]) * 15;
+                    else if (i === 2) pValue = 25 + (value - tableEntry[p1]) / (tableEntry[p2] - tableEntry[p1]) * 25;
+                    else if (i === 3) pValue = 50 + (value - tableEntry[p1]) / (tableEntry[p2] - tableEntry[p1]) * 25;
+                    else if (i === 4) pValue = 75 + (value - tableEntry[p1]) / (tableEntry[p2] - tableEntry[p1]) * 15;
+                    else pValue = 90 + (value - tableEntry[p1]) / (tableEntry[p2] - tableEntry[p1]) * 7;
+                    return 'P' + Math.round(pValue);
+                }
+            }
+            return '未知';
+        }
+
+        // 计算标准差
+        function calculateStdScore(value, p50, p97, p3) {
+            if (value === null || p50 === null) return null;
+            let sd;
+            if (p97 !== null && p3 !== null) {
+                sd = (p97 - p3) / 3.76;
+            } else if (p97 !== null) {
+                sd = (p97 - p50) / 1.88;
+            } else if (p3 !== null) {
+                sd = (p50 - p3) / 1.88;
+            } else {
+                return null;
+            }
+            if (sd === 0) return null;
+            return Math.round(((value - p50) / sd) * 100) / 100;
+        }
+
+        // 计算标准差数值
+        function calculateStdForValue(value, table, key) {
+            if (value === null || key === null) return null;
+            const keys = Object.keys(table).map(k => parseInt(k));
+            let p50, p97, p3;
+            if (key in table) {
+                p50 = table[key].P50;
+                p97 = table[key].P97;
+                p3 = table[key].P3;
+            } else {
+                const [k1, k2] = findClosestKeys(keys, key);
+                p50 = linearInterpolate(key, k1, table[k1].P50, k2, table[k2].P50);
+                p97 = linearInterpolate(key, k1, table[k1].P97, k2, table[k2].P97);
+                p3 = linearInterpolate(key, k1, table[k1].P3, k2, table[k2].P3);
+            }
+            return calculateStdScore(value, p50, p97, p3);
+        }
+
+        // 根据百分位计算评价
+        function calculateEvaluationFromPercentile(percentileStr) {
+            if (!percentileStr || percentileStr === '未知') return {value: null, result: null};
+            if (percentileStr.startsWith('<')) return {value: '<P3', result: '下'};
+            if (percentileStr.startsWith('>')) return {value: '≥P97', result: '上'};
+            if (percentileStr.startsWith('P')) {
+                const pValue = parseInt(percentileStr.substring(1));
+                if (pValue >= 97) return {value: 'P' + pValue, result: '上'};
+                if (pValue >= 75) return {value: 'P' + pValue, result: '中上'};
+                if (pValue >= 25) return {value: 'P' + pValue, result: '中'};
+                if (pValue >= 3) return {value: 'P' + pValue, result: '中下'};
+                return {value: 'P' + pValue, result: '下'};
+            }
+            return {value: null, result: null};
+        }
+
+        // 根据标准差计算评价
+        function calculateEvaluationFromStd(stdValue) {
+            if (stdValue === null) return {value: null, result: null};
+            if (stdValue >= 2) return {value: stdValue.toFixed(2) + 'SD', result: '上'};
+            if (stdValue >= 1) return {value: stdValue.toFixed(2) + 'SD', result: '中上'};
+            if (stdValue >= -1) return {value: stdValue.toFixed(2) + 'SD', result: '中'};
+            if (stdValue >= -2) return {value: stdValue.toFixed(2) + 'SD', result: '中下'};
+            return {value: stdValue.toFixed(2) + 'SD', result: '下'};
+        }
+
+        // 根据百分位计算营养状况评价（按照表3标准）
+        function calculateNutritionFromPercentile(percentileStr, indicatorType) {
+            if (!percentileStr || percentileStr === '未知') return null;
+            let stdApprox;
+            if (percentileStr.startsWith('<')) stdApprox = -2.5;
+            else if (percentileStr.startsWith('>')) stdApprox = 2.5;
+            else if (percentileStr.startsWith('P')) {
+                const pValue = parseInt(percentileStr.substring(1));
+                if (pValue >= 97) stdApprox = 1.88 + (pValue - 97) / 3 * 1.12;
+                else if (pValue >= 90) stdApprox = 1.28 + (pValue - 90) / 7 * 0.60;
+                else if (pValue >= 75) stdApprox = 0.67 + (pValue - 75) / 15 * 0.61;
+                else if (pValue >= 50) stdApprox = 0 + (pValue - 50) / 25 * 0.67;
+                else if (pValue >= 25) stdApprox = -0.67 + (pValue - 25) / 25 * 0.61;
+                else if (pValue >= 10) stdApprox = -1.28 + (pValue - 10) / 15 * 0.60;
+                else if (pValue >= 3) stdApprox = -1.88 + (pValue - 3) / 7 * 0.60;
+                else stdApprox = -2.5;
+            } else return null;
+            
+            // 根据表3标准判断营养状况
+            if (indicatorType === '年龄别体重') {
+                if (stdApprox < -3) return '重度低体重';
+                if (stdApprox < -2) return '低体重';
+                return ''; // 正常范围，不显示评价
+            } else if (indicatorType === '年龄别身高') {
+                if (stdApprox < -3) return '重度生长迟缓';
+                if (stdApprox < -2) return '生长迟缓';
+                return ''; // 正常范围，不显示评价
+            } else if (indicatorType === '身高别体重' || indicatorType === '年龄别BMI') {
+                if (stdApprox >= 3) return '重度肥胖';
+                if (stdApprox >= 2) return '肥胖';
+                if (stdApprox >= 1) return '超重';
+                if (stdApprox < -3) return '重度消瘦';
+                if (stdApprox < -2) return '消瘦';
+                return ''; // 正常范围（-2 SD ≤ • < +1 SD），不显示评价
+            }
+            return null;
+        }
+
+        // 根据标准差计算营养状况评价（按照表3标准）
+        function calculateNutritionFromStd(stdValue, indicatorType) {
+            if (stdValue === null) return null;
+            
+            // 根据表3标准判断营养状况
+            if (indicatorType === '年龄别体重') {
+                if (stdValue < -3) return '重度低体重';
+                if (stdValue < -2) return '低体重';
+                return ''; // 正常范围，不显示评价
+            } else if (indicatorType === '年龄别身高') {
+                if (stdValue < -3) return '重度生长迟缓';
+                if (stdValue < -2) return '生长迟缓';
+                return ''; // 正常范围，不显示评价
+            } else if (indicatorType === '身高别体重' || indicatorType === '年龄别BMI') {
+                if (stdValue >= 3) return '重度肥胖';
+                if (stdValue >= 2) return '肥胖';
+                if (stdValue >= 1) return '超重';
+                if (stdValue < -3) return '重度消瘦';
+                if (stdValue < -2) return '消瘦';
+                return ''; // 正常范围（-2 SD ≤ • < +1 SD），不显示评价
+            }
+            return null;
+        }
+
+        // 计算单行
+        function calculateRow(row) {
+            const gender = row.querySelector('.gender-input').value;
+            const birthDate = row.querySelector('.birth-date-input').value;
+            const checkDate = row.querySelector('.check-date-input').value;
+            const weight = parseFloat(row.querySelector('.weight-input').value) || null;
+            const height = parseFloat(row.querySelector('.height-input').value) || null;
+            const headCirc = parseFloat(row.querySelector('.head-circ-input').value) || null;
+
+            if (!gender || !birthDate) {
+                return; // 跳过没有必需数据的行
+            }
+
+            const ageMonths = calculateAgeMonths(birthDate, checkDate);
+            if (ageMonths === null || ageMonths < 0 || ageMonths > 84) {
+                return;
+            }
+
+            // 更新年龄
+            row.querySelector('.age-cell').textContent = formatAge(ageMonths);
+
+            // 获取数据表
+            const weightTable = gender === '男' ? ageWeightBoy : ageWeightGirl;
+            const heightTable = gender === '男' ? ageHeightBoy : ageHeightGirl;
+            const bmiTable = gender === '男' ? ageBMIBoy : ageBMIGirl;
+
+            // 标准体重和身高
+            const stdWeight = getPercentileValue(weightTable, ageMonths, 'P50');
+            const stdHeight = getPercentileValue(heightTable, ageMonths, 'P50');
+            if (stdWeight) row.querySelector('.std-weight-cell').textContent = stdWeight.toFixed(1);
+            if (stdHeight) row.querySelector('.std-height-cell').textContent = stdHeight.toFixed(1);
+
+            // BMI
+            let bmi = null;
+            if (weight && height) {
+                bmi = Math.round((weight / Math.pow(height / 100, 2)) * 10) / 10;
+                row.querySelector('.bmi-cell').textContent = bmi.toFixed(1);
+            }
+
+            // 体重计算
+            if (weight) {
+                if (currentMode === 'percentile') {
+                    const percentile = calculatePercentile(weight, weightTable, ageMonths);
+                    if (percentile) {
+                        row.querySelector('.age-weight-cell').textContent = percentile;
+                        const eval = calculateEvaluationFromPercentile(percentile);
+                        if (eval.value) row.querySelector('.weight-eval-value-cell').textContent = eval.value;
+                        if (eval.result) row.querySelector('.weight-eval-result-cell').textContent = eval.result;
+                        // 年龄别体重的评价结果列显示营养状况评价（表3标准）
+                        const nutrition = calculateNutritionFromPercentile(percentile, '年龄别体重');
+                        const nutritionCell = row.querySelector('.age-weight-eval-result-cell');
+                        if (nutritionCell) {
+                            nutritionCell.textContent = nutrition !== null ? nutrition : '';
+                        }
+                    }
+                } else {
+                    const std = calculateStdForValue(weight, weightTable, ageMonths);
+                    if (std !== null) {
+                        row.querySelector('.age-weight-cell').textContent = std.toFixed(2) + 'SD';
+                        const eval = calculateEvaluationFromStd(std);
+                        if (eval.value) row.querySelector('.weight-eval-value-cell').textContent = eval.value;
+                        if (eval.result) row.querySelector('.weight-eval-result-cell').textContent = eval.result;
+                        // 年龄别体重的评价结果列显示营养状况评价（表3标准）
+                        const nutrition = calculateNutritionFromStd(std, '年龄别体重');
+                        const nutritionCell = row.querySelector('.age-weight-eval-result-cell');
+                        if (nutritionCell) {
+                            nutritionCell.textContent = nutrition !== null ? nutrition : '';
+                        }
+                    }
+                }
+            }
+
+            // 身高计算
+            if (height) {
+                if (currentMode === 'percentile') {
+                    const percentile = calculatePercentile(height, heightTable, ageMonths);
+                    if (percentile) {
+                        row.querySelector('.age-height-cell').textContent = percentile;
+                        const eval = calculateEvaluationFromPercentile(percentile);
+                        if (eval.value) row.querySelector('.height-eval-value-cell').textContent = eval.value;
+                        if (eval.result) row.querySelector('.height-eval-result-cell').textContent = eval.result;
+                        // 年龄别身高的评价结果列显示营养状况评价（表3标准）
+                        const nutrition = calculateNutritionFromPercentile(percentile, '年龄别身高');
+                        const nutritionCell = row.querySelector('.age-height-eval-result-cell');
+                        if (nutritionCell) {
+                            nutritionCell.textContent = nutrition !== null ? nutrition : '';
+                        }
+                    }
+                } else {
+                    const std = calculateStdForValue(height, heightTable, ageMonths);
+                    if (std !== null) {
+                        row.querySelector('.age-height-cell').textContent = std.toFixed(2) + 'SD';
+                        const eval = calculateEvaluationFromStd(std);
+                        if (eval.value) row.querySelector('.height-eval-value-cell').textContent = eval.value;
+                        if (eval.result) row.querySelector('.height-eval-result-cell').textContent = eval.result;
+                        // 年龄别身高的评价结果列显示营养状况评价（表3标准）
+                        const nutrition = calculateNutritionFromStd(std, '年龄别身高');
+                        const nutritionCell = row.querySelector('.age-height-eval-result-cell');
+                        if (nutritionCell) {
+                            nutritionCell.textContent = nutrition !== null ? nutrition : '';
+                        }
+                    }
+                }
+            }
+
+            // BMI计算
+            if (bmi) {
+                if (currentMode === 'percentile') {
+                    const percentile = calculatePercentile(bmi, bmiTable, ageMonths);
+                    if (percentile) {
+                        row.querySelector('.age-bmi-cell').textContent = percentile;
+                        const eval = calculateEvaluationFromPercentile(percentile);
+                        if (eval.result) row.querySelector('.bmi-eval-result-cell').textContent = eval.result;
+                        const nutrition = calculateNutritionFromPercentile(percentile, '年龄别BMI');
+                        // 确保评价结果正确显示
+                        const nutritionCell = row.querySelector('.age-bmi-eval-result-cell');
+                        if (nutritionCell) {
+                            nutritionCell.textContent = nutrition !== null ? nutrition : '';
+                        }
+                    }
+                } else {
+                    const std = calculateStdForValue(bmi, bmiTable, ageMonths);
+                    if (std !== null) {
+                        row.querySelector('.age-bmi-cell').textContent = std.toFixed(2) + 'SD';
+                        const eval = calculateEvaluationFromStd(std);
+                        if (eval.result) row.querySelector('.bmi-eval-result-cell').textContent = eval.result;
+                        const nutrition = calculateNutritionFromStd(std, '年龄别BMI');
+                        // 确保评价结果正确显示
+                        const nutritionCell = row.querySelector('.age-bmi-eval-result-cell');
+                        if (nutritionCell) {
+                            nutritionCell.textContent = nutrition !== null ? nutrition : '';
+                        }
+                    }
+                }
+            }
+
+            // 身高别体重计算
+            if (weight && height) {
+                let heightWeightTable;
+                if (ageMonths < 24) {
+                    heightWeightTable = gender === '男' ? lengthWeightBoy0_2 : lengthWeightGirl0_2;
+                } else {
+                    heightWeightTable = gender === '男' ? heightWeightBoy2_7 : heightWeightGirl2_7;
+                }
+                const heightRounded = Math.round(height);
+                if (currentMode === 'percentile') {
+                    const percentile = calculatePercentile(weight, heightWeightTable, heightRounded);
+                    if (percentile) {
+                        row.querySelector('.height-weight-cell').textContent = percentile;
+                        const nutrition = calculateNutritionFromPercentile(percentile, '身高别体重');
+                        // 确保评价结果正确显示
+                        const nutritionCell = row.querySelector('.height-weight-eval-result-cell');
+                        if (nutritionCell) {
+                            nutritionCell.textContent = nutrition !== null ? nutrition : '';
+                        }
+                    }
+                } else {
+                    const std = calculateStdForValue(weight, heightWeightTable, heightRounded);
+                    if (std !== null) {
+                        row.querySelector('.height-weight-cell').textContent = std.toFixed(2) + 'SD';
+                        const nutrition = calculateNutritionFromStd(std, '身高别体重');
+                        // 确保评价结果正确显示
+                        const nutritionCell = row.querySelector('.height-weight-eval-result-cell');
+                        if (nutritionCell) {
+                            nutritionCell.textContent = nutrition !== null ? nutrition : '';
+                        }
+                    }
+                }
+            }
+
+            // 年龄别头围计算（仅3岁以下）
+            if (headCirc && ageMonths <= 36) {
+                const headTable = gender === '男' ? ageHeadBoy : ageHeadGirl;
+                if (currentMode === 'percentile') {
+                    const percentile = calculatePercentile(headCirc, headTable, ageMonths);
+                    if (percentile) {
+                        row.querySelector('.age-head-cell').textContent = percentile;
+                        const eval = calculateEvaluationFromPercentile(percentile);
+                        // 即使返回空也要设置（清空之前的值）
+                        row.querySelector('.age-head-eval-result-cell').textContent = eval.result || '';
+                    }
+                } else {
+                    const std = calculateStdForValue(headCirc, headTable, ageMonths);
+                    if (std !== null) {
+                        row.querySelector('.age-head-cell').textContent = std.toFixed(2) + 'SD';
+                        const eval = calculateEvaluationFromStd(std);
+                        // 即使返回空也要设置（清空之前的值）
+                        row.querySelector('.age-head-eval-result-cell').textContent = eval.result || '';
+                    }
+                }
+            } else {
+                // 如果不是3岁以下或没有头围数据，清空相关单元格
+                row.querySelector('.age-head-cell').textContent = '';
+                row.querySelector('.age-head-eval-result-cell').textContent = '';
+            }
+        }
+
+        // 批量计算
+        function calculateAll() {
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach(row => calculateRow(row));
+            alert(`已计算 ${rows.length} 行数据！`);
+        }
+
+        // 清空所有
+        function clearAll() {
+            if (confirm('确定要清空所有数据吗？')) {
+                document.getElementById('tableBody').innerHTML = '';
+                rowCount = 0;
+                updateStatus();
+            }
+        }
+
+        // 导入Excel
+        function importExcel(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    
+                    // 读取第一个工作表
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    
+                    // 转换为JSON格式
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1, defval: ''});
+                    
+                    if (jsonData.length < 2) {
+                        alert('Excel文件数据不足，至少需要表头和数据行！');
+                        return;
+                    }
+
+                    // 查找表头行（可能不在第一行）
+                    let headerRowIndex = 0;
+                    let headers = [];
+                    let colMap = {};
+                    
+                    // 尝试从第一行开始查找，如果第一行没有找到"性别"和"出生日期"，继续查找
+                    for (let rowIdx = 0; rowIdx < Math.min(5, jsonData.length); rowIdx++) {
+                        headers = jsonData[rowIdx].map(h => String(h || '').trim());
+                        colMap = {};
+                        
+                        // 匹配列名（支持多种可能的列名，不区分大小写）
+                        headers.forEach((header, index) => {
+                            if (!header) return;
+                            const h = header.toLowerCase();
+                            // 移除所有空格和特殊字符进行匹配
+                            const hClean = h.replace(/\s+/g, '');
+                            
+                            if (hClean.includes('姓名') || h.includes('name')) colMap.name = index;
+                            else if (hClean.includes('性别') || h.includes('gender') || h.includes('sex')) colMap.gender = index;
+                            else if (hClean.includes('出生日期') || hClean.includes('出生') || h.includes('birth') || h.includes('birthdate')) colMap.birthDate = index;
+                            else if (hClean.includes('测查日期') || hClean.includes('检查日期') || hClean.includes('测量日期') || h.includes('check') || (h.includes('date') && !h.includes('birth'))) colMap.checkDate = index;
+                            else if (hClean.includes('体重') && !hClean.includes('标准') && !hClean.includes('增值')) colMap.weight = index;
+                            else if (hClean.includes('身高') && !hClean.includes('标准') && !hClean.includes('增值')) colMap.height = index;
+                            else if (hClean.includes('头围') && !hClean.includes('标准')) colMap.headCirc = index;
+                        });
+
+                        // 如果找到了必需的列，使用这一行作为表头
+                        if (colMap.gender !== undefined && colMap.birthDate !== undefined) {
+                            headerRowIndex = rowIdx;
+                            break;
+                        }
+                    }
+
+                    // 如果仍然没有找到必需的列，显示错误信息
+                    if (colMap.gender === undefined || colMap.birthDate === undefined) {
+                        const foundHeaders = headers.filter(h => h).join('、');
+                        alert(`Excel文件必须包含"性别"和"出生日期"列！\n\n检测到的列名：${foundHeaders || '未找到任何列名'}\n\n请确保Excel文件的第一行包含表头，且包含"性别"和"出生日期"列。`);
+                        return;
+                    }
+
+                    // 清空现有数据
+                    if (confirm('导入数据将覆盖现有数据，是否继续？')) {
+                        document.getElementById('tableBody').innerHTML = '';
+                        rowCount = 0;
+
+                        // 从表头行的下一行开始读取数据
+                        let importedCount = 0;
+                        for (let i = headerRowIndex + 1; i < jsonData.length; i++) {
+                            const row = jsonData[i];
+                            if (!row || row.length === 0) continue;
+
+                            // 检查是否有必需数据
+                            const gender = row[colMap.gender] ? String(row[colMap.gender]).trim() : '';
+                            const birthDate = row[colMap.birthDate] ? String(row[colMap.birthDate]).trim() : '';
+                            
+                            if (!gender || !birthDate) continue; // 跳过没有必需数据的行
+
+                            // 添加新行
+                            addRow();
+
+                            // 获取最后添加的行
+                            const rows = document.querySelectorAll('#tableBody tr');
+                            const newRow = rows[rows.length - 1];
+
+                            // 填充数据
+                            if (colMap.name && row[colMap.name]) {
+                                newRow.querySelector('.name-input').value = String(row[colMap.name]).trim();
+                            }
+                            
+                            if (gender) {
+                                const genderSelect = newRow.querySelector('.gender-input');
+                                if (gender === '男' || gender === 'M' || gender === 'male' || gender === '1') {
+                                    genderSelect.value = '男';
+                                } else if (gender === '女' || gender === 'F' || gender === 'female' || gender === '2') {
+                                    genderSelect.value = '女';
+                                }
+                            }
+
+                            if (birthDate) {
+                                // 处理日期格式（支持多种格式）
+                                let dateStr = birthDate;
+                                // 如果是Excel日期数字，转换为日期字符串
+                                if (!isNaN(birthDate) && birthDate > 25569) {
+                                    // Excel日期从1900-01-01开始，需要转换
+                                    const excelEpoch = new Date(1899, 11, 30);
+                                    const date = new Date(excelEpoch.getTime() + (birthDate - 1) * 86400000);
+                                    dateStr = date.toISOString().split('T')[0];
+                                } else if (birthDate.includes('/')) {
+                                    // 处理 2024/1/1 格式
+                                    const parts = birthDate.split('/');
+                                    if (parts.length === 3) {
+                                        dateStr = `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+                                    }
+                                } else if (birthDate.length === 8 && !birthDate.includes('-')) {
+                                    // 处理 20240101 格式
+                                    dateStr = `${birthDate.substring(0, 4)}-${birthDate.substring(4, 6)}-${birthDate.substring(6, 8)}`;
+                                }
+                                newRow.querySelector('.birth-date-input').value = dateStr;
+                            }
+
+                            if (colMap.checkDate && row[colMap.checkDate]) {
+                                let checkDateStr = String(row[colMap.checkDate]).trim();
+                                // 处理日期格式
+                                if (!isNaN(checkDateStr) && checkDateStr > 25569) {
+                                    const excelEpoch = new Date(1899, 11, 30);
+                                    const date = new Date(excelEpoch.getTime() + (checkDateStr - 1) * 86400000);
+                                    checkDateStr = date.toISOString().split('T')[0];
+                                } else if (checkDateStr.includes('/')) {
+                                    const parts = checkDateStr.split('/');
+                                    if (parts.length === 3) {
+                                        checkDateStr = `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+                                    }
+                                } else if (checkDateStr.length === 8 && !checkDateStr.includes('-')) {
+                                    checkDateStr = `${checkDateStr.substring(0, 4)}-${checkDateStr.substring(4, 6)}-${checkDateStr.substring(6, 8)}`;
+                                }
+                                newRow.querySelector('.check-date-input').value = checkDateStr;
+                            }
+
+                            if (colMap.weight !== undefined && row[colMap.weight] !== undefined && row[colMap.weight] !== '') {
+                                let weightStr = String(row[colMap.weight]).trim();
+                                // 处理以小数点结尾的情况（如"21."）
+                                if (weightStr.endsWith('.')) {
+                                    weightStr = weightStr.slice(0, -1);
+                                }
+                                const weight = parseFloat(weightStr);
+                                if (!isNaN(weight) && weight > 0) {
+                                    newRow.querySelector('.weight-input').value = weight;
+                                }
+                            }
+
+                            if (colMap.height !== undefined && row[colMap.height] !== undefined && row[colMap.height] !== '') {
+                                let heightStr = String(row[colMap.height]).trim();
+                                // 处理以小数点结尾的情况
+                                if (heightStr.endsWith('.')) {
+                                    heightStr = heightStr.slice(0, -1);
+                                }
+                                const height = parseFloat(heightStr);
+                                if (!isNaN(height) && height > 0) {
+                                    newRow.querySelector('.height-input').value = height;
+                                }
+                            }
+
+                            if (colMap.headCirc !== undefined && row[colMap.headCirc] !== undefined && row[colMap.headCirc] !== '') {
+                                let headCircStr = String(row[colMap.headCirc]).trim();
+                                // 处理以小数点结尾的情况
+                                if (headCircStr.endsWith('.')) {
+                                    headCircStr = headCircStr.slice(0, -1);
+                                }
+                                const headCirc = parseFloat(headCircStr);
+                                if (!isNaN(headCirc) && headCirc > 0) {
+                                    newRow.querySelector('.head-circ-input').value = headCirc;
+                                }
+                            }
+
+                            importedCount++;
+                        }
+
+                        // 自动计算所有导入的数据
+                        setTimeout(() => {
+                            calculateAll();
+                            alert(`成功导入 ${importedCount} 条数据并完成计算！`);
+                        }, 100);
+
+                        // 清空文件输入，以便可以再次选择同一文件
+                        event.target.value = '';
+                    }
+                } catch (error) {
+                    console.error('导入Excel错误:', error);
+                    alert('导入Excel文件失败：' + error.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // 导出Excel
+        function exportExcel() {
+            const rows = document.querySelectorAll('#tableBody tr');
+            if (rows.length === 0) {
+                alert('没有数据可导出！');
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+            const wsData = [];
+
+            // 表头
+            wsData.push([
+                '序号', '姓名', '性别', '出生日期', '实足年龄年月', '测查日期',
+                '体重(kg)', '标准体重(kg)', '评价值', '评价结果',
+                '身高(cm)', '标准身高(cm)', '评价值', '评价结果',
+                'BMI', '评价结果',
+                '儿童年龄别体重', '评价结果',
+                '年龄别身高', '评价结果',
+                '身高别体重', '评价结果',
+                '年龄别BMI', '评价结果',
+                '头围', '年龄别头围', '评价结果'
+            ]);
+
+            // 数据行
+            rows.forEach(row => {
+                const rowData = [
+                    row.querySelector('td:first-child').textContent,
+                    row.querySelector('.name-input').value || '',
+                    row.querySelector('.gender-input').value || '',
+                    row.querySelector('.birth-date-input').value || '',
+                    row.querySelector('.age-cell').textContent,
+                    row.querySelector('.check-date-input').value || '',
+                    row.querySelector('.weight-input').value || '',
+                    row.querySelector('.std-weight-cell').textContent,
+                    row.querySelector('.weight-eval-value-cell').textContent,
+                    row.querySelector('.weight-eval-result-cell').textContent,
+                    row.querySelector('.height-input').value || '',
+                    row.querySelector('.std-height-cell').textContent,
+                    row.querySelector('.height-eval-value-cell').textContent,
+                    row.querySelector('.height-eval-result-cell').textContent,
+                    row.querySelector('.bmi-cell').textContent,
+                    row.querySelector('.bmi-eval-result-cell').textContent,
+                    row.querySelector('.age-weight-cell').textContent,
+                    row.querySelector('.age-weight-eval-result-cell').textContent,
+                    row.querySelector('.age-height-cell').textContent,
+                    row.querySelector('.age-height-eval-result-cell').textContent,
+                    row.querySelector('.height-weight-cell').textContent,
+                    row.querySelector('.height-weight-eval-result-cell').textContent,
+                    row.querySelector('.age-bmi-cell').textContent,
+                    row.querySelector('.age-bmi-eval-result-cell').textContent,
+                    row.querySelector('.head-circ-input').value || '',
+                    row.querySelector('.age-head-cell').textContent,
+                    row.querySelector('.age-head-eval-result-cell').textContent
+                ];
+                wsData.push(rowData);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, '儿童生长标准');
+
+            const modeText = currentMode === 'percentile' ? '百分位' : '标准差';
+            const fileName = `儿童生长标准计算表_${modeText}_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+            alert('导出成功！');
+        }
+
+        // 初始化：添加一行
+        window.onload = function() {
+            addRow();
+        };
+    </script>
 </body>
 </html>

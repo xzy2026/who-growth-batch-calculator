@@ -326,11 +326,12 @@
             <div class="info-box">
                 <h3>使用说明</h3>
                 <p>1. 选择计算模式（百分位数值或标准差数值）</p>
-                <p>2. 点击"导入Excel"按钮可从Excel文件导入数据（支持姓名、性别、出生日期、测查日期、体重、身高、头围等）</p>
-                <p>3. 或点击"添加行"按钮手动添加儿童数据行</p>
-                <p>4. 输入儿童信息（性别和出生日期为必填项）</p>
-                <p>5. 点击"批量计算"按钮计算所有数据（导入Excel后会自动计算）</p>
-                <p>6. 点击"导出Excel"按钮导出结果</p>
+                <p>2. 点击"下载模板"按钮下载Excel数据模板，填写数据后使用"导入Excel"按钮导入</p>
+                <p>3. 点击"导入Excel"按钮可从Excel文件导入数据（支持姓名、性别、出生日期、测查日期、体重、身高、头围等）</p>
+                <p>4. 或点击"添加行"按钮手动添加儿童数据行</p>
+                <p>5. 输入儿童信息（性别和出生日期为必填项）</p>
+                <p>6. 点击"批量计算"按钮计算所有数据（导入Excel后会自动计算）</p>
+                <p>7. 点击"导出Excel"按钮导出结果</p>
             </div>
 
             <div class="toolbar">
@@ -340,6 +341,7 @@
                 </div>
                 <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display: none;" onchange="importExcel(event)">
                 <button class="btn btn-info" onclick="document.getElementById('excelFileInput').click()">导入Excel</button>
+                <button class="btn btn-info" onclick="downloadTemplate()">下载模板</button>
                 <button class="btn btn-primary" onclick="addRow()">添加行</button>
                 <button class="btn btn-success" onclick="calculateAll()">批量计算</button>
                 <button class="btn btn-warning" onclick="exportExcel()">导出Excel</button>
@@ -1368,6 +1370,54 @@
             const fileName = `儿童生长标准计算表_${modeText}_${new Date().toISOString().split('T')[0]}.xlsx`;
             XLSX.writeFile(wb, fileName);
             alert('导出成功！');
+        }
+
+        // 下载Excel模板
+        function downloadTemplate() {
+            const wb = XLSX.utils.book_new();
+            const wsData = [];
+
+            // 表头
+            wsData.push([
+                '序号',
+                '姓名',
+                '性别',
+                '出生日期',
+                '测查日期',
+                '体重（kg)',
+                '身高(cm)'
+            ]);
+
+            // 添加一行示例数据（帮助用户理解格式）
+            wsData.push([
+                1,
+                '示例',
+                '男',
+                '2020-01-01',
+                '2024-01-01',
+                '',
+                ''
+            ]);
+
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            
+            // 设置列宽
+            const colWidths = [
+                { wch: 8 },   // 序号
+                { wch: 12 },  // 姓名
+                { wch: 8 },   // 性别
+                { wch: 12 },  // 出生日期
+                { wch: 12 },  // 测查日期
+                { wch: 12 },  // 体重（kg)
+                { wch: 12 }   // 身高(cm)
+            ];
+            ws['!cols'] = colWidths;
+
+            XLSX.utils.book_append_sheet(wb, ws, '数据模板');
+
+            const fileName = '儿童生长标准数据模板.xlsx';
+            XLSX.writeFile(wb, fileName);
+            alert('模板下载成功！\n\n模板包含以下列：\n序号、姓名、性别、出生日期、测查日期、体重（kg)、身高(cm)\n\n请填写数据后使用"导入Excel"功能导入。');
         }
 
         // 初始化：添加一行

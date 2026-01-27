@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>7岁以下儿童生长标准批量计算器</title>
+    <!-- Favicon (浏览器标签页小图标) -->
+    <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+    <link rel="shortcut icon" type="image/jpeg" href="assets/logo.jpg">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * {
@@ -40,7 +43,7 @@
         }
 
         .header-logo {
-            height: 60px;
+            height: 90px;
             width: auto;
             /* 移除滤镜，显示logo原始颜色 */
         }
@@ -704,7 +707,7 @@
             
             // 步骤4：调整整年数和整月数，使整月数在0-11之间
             if (整月数 < 0) {
-                整年数--;
+                整年数--; 
                 整月数 += 12;
             }
             

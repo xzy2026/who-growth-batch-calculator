@@ -33,6 +33,20 @@
             color: white;
             padding: 30px;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .header-logo {
+            height: 60px;
+            width: auto;
+            filter: brightness(0) invert(1);
+        }
+
+        .header-content {
+            flex: 1;
         }
 
         .header h1 {
@@ -318,8 +332,11 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>7岁以下儿童生长标准批量计算器</h1>
-            <p>支持批量输入和导出Excel表格（根据WS/T 423-2022标准）</p>
+            <img src="assets/logo.png" alt="Logo" class="header-logo" onerror="this.style.display='none'">
+            <div class="header-content">
+                <h1>7岁以下儿童生长标准批量计算器</h1>
+                <p>支持批量输入和导出Excel表格（根据WS/T 423-2022标准）</p>
+            </div>
         </div>
         
         <div class="content">

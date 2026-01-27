@@ -214,7 +214,8 @@
             position: sticky;
             top: 0;
             z-index: 10;
-            white-space: nowrap;
+            white-space: normal;
+            word-wrap: break-word;
             font-size: 13px;
             line-height: 1.4;
         }
@@ -243,6 +244,14 @@
             border-radius: 4px;
             font-size: 14px;
             min-width: 60px;
+            box-sizing: border-box;
+        }
+        
+        input::placeholder {
+            font-size: 13px;
+            color: #999;
+            white-space: normal;
+            overflow: visible;
         }
         
         select {
@@ -389,27 +398,27 @@
                             <th style="width: 110px;">出生日期</th>
                             <th style="width: 100px;">实足年龄</th>
                             <th style="width: 110px;">测查日期</th>
-                            <th style="width: 90px;">体重(kg)</th>
-                            <th style="width: 100px;">标准体重(kg)</th>
-                            <th style="width: 80px;">评价值</th>
-                            <th style="width: 85px;">评价结果</th>
-                            <th style="width: 90px;">身高(cm)</th>
-                            <th style="width: 100px;">标准身高(cm)</th>
-                            <th style="width: 80px;">评价值</th>
-                            <th style="width: 85px;">评价结果</th>
+                            <th style="width: 100px;">体重(kg)</th>
+                            <th style="width: 110px;">标准体重(kg)</th>
+                            <th style="width: 90px;">评价值</th>
+                            <th style="width: 95px;">评价结果</th>
+                            <th style="width: 100px;">身高(cm)</th>
+                            <th style="width: 110px;">标准身高(cm)</th>
+                            <th style="width: 90px;">评价值</th>
+                            <th style="width: 95px;">评价结果</th>
                             <th style="width: 70px;">BMI</th>
                             <th style="width: 85px;">评价结果</th>
-                            <th style="width: 110px;">年龄别体重</th>
-                            <th style="width: 85px;">评价结果</th>
-                            <th style="width: 110px;">年龄别身高</th>
-                            <th style="width: 85px;">评价结果</th>
-                            <th style="width: 110px;">身高别体重</th>
-                            <th style="width: 85px;">评价结果</th>
-                            <th style="width: 110px;">年龄别BMI</th>
-                            <th style="width: 85px;">评价结果</th>
-                            <th style="width: 70px;">头围(cm)</th>
-                            <th style="width: 110px;">年龄别头围</th>
-                            <th style="width: 85px;">评价结果</th>
+                            <th style="width: 120px;">年龄别体重</th>
+                            <th style="width: 95px;">评价结果</th>
+                            <th style="width: 120px;">年龄别身高</th>
+                            <th style="width: 95px;">评价结果</th>
+                            <th style="width: 120px;">身高别体重</th>
+                            <th style="width: 95px;">评价结果</th>
+                            <th style="width: 120px;">年龄别BMI</th>
+                            <th style="width: 95px;">评价结果</th>
+                            <th style="width: 90px;">头围(cm)</th>
+                            <th style="width: 120px;">年龄别头围</th>
+                            <th style="width: 95px;">评价结果</th>
                             <th style="width: 60px;">操作</th>
                         </tr>
                     </thead>

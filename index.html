@@ -155,6 +155,15 @@
             background: #ffcd39;
         }
 
+        .btn-template {
+            background: #6f42c1;
+            color: white;
+        }
+
+        .btn-template:hover {
+            background: #8560c9;
+        }
+
         .table-container {
             overflow-x: auto;
             overflow-y: auto;
@@ -363,7 +372,7 @@
                 </div>
                 <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display: none;" onchange="importExcel(event)">
                 <button class="btn btn-info" onclick="document.getElementById('excelFileInput').click()">导入Excel</button>
-                <button class="btn btn-info" onclick="downloadTemplate()">下载模板</button>
+                <button class="btn btn-template" onclick="downloadTemplate()">下载模板</button>
                 <button class="btn btn-primary" onclick="addRow()">添加行</button>
                 <button class="btn btn-success" onclick="calculateAll()">批量计算</button>
                 <button class="btn btn-warning" onclick="exportExcel()">导出Excel</button>

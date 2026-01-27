@@ -1,5 +1,5 @@
    <div align="center">
-     <img src="assets/logo.png" alt="Logo" width="200">
+     <img src="logo.png" alt="Logo" width="200">
    </div>
    
    # who-growth-batch-calculator

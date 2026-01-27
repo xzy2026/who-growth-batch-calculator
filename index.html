@@ -221,9 +221,10 @@
         }
 
         td {
-            padding: 8px;
+            padding: 10px 8px;
             border: 1px solid #ddd;
             text-align: center;
+            vertical-align: middle;
         }
 
         tr:nth-child(even) {
@@ -239,12 +240,14 @@
         input[type="date"],
         select {
             width: 100%;
-            padding: 8px;
+            padding: 10px 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 14px;
             min-width: 60px;
+            min-height: 42px;
             box-sizing: border-box;
+            line-height: 1.4;
         }
         
         input::placeholder {
@@ -252,6 +255,7 @@
             color: #999;
             white-space: normal;
             overflow: visible;
+            line-height: 1.5;
         }
         
         select {

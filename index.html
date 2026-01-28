@@ -1233,20 +1233,27 @@
             // 返回总月数
             const totalMonths = 整年数 * 12 + 整月数;
             
-            // 确保年龄在合理范围内（0-84个月）
-            if (totalMonths < 0 || totalMonths > 84) {
+            // 允许超过84个月（7岁），但负数年龄无效
+            if (totalMonths < 0) {
                 return null;
             }
             
             return totalMonths;
         }
 
-        // 格式化年龄
+        // 格式化年龄（支持超过7岁）
         function formatAge(months) {
             if (months === null || months < 0) return '-';
             const years = Math.floor(months / 12);
             const monthsRemain = months % 12;
             return `${years}岁${monthsRemain}月`;
+        }
+        
+        // 获取用于查表的年龄（如果超过84个月，使用84个月）
+        function getAgeForLookup(ageMonths) {
+            if (ageMonths === null || ageMonths < 0) return null;
+            // 如果超过84个月（7岁），使用84个月来查表
+            return ageMonths > 84 ? 84 : ageMonths;
         }
         
         // 格式化显示值（空值显示为"-"）
@@ -1493,12 +1500,15 @@
             }
 
             const ageMonths = calculateAgeMonths(birthDate, checkDate);
-            if (ageMonths === null || ageMonths < 0 || ageMonths > 84) {
+            if (ageMonths === null || ageMonths < 0) {
                 return;
             }
 
-            // 更新年龄
+            // 更新年龄（显示实际年龄，即使超过7岁）
             row.querySelector('.age-cell').textContent = formatAge(ageMonths);
+            
+            // 获取用于查表的年龄（如果超过84个月，使用84个月）
+            const lookupAgeMonths = getAgeForLookup(ageMonths);
             
             // 如果没有体重或身高数据，初始化相关单元格为"-"
             if (!weight) {
@@ -1526,9 +1536,9 @@
             const heightTable = gender === '男' ? ageHeightBoy : ageHeightGirl;
             const bmiTable = gender === '男' ? ageBMIBoy : ageBMIGirl;
 
-            // 标准体重和身高
-            const stdWeight = getPercentileValue(weightTable, ageMonths, 'P50');
-            const stdHeight = getPercentileValue(heightTable, ageMonths, 'P50');
+            // 标准体重和身高（使用查表年龄，如果超过7岁则使用84个月）
+            const stdWeight = getPercentileValue(weightTable, lookupAgeMonths, 'P50');
+            const stdHeight = getPercentileValue(heightTable, lookupAgeMonths, 'P50');
             row.querySelector('.std-weight-cell').textContent = stdWeight ? stdWeight.toFixed(1) : '-';
             row.querySelector('.std-height-cell').textContent = stdHeight ? stdHeight.toFixed(1) : '-';
 
@@ -1541,10 +1551,10 @@
                 row.querySelector('.bmi-cell').textContent = '-';
             }
 
-            // 体重计算
+            // 体重计算（使用查表年龄）
             if (weight) {
                 if (currentMode === 'percentile') {
-                    const percentile = calculatePercentile(weight, weightTable, ageMonths);
+                    const percentile = calculatePercentile(weight, weightTable, lookupAgeMonths);
                     if (percentile) {
                         row.querySelector('.age-weight-cell').textContent = percentile;
                         const eval = calculateEvaluationFromPercentile(percentile);
@@ -1566,7 +1576,7 @@
                 } else {
                     // 优先使用标准差数据表（表B.1或B.2）
                     const weightStdTable = gender === '男' ? ageWeightBoyStd : ageWeightGirlStd;
-                    const std = calculateStdForValue(weight, weightTable, ageMonths, weightStdTable);
+                    const std = calculateStdForValue(weight, weightTable, lookupAgeMonths, weightStdTable);
                     if (std !== null) {
                         row.querySelector('.age-weight-cell').textContent = std.toFixed(2) + 'SD';
                         const eval = calculateEvaluationFromStd(std);
@@ -1588,10 +1598,10 @@
                 }
             }
 
-            // 身高计算
+            // 身高计算（使用查表年龄）
             if (height) {
                 if (currentMode === 'percentile') {
-                    const percentile = calculatePercentile(height, heightTable, ageMonths);
+                    const percentile = calculatePercentile(height, heightTable, lookupAgeMonths);
                     if (percentile) {
                         row.querySelector('.age-height-cell').textContent = percentile;
                         const eval = calculateEvaluationFromPercentile(percentile);
@@ -1613,7 +1623,7 @@
                 } else {
                     // 优先使用标准差数据表（表B.3或B.4）
                     const heightStdTable = gender === '男' ? ageHeightBoyStd : ageHeightGirlStd;
-                    const std = calculateStdForValue(height, heightTable, ageMonths, heightStdTable);
+                    const std = calculateStdForValue(height, heightTable, lookupAgeMonths, heightStdTable);
                     if (std !== null) {
                         row.querySelector('.age-height-cell').textContent = std.toFixed(2) + 'SD';
                         const eval = calculateEvaluationFromStd(std);
@@ -1635,10 +1645,10 @@
                 }
             }
 
-            // BMI计算
+            // BMI计算（使用查表年龄）
             if (bmi) {
                 if (currentMode === 'percentile') {
-                    const percentile = calculatePercentile(bmi, bmiTable, ageMonths);
+                    const percentile = calculatePercentile(bmi, bmiTable, lookupAgeMonths);
                     if (percentile) {
                         row.querySelector('.age-bmi-cell').textContent = percentile;
                         const eval = calculateEvaluationFromPercentile(percentile);
@@ -1658,7 +1668,7 @@
                 } else {
                     // 优先使用标准差数据表（表B.9或B.10）
                     const bmiStdTable = gender === '男' ? ageBMIBoyStd : ageBMIGirlStd;
-                    const std = calculateStdForValue(bmi, bmiTable, ageMonths, bmiStdTable);
+                    const std = calculateStdForValue(bmi, bmiTable, lookupAgeMonths, bmiStdTable);
                     if (std !== null) {
                         row.querySelector('.age-bmi-cell').textContent = std.toFixed(2) + 'SD';
                         const eval = calculateEvaluationFromStd(std);
@@ -1678,10 +1688,12 @@
                 }
             }
 
-            // 身高别体重计算
+            // 身高别体重计算（使用查表年龄判断使用哪个表）
             if (weight && height) {
                 let heightWeightTable;
-                if (ageMonths < 24) {
+                // 如果超过7岁，使用2-7岁的表（84个月对应2-7岁表）
+                const ageForTable = lookupAgeMonths < 24 ? lookupAgeMonths : Math.min(lookupAgeMonths, 84);
+                if (ageForTable < 24) {
                     heightWeightTable = gender === '男' ? lengthWeightBoy0_2 : lengthWeightGirl0_2;
                 } else {
                     heightWeightTable = gender === '男' ? heightWeightBoy2_7 : heightWeightGirl2_7;
@@ -1705,7 +1717,7 @@
                 } else {
                     // 优先使用标准差数据表（表B.5-B.8）
                     let heightWeightStdTable = null;
-                    if (ageMonths < 24) {
+                    if (ageForTable < 24) {
                         heightWeightStdTable = gender === '男' ? lengthWeightBoy0_2Std : lengthWeightGirl0_2Std;
                     } else {
                         heightWeightStdTable = gender === '男' ? heightWeightBoy2_7Std : heightWeightGirl2_7Std;
@@ -1727,11 +1739,11 @@
                 }
             }
 
-            // 年龄别头围计算（仅3岁以下）
-            if (headCirc && ageMonths <= 36) {
+            // 年龄别头围计算（仅3岁以下，使用查表年龄）
+            if (headCirc && lookupAgeMonths <= 36) {
                 const headTable = gender === '男' ? ageHeadBoy : ageHeadGirl;
                 if (currentMode === 'percentile') {
-                    const percentile = calculatePercentile(headCirc, headTable, ageMonths);
+                    const percentile = calculatePercentile(headCirc, headTable, lookupAgeMonths);
                     if (percentile) {
                         row.querySelector('.age-head-cell').textContent = percentile;
                         const eval = calculateEvaluationFromPercentile(percentile);
@@ -1744,7 +1756,7 @@
                 } else {
                     // 优先使用标准差数据表（表B.11或B.12）
                     const headStdTable = gender === '男' ? ageHeadBoyStd : ageHeadGirlStd;
-                    const std = calculateStdForValue(headCirc, headTable, ageMonths, headStdTable);
+                    const std = calculateStdForValue(headCirc, headTable, lookupAgeMonths, headStdTable);
                     if (std !== null) {
                         row.querySelector('.age-head-cell').textContent = std.toFixed(2) + 'SD';
                         const eval = calculateEvaluationFromStd(std);

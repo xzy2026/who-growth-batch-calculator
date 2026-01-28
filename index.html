@@ -1559,12 +1559,14 @@
                         row.querySelector('.age-weight-cell').textContent = percentile;
                         const eval = calculateEvaluationFromPercentile(percentile);
                         row.querySelector('.weight-eval-value-cell').textContent = eval.value || '-';
-                        row.querySelector('.weight-eval-result-cell').textContent = eval.result || '-';
+                        // 正常区间（空字符串）显示为 "-"
+                        row.querySelector('.weight-eval-result-cell').textContent = (eval.result === '' || !eval.result) ? '-' : eval.result;
                         // 年龄别体重的评价结果列显示营养状况评价（表3标准）
                         const nutrition = calculateNutritionFromPercentile(percentile, '年龄别体重');
                         const nutritionCell = row.querySelector('.age-weight-eval-result-cell');
                         if (nutritionCell) {
-                            nutritionCell.textContent = nutrition !== null ? nutrition : '-';
+                            // 正常区间（空字符串）显示为 "-"
+                            nutritionCell.textContent = (nutrition === '' || nutrition === null) ? '-' : nutrition;
                         }
                     } else {
                         row.querySelector('.age-weight-cell').textContent = '-';
@@ -1581,12 +1583,14 @@
                         row.querySelector('.age-weight-cell').textContent = std.toFixed(2) + 'SD';
                         const eval = calculateEvaluationFromStd(std);
                         row.querySelector('.weight-eval-value-cell').textContent = eval.value || '-';
-                        row.querySelector('.weight-eval-result-cell').textContent = eval.result || '-';
+                        // 正常区间（空字符串）显示为 "-"
+                        row.querySelector('.weight-eval-result-cell').textContent = (eval.result === '' || !eval.result) ? '-' : eval.result;
                         // 年龄别体重的评价结果列显示营养状况评价（表3标准）
                         const nutrition = calculateNutritionFromStd(std, '年龄别体重');
                         const nutritionCell = row.querySelector('.age-weight-eval-result-cell');
                         if (nutritionCell) {
-                            nutritionCell.textContent = nutrition !== null ? nutrition : '-';
+                            // 正常区间（空字符串）显示为 "-"
+                            nutritionCell.textContent = (nutrition === '' || nutrition === null) ? '-' : nutrition;
                         }
                     } else {
                         row.querySelector('.age-weight-cell').textContent = '-';
@@ -1606,12 +1610,14 @@
                         row.querySelector('.age-height-cell').textContent = percentile;
                         const eval = calculateEvaluationFromPercentile(percentile);
                         row.querySelector('.height-eval-value-cell').textContent = eval.value || '-';
-                        row.querySelector('.height-eval-result-cell').textContent = eval.result || '-';
+                        // 正常区间（空字符串）显示为 "-"
+                        row.querySelector('.height-eval-result-cell').textContent = (eval.result === '' || !eval.result) ? '-' : eval.result;
                         // 年龄别身高的评价结果列显示营养状况评价（表3标准）
                         const nutrition = calculateNutritionFromPercentile(percentile, '年龄别身高');
                         const nutritionCell = row.querySelector('.age-height-eval-result-cell');
                         if (nutritionCell) {
-                            nutritionCell.textContent = nutrition !== null ? nutrition : '-';
+                            // 正常区间（空字符串）显示为 "-"
+                            nutritionCell.textContent = (nutrition === '' || nutrition === null) ? '-' : nutrition;
                         }
                     } else {
                         row.querySelector('.age-height-cell').textContent = '-';
@@ -1628,12 +1634,14 @@
                         row.querySelector('.age-height-cell').textContent = std.toFixed(2) + 'SD';
                         const eval = calculateEvaluationFromStd(std);
                         row.querySelector('.height-eval-value-cell').textContent = eval.value || '-';
-                        row.querySelector('.height-eval-result-cell').textContent = eval.result || '-';
+                        // 正常区间（空字符串）显示为 "-"
+                        row.querySelector('.height-eval-result-cell').textContent = (eval.result === '' || !eval.result) ? '-' : eval.result;
                         // 年龄别身高的评价结果列显示营养状况评价（表3标准）
                         const nutrition = calculateNutritionFromStd(std, '年龄别身高');
                         const nutritionCell = row.querySelector('.age-height-eval-result-cell');
                         if (nutritionCell) {
-                            nutritionCell.textContent = nutrition !== null ? nutrition : '-';
+                            // 正常区间（空字符串）显示为 "-"
+                            nutritionCell.textContent = (nutrition === '' || nutrition === null) ? '-' : nutrition;
                         }
                     } else {
                         row.querySelector('.age-height-cell').textContent = '-';
@@ -1652,12 +1660,14 @@
                     if (percentile) {
                         row.querySelector('.age-bmi-cell').textContent = percentile;
                         const eval = calculateEvaluationFromPercentile(percentile);
-                        row.querySelector('.bmi-eval-result-cell').textContent = eval.result || '-';
+                        // 正常区间（空字符串）显示为 "-"
+                        row.querySelector('.bmi-eval-result-cell').textContent = (eval.result === '' || !eval.result) ? '-' : eval.result;
                         const nutrition = calculateNutritionFromPercentile(percentile, '年龄别BMI');
                         // 确保评价结果正确显示
                         const nutritionCell = row.querySelector('.age-bmi-eval-result-cell');
                         if (nutritionCell) {
-                            nutritionCell.textContent = nutrition !== null ? nutrition : '-';
+                            // 正常区间（空字符串）显示为 "-"
+                            nutritionCell.textContent = (nutrition === '' || nutrition === null) ? '-' : nutrition;
                         }
                     } else {
                         row.querySelector('.age-bmi-cell').textContent = '-';
@@ -1672,12 +1682,14 @@
                     if (std !== null) {
                         row.querySelector('.age-bmi-cell').textContent = std.toFixed(2) + 'SD';
                         const eval = calculateEvaluationFromStd(std);
-                        row.querySelector('.bmi-eval-result-cell').textContent = eval.result || '-';
+                        // 正常区间（空字符串）显示为 "-"
+                        row.querySelector('.bmi-eval-result-cell').textContent = (eval.result === '' || !eval.result) ? '-' : eval.result;
                         const nutrition = calculateNutritionFromStd(std, '年龄别BMI');
                         // 确保评价结果正确显示
                         const nutritionCell = row.querySelector('.age-bmi-eval-result-cell');
                         if (nutritionCell) {
-                            nutritionCell.textContent = nutrition !== null ? nutrition : '-';
+                            // 正常区间（空字符串）显示为 "-"
+                            nutritionCell.textContent = (nutrition === '' || nutrition === null) ? '-' : nutrition;
                         }
                     } else {
                         row.querySelector('.age-bmi-cell').textContent = '-';
@@ -1707,7 +1719,8 @@
                         // 确保评价结果正确显示
                         const nutritionCell = row.querySelector('.height-weight-eval-result-cell');
                         if (nutritionCell) {
-                            nutritionCell.textContent = nutrition !== null ? nutrition : '-';
+                            // 正常区间（空字符串）显示为 "-"
+                            nutritionCell.textContent = (nutrition === '' || nutrition === null) ? '-' : nutrition;
                         }
                     } else {
                         row.querySelector('.height-weight-cell').textContent = '-';
@@ -1729,7 +1742,8 @@
                         // 确保评价结果正确显示
                         const nutritionCell = row.querySelector('.height-weight-eval-result-cell');
                         if (nutritionCell) {
-                            nutritionCell.textContent = nutrition !== null ? nutrition : '-';
+                            // 正常区间（空字符串）显示为 "-"
+                            nutritionCell.textContent = (nutrition === '' || nutrition === null) ? '-' : nutrition;
                         }
                     } else {
                         row.querySelector('.height-weight-cell').textContent = '-';
@@ -1747,9 +1761,10 @@
                     if (percentile) {
                         row.querySelector('.age-head-cell').textContent = percentile;
                         const eval = calculateEvaluationFromPercentile(percentile);
-                        // 即使返回空也要设置（清空之前的值）
-                        row.querySelector('.age-head-eval-result-cell').textContent = eval.result || '-';
+                        // 正常区间（空字符串）显示为 "-"
+                        row.querySelector('.age-head-eval-result-cell').textContent = (eval.result === '' || !eval.result) ? '-' : eval.result;
                     } else {
+                        // 计算失败时显示 "-"
                         row.querySelector('.age-head-cell').textContent = '-';
                         row.querySelector('.age-head-eval-result-cell').textContent = '-';
                     }
@@ -1760,17 +1775,18 @@
                     if (std !== null) {
                         row.querySelector('.age-head-cell').textContent = std.toFixed(2) + 'SD';
                         const eval = calculateEvaluationFromStd(std);
-                        // 即使返回空也要设置（清空之前的值）
-                        row.querySelector('.age-head-eval-result-cell').textContent = eval.result || '-';
+                        // 正常区间（空字符串）显示为 "-"
+                        row.querySelector('.age-head-eval-result-cell').textContent = (eval.result === '' || !eval.result) ? '-' : eval.result;
                     } else {
+                        // 计算失败时显示 "-"
                         row.querySelector('.age-head-cell').textContent = '-';
                         row.querySelector('.age-head-eval-result-cell').textContent = '-';
                     }
                 }
             } else {
-                // 如果不是3岁以下或没有头围数据，清空相关单元格
-                row.querySelector('.age-head-cell').textContent = '-';
-                row.querySelector('.age-head-eval-result-cell').textContent = '-';
+                // 如果没有输入头围数据，相关单元格应该为空（不是 "-"）
+                row.querySelector('.age-head-cell').textContent = '';
+                row.querySelector('.age-head-eval-result-cell').textContent = '';
             }
         }
 

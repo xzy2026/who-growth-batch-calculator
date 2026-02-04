@@ -1960,11 +1960,16 @@
                                         });
                                     }
                                     
-                                    // 检查是否是Excel日期序列号（数字且大于25569，对应1970-01-01）
-                                    // 注意：如果dateStr是纯数字字符串（如"43738"），说明是Excel日期序列号
+                                    // 先判断 8 位 YYYYMMDD（如 20221111），避免被误判为 Excel 序列号
                                     const dateNum = parseFloat(dateStr);
-                                    if (!isNaN(dateNum) && !isNaN(parseInt(dateStr)) && dateStr.trim() === String(dateNum) && dateNum > 25569) {
-                                        // Excel日期序列号转换
+                                    if (dateStr.length === 8 && /^\d{8}$/.test(dateStr)) {
+                                        const y = parseInt(dateStr.substring(0, 4), 10);
+                                        if (y >= 1900 && y <= 2100) {
+                                            birthDateStr = `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
+                                        }
+                                    }
+                                    if (!birthDateStr && !isNaN(dateNum) && !isNaN(parseInt(dateStr)) && dateStr.trim() === String(dateNum) && dateNum > 25569) {
+                                        // Excel日期序列号转换（5位左右的数字，如 44927）
                                         // Excel日期从1900-01-01开始（序列号1）
                                         // 基准日期：1899-12-30（UTC）
                                         const excelEpoch = Date.UTC(1899, 11, 30);
@@ -1975,8 +1980,6 @@
                                         const month = String(date.getMonth() + 1).padStart(2, '0');
                                         const day = String(date.getDate()).padStart(2, '0');
                                         birthDateStr = `${year}-${month}-${day}`;
-                                        
-                                        // 调试信息
                                         if (i === headerRowIndex + 1) {
                                             console.log('Excel日期序列号转换', {
                                                 excelNum: dateNum,
@@ -1984,7 +1987,8 @@
                                                 dateObject: date.toISOString()
                                             });
                                         }
-                                    } else if (dateStr.includes('/')) {
+                                    }
+                                    if (!birthDateStr && dateStr.includes('/')) {
                                         // 处理日期格式：可能是 YYYY/MM/DD 或 MM/DD/YY
                                         // 清理末尾的斜杠（如 "2021/04/02/" -> "2021/04/02"）
                                         let cleanDateStr = dateStr;
@@ -2061,13 +2065,48 @@
                                                 });
                                             }
                                         }
-                                    } else if (dateStr.includes('-')) {
+                                    }
+                                    if (!birthDateStr && dateStr.includes('.')) {
+                                        // 点号分隔：2021.11.9、2026. 2. 4（支持数字前后空格）
+                                        const parts = dateStr.split('.').map(p => (p || '').trim()).filter(p => p);
+                                        if (parts.length >= 3) {
+                                            const firstPart = parseInt(parts[0], 10);
+                                            const secondPart = parseInt(parts[1], 10);
+                                            const thirdPart = parseInt(parts[2], 10);
+                                            let year, month, day;
+                                            if (firstPart > 12) {
+                                                year = parts[0];
+                                                month = parts[1].padStart(2, '0');
+                                                day = parts[2].padStart(2, '0');
+                                            } else if (secondPart > 12) {
+                                                month = parts[0].padStart(2, '0');
+                                                day = parts[1].padStart(2, '0');
+                                                year = thirdPart < 50 ? '20' + parts[2].padStart(2, '0') : '19' + parts[2].padStart(2, '0');
+                                            } else {
+                                                if (firstPart >= 1900 && firstPart <= 2100) {
+                                                    year = parts[0];
+                                                    month = parts[1].padStart(2, '0');
+                                                    day = parts[2].padStart(2, '0');
+                                                } else {
+                                                    month = parts[0].padStart(2, '0');
+                                                    day = parts[1].padStart(2, '0');
+                                                    year = thirdPart < 50 ? '20' + parts[2].padStart(2, '0') : '19' + parts[2].padStart(2, '0');
+                                                }
+                                            }
+                                            birthDateStr = `${year}-${month}-${day}`;
+                                        } else {
+                                            birthDateStr = dateStr;
+                                        }
+                                    }
+                                    if (!birthDateStr && dateStr.includes('-')) {
                                         // 已经是 YYYY-MM-DD 格式，直接使用
                                         birthDateStr = dateStr;
-                                    } else if (dateStr.length === 8 && !isNaN(dateStr)) {
-                                        // 处理 20191101 格式
+                                    }
+                                    if (!birthDateStr && dateStr.length === 8 && !isNaN(dateStr)) {
+                                        // 处理 20191101 格式（字符串形式的8位，上面已处理过纯8位数字）
                                         birthDateStr = `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
-                                    } else {
+                                    }
+                                    if (!birthDateStr) {
                                         // 其他格式，尝试直接使用
                                         birthDateStr = dateStr;
                                         if (i <= headerRowIndex + 3) {
@@ -2188,11 +2227,16 @@
                                         dateStr = dateStr.slice(0, -1);
                                     }
                                     
-                                    // 检查是否是Excel日期序列号
                                     const dateNum = parseFloat(dateStr);
                                     const isPureNumber = !isNaN(dateNum) && !isNaN(parseInt(dateStr)) && dateStr.trim() === String(dateNum);
-                                    
-                                    if (isPureNumber && dateNum > 25569) {
+                                    // 先判断 8 位 YYYYMMDD（如 20251120），避免被误判为 Excel 序列号
+                                    if (dateStr.length === 8 && /^\d{8}$/.test(dateStr)) {
+                                        const y = parseInt(dateStr.substring(0, 4), 10);
+                                        if (y >= 1900 && y <= 2100) {
+                                            checkDateStr = `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
+                                        }
+                                    }
+                                    if (!checkDateStr && isPureNumber && dateNum > 25569) {
                                         // Excel日期序列号转换
                                         const excelEpoch = Date.UTC(1899, 11, 30);
                                         const date = new Date(excelEpoch + (dateNum - 1) * 86400000);
@@ -2200,7 +2244,8 @@
                                         const month = String(date.getMonth() + 1).padStart(2, '0');
                                         const day = String(date.getDate()).padStart(2, '0');
                                         checkDateStr = `${year}-${month}-${day}`;
-                                    } else if (dateStr.includes('/')) {
+                                    }
+                                    if (!checkDateStr && dateStr.includes('/')) {
                                         // 与出生日期一致：支持 YYYY/M/D、YYYY/MM/DD、MM/DD/YY，并对每段 trim
                                         const parts = dateStr.split('/').map(p => (p || '').trim()).filter(p => p);
                                         if (parts.length >= 3) {
@@ -2233,11 +2278,46 @@
                                         } else {
                                             checkDateStr = dateStr;
                                         }
-                                    } else if (dateStr.includes('-')) {
+                                    }
+                                    if (!checkDateStr && dateStr.includes('.')) {
+                                        // 点号分隔：2026.2.4、2026. 2. 4（支持数字前后空格）
+                                        const parts = dateStr.split('.').map(p => (p || '').trim()).filter(p => p);
+                                        if (parts.length >= 3) {
+                                            const first = parseInt(parts[0], 10);
+                                            const second = parseInt(parts[1], 10);
+                                            const third = parseInt(parts[2], 10);
+                                            let year, month, day;
+                                            if (first > 12) {
+                                                year = parts[0];
+                                                month = parts[1].padStart(2, '0');
+                                                day = parts[2].padStart(2, '0');
+                                            } else if (second > 12) {
+                                                month = parts[0].padStart(2, '0');
+                                                day = parts[1].padStart(2, '0');
+                                                year = third < 50 ? '20' + parts[2].padStart(2, '0') : '19' + parts[2].padStart(2, '0');
+                                            } else {
+                                                if (first >= 1900 && first <= 2100) {
+                                                    year = parts[0];
+                                                    month = parts[1].padStart(2, '0');
+                                                    day = parts[2].padStart(2, '0');
+                                                } else {
+                                                    month = parts[0].padStart(2, '0');
+                                                    day = parts[1].padStart(2, '0');
+                                                    year = third < 50 ? '20' + parts[2].padStart(2, '0') : '19' + parts[2].padStart(2, '0');
+                                                }
+                                            }
+                                            checkDateStr = `${year}-${month}-${day}`;
+                                        } else {
+                                            checkDateStr = dateStr;
+                                        }
+                                    }
+                                    if (!checkDateStr && dateStr.includes('-')) {
                                         checkDateStr = dateStr;
-                                    } else if (dateStr.length === 8 && !isNaN(dateStr)) {
+                                    }
+                                    if (!checkDateStr && dateStr.length === 8 && !isNaN(dateStr)) {
                                         checkDateStr = `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
-                                    } else {
+                                    }
+                                    if (!checkDateStr) {
                                         checkDateStr = dateStr;
                                     }
                                 }

@@ -2164,56 +2164,81 @@
                                 }
                             }
 
-                            if (colMap.checkDate && row[colMap.checkDate]) {
+                            // 使用 !== undefined 判断，避免测查日期在第1列(index=0)时被误判为假而跳过
+                            const hasCheckDateCol = colMap.checkDate !== undefined && colMap.checkDate !== null;
+                            const checkDateRaw = hasCheckDateCol ? row[colMap.checkDate] : undefined;
+                            const hasCheckDateValue = checkDateRaw !== undefined && checkDateRaw !== null && String(checkDateRaw).trim() !== '';
+                            if (hasCheckDateCol && hasCheckDateValue) {
                                 // 处理日期：可能是Date对象、字符串或数字
-                                let checkDateValue = row[colMap.checkDate];
+                                let checkDateValue = checkDateRaw;
                                 let checkDateStr = '';
                                 
-                                if (checkDateValue !== undefined && checkDateValue !== null && checkDateValue !== '') {
-                                    if (checkDateValue instanceof Date) {
-                                        // 使用本地时间，因为Excel日期是本地日期
-                                        const year = checkDateValue.getFullYear();
-                                        const month = String(checkDateValue.getMonth() + 1).padStart(2, '0');
-                                        const day = String(checkDateValue.getDate()).padStart(2, '0');
+                                if (checkDateValue instanceof Date) {
+                                    // 使用本地时间，因为Excel日期是本地日期
+                                    const year = checkDateValue.getFullYear();
+                                    const month = String(checkDateValue.getMonth() + 1).padStart(2, '0');
+                                    const day = String(checkDateValue.getDate()).padStart(2, '0');
+                                    checkDateStr = `${year}-${month}-${day}`;
+                                } else {
+                                    // 转换为字符串
+                                    let dateStr = String(checkDateValue).trim();
+                                    
+                                    // 清理末尾的斜杠
+                                    if (dateStr.endsWith('/')) {
+                                        dateStr = dateStr.slice(0, -1);
+                                    }
+                                    
+                                    // 检查是否是Excel日期序列号
+                                    const dateNum = parseFloat(dateStr);
+                                    const isPureNumber = !isNaN(dateNum) && !isNaN(parseInt(dateStr)) && dateStr.trim() === String(dateNum);
+                                    
+                                    if (isPureNumber && dateNum > 25569) {
+                                        // Excel日期序列号转换
+                                        const excelEpoch = Date.UTC(1899, 11, 30);
+                                        const date = new Date(excelEpoch + (dateNum - 1) * 86400000);
+                                        const year = date.getFullYear();
+                                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                                        const day = String(date.getDate()).padStart(2, '0');
                                         checkDateStr = `${year}-${month}-${day}`;
-                                    } else {
-                                        // 转换为字符串
-                                        let dateStr = String(checkDateValue).trim();
-                                        
-                                        // 清理末尾的斜杠
-                                        if (dateStr.endsWith('/')) {
-                                            dateStr = dateStr.slice(0, -1);
-                                        }
-                                        
-                                        // 检查是否是Excel日期序列号
-                                        const dateNum = parseFloat(dateStr);
-                                        const isPureNumber = !isNaN(dateNum) && !isNaN(parseInt(dateStr)) && dateStr.trim() === String(dateNum);
-                                        
-                                        if (isPureNumber && dateNum > 25569) {
-                                            // Excel日期序列号转换
-                                            const excelEpoch = Date.UTC(1899, 11, 30);
-                                            const date = new Date(excelEpoch + (dateNum - 1) * 86400000);
-                                            const year = date.getFullYear();
-                                            const month = String(date.getMonth() + 1).padStart(2, '0');
-                                            const day = String(date.getDate()).padStart(2, '0');
-                                            checkDateStr = `${year}-${month}-${day}`;
-                                        } else if (dateStr.includes('/')) {
-                                            // 处理 YYYY/MM/DD 格式
-                                            const parts = dateStr.split('/').filter(p => p);
-                                            if (parts.length >= 3) {
-                                                checkDateStr = `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+                                    } else if (dateStr.includes('/')) {
+                                        // 与出生日期一致：支持 YYYY/M/D、YYYY/MM/DD、MM/DD/YY，并对每段 trim
+                                        const parts = dateStr.split('/').map(p => (p || '').trim()).filter(p => p);
+                                        if (parts.length >= 3) {
+                                            const first = parseInt(parts[0], 10);
+                                            const second = parseInt(parts[1], 10);
+                                            const third = parseInt(parts[2], 10);
+                                            let year, month, day;
+                                            if (first > 12) {
+                                                year = parts[0];
+                                                month = parts[1].padStart(2, '0');
+                                                day = parts[2].padStart(2, '0');
+                                            } else if (second > 12) {
+                                                month = parts[0].padStart(2, '0');
+                                                day = parts[1].padStart(2, '0');
+                                                const y = third;
+                                                year = y < 50 ? '20' + parts[2].padStart(2, '0') : '19' + parts[2].padStart(2, '0');
                                             } else {
-                                                checkDateStr = dateStr;
+                                                if (first >= 1900 && first <= 2100) {
+                                                    year = parts[0];
+                                                    month = parts[1].padStart(2, '0');
+                                                    day = parts[2].padStart(2, '0');
+                                                } else {
+                                                    month = parts[0].padStart(2, '0');
+                                                    day = parts[1].padStart(2, '0');
+                                                    const y = third;
+                                                    year = y < 50 ? '20' + parts[2].padStart(2, '0') : '19' + parts[2].padStart(2, '0');
+                                                }
                                             }
-                                        } else if (dateStr.includes('-')) {
-                                            // 已经是 YYYY-MM-DD 格式，直接使用
-                                            checkDateStr = dateStr;
-                                        } else if (dateStr.length === 8 && !isNaN(dateStr)) {
-                                            // 处理 YYYYMMDD 格式
-                                            checkDateStr = `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
+                                            checkDateStr = `${year}-${month}-${day}`;
                                         } else {
                                             checkDateStr = dateStr;
                                         }
+                                    } else if (dateStr.includes('-')) {
+                                        checkDateStr = dateStr;
+                                    } else if (dateStr.length === 8 && !isNaN(dateStr)) {
+                                        checkDateStr = `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
+                                    } else {
+                                        checkDateStr = dateStr;
                                     }
                                 }
                                 

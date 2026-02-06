@@ -1410,24 +1410,17 @@
                 return null;
             }
             
-            // 步骤1：计算整年数
+            // 实足年龄（月）：按日历月差计算，与 WS/T 423-2022 及标准表查表一致
+            // 公式：总月数 = (测查年 - 出生年)*12 + (测查月 - 出生月)，不按“足月”减1
             let 整年数 = check.getFullYear() - birth.getFullYear();
-            
-            // 步骤2：计算整月数
             let 整月数 = check.getMonth() - birth.getMonth();
             
-            // 步骤3：如果测查日 < 出生日，则整月数减1（因为不足一个月）
-            if (check.getDate() < birth.getDate()) {
-                整月数--;
-            }
-            
-            // 步骤4：调整整年数和整月数，使整月数在0-11之间
+            // 调整使整月数在 0～11 之间
             if (整月数 < 0) {
-                整年数--; 
+                整年数--;
                 整月数 += 12;
             }
             
-            // 返回总月数
             const totalMonths = 整年数 * 12 + 整月数;
             
             // 允许超过84个月（7岁），但负数年龄无效
@@ -1438,12 +1431,14 @@
             return totalMonths;
         }
 
-        // 格式化年龄（支持超过7岁）
+        // 格式化年龄（支持超过7岁），与核对脚本一致：整岁时显示“X岁”，否则“X岁Y月”或“Y月”
         function formatAge(months) {
             if (months === null || months < 0) return '-';
             const years = Math.floor(months / 12);
             const monthsRemain = months % 12;
-            return `${years}岁${monthsRemain}月`;
+            if (years > 0 && monthsRemain === 0) return years + '岁';
+            if (years === 0) return monthsRemain + '月';
+            return years + '岁' + monthsRemain + '月';
         }
         
         // 获取用于查表的年龄（如果超过84个月，使用84个月）
@@ -1531,21 +1526,23 @@
         }
 
         // 从标准差数据表直接计算Z-score（优先使用）
+        // 极端值复核：仅当键在表范围内时计算Z，表外不外推避免>1SD误差
         function calculateStdFromStdTable(value, stdTable, key) {
             if (value === null || key === null || !stdTable) return null;
-            const keys = Object.keys(stdTable).map(k => parseInt(k));
+            const keys = Object.keys(stdTable).map(k => parseInt(k)).sort((a, b) => a - b);
+            const kMin = keys[0], kMax = keys[keys.length - 1];
+            // 键在表外时不使用边界行外推，避免极端值计算错误
+            if (key < kMin || key > kMax) return null;
             let mean, sd;
-            
-            if (key in stdTable) {
+            const keyStr = String(key);
+            if (Object.prototype.hasOwnProperty.call(stdTable, keyStr)) {
                 mean = stdTable[key].mean;
                 sd = stdTable[key].SD;
             } else {
-                // 线性插值
                 const [k1, k2] = findClosestKeys(keys, key);
                 mean = linearInterpolate(key, k1, stdTable[k1].mean, k2, stdTable[k2].mean);
                 sd = linearInterpolate(key, k1, stdTable[k1].SD, k2, stdTable[k2].SD);
             }
-            
             if (mean === null || sd === null || sd === 0) return null;
             return Math.round(((value - mean) / sd) * 100) / 100;
         }
@@ -1567,22 +1564,27 @@
             return Math.round(((value - p50) / sd) * 100) / 100;
         }
 
-        // 计算标准差数值（优先使用标准差数据表，如果没有则从百分位计算）
+        // 计算标准差数值（优先使用附录B标准差表；若无或查找失败则从百分位表估算，仅作备用）
+        // 营养状况评价复核：Z = (value - mean) / SD，mean/SD 应来自附录B对应性别、年龄/身高的表
         function calculateStdForValue(value, table, key, stdTable = null) {
             if (value === null || key === null) return null;
             
-            // 优先使用标准差数据表（如果提供）
+            // 优先使用附录B标准差数据表（表B.5～B.10等），中位数与SD采用线性插值
             if (stdTable) {
                 const stdFromTable = calculateStdFromStdTable(value, stdTable, key);
                 if (stdFromTable !== null) {
                     return stdFromTable;
                 }
+                // 附录B查表失败时回退到百分位估算，便于发现缺失数据
+                if (typeof console !== 'undefined' && console.warn) {
+                    console.warn('[营养评价] 标准差表查表失败，使用百分位估算Z值。键=', key, '表键=', Object.keys(stdTable).map(k => parseInt(k)).sort((a,b)=>a-b).slice(0,5).join(',')+'...');
+                }
             }
             
-            // 如果没有标准差数据表或查找失败，则从百分位数据计算
+            // 备用：从百分位表（附录A）估算SD后算Z；实测值超出P3～P97时不给出Z，避免极端值>1SD误差
             const keys = Object.keys(table).map(k => parseInt(k));
             let p50, p97, p3;
-            if (key in table) {
+            if (Object.prototype.hasOwnProperty.call(table, String(key))) {
                 p50 = table[key].P50;
                 p97 = table[key].P97;
                 p3 = table[key].P3;
@@ -1592,6 +1594,8 @@
                 p97 = linearInterpolate(key, k1, table[k1].P97, k2, table[k2].P97);
                 p3 = linearInterpolate(key, k1, table[k1].P3, k2, table[k2].P3);
             }
+            if (p3 != null && value < p3) return null;  // 低于P3不沿用备用Z，避免严重高估
+            if (p97 != null && value > p97) return null; // 高于P97不沿用备用Z，避免严重低估
             return calculateStdScore(value, p50, p97, p3);
         }
 
@@ -1660,27 +1664,38 @@
         }
 
         // 根据标准差计算营养状况评价（按照表3标准）
+        // 重要：年龄别体重仅用“低体重/重度低体重”；身高别体重与年龄别BMI仅用“超重/肥胖/重度肥胖/消瘦/重度消瘦”，不可混用
         function calculateNutritionFromStd(stdValue, indicatorType) {
             if (stdValue === null) return null;
             
-            // 根据表3标准判断营养状况
             if (indicatorType === '年龄别体重') {
                 if (stdValue < -3) return '重度低体重';
                 if (stdValue < -2) return '低体重';
-                return ''; // 正常范围，不显示评价
+                return '';
             } else if (indicatorType === '年龄别身高') {
                 if (stdValue < -3) return '重度生长迟缓';
                 if (stdValue < -2) return '生长迟缓';
-                return ''; // 正常范围，不显示评价
+                return '';
             } else if (indicatorType === '身高别体重' || indicatorType === '年龄别BMI') {
+                // 表3：身长/身高别体重、年龄别BMI 仅用以下五种营养状况，不得使用“低体重/重度低体重”
                 if (stdValue >= 3) return '重度肥胖';
                 if (stdValue >= 2) return '肥胖';
                 if (stdValue >= 1) return '超重';
                 if (stdValue < -3) return '重度消瘦';
                 if (stdValue < -2) return '消瘦';
-                return ''; // 正常范围（-2 SD ≤ • < +1 SD），不显示评价
+                return '';
             }
             return null;
+        }
+
+        // 仅用于“身高别体重”“年龄别BMI”列：若误得到年龄别体重标准的结果则过滤掉，避免错列显示
+        function sanitizeNutritionForHeightWeightOrBMI(nutrition, indicatorType) {
+            if (indicatorType !== '身高别体重' && indicatorType !== '年龄别BMI') return nutrition;
+            if (nutrition === '低体重' || nutrition === '重度低体重') {
+                if (typeof console !== 'undefined' && console.warn) console.warn('[营养评价] 身高别体重/年龄别BMI列不应出现“低体重/重度低体重”，已过滤');
+                return '';
+            }
+            return nutrition;
         }
 
         // 计算单行
@@ -1859,13 +1874,9 @@
                         const eval = calculateEvaluationFromPercentile(percentile);
                         // 正常区间（空字符串）显示为 "-"
                         row.querySelector('.bmi-eval-result-cell').textContent = (eval.result === '' || !eval.result) ? '-' : eval.result;
-                        const nutrition = calculateNutritionFromPercentile(percentile, '年龄别BMI');
-                        // 确保评价结果正确显示
+                        const nutrition = sanitizeNutritionForHeightWeightOrBMI(calculateNutritionFromPercentile(percentile, '年龄别BMI'), '年龄别BMI');
                         const nutritionCell = row.querySelector('.age-bmi-eval-result-cell');
-                        if (nutritionCell) {
-                            // 正常区间（空字符串）显示为 "-"
-                            nutritionCell.textContent = (nutrition === '' || nutrition === null) ? '-' : nutrition;
-                        }
+                        if (nutritionCell) nutritionCell.textContent = (nutrition === '' || nutrition === null) ? '-' : nutrition;
                     } else {
                         row.querySelector('.age-bmi-cell').textContent = '-';
                         row.querySelector('.bmi-eval-result-cell').textContent = '-';
@@ -1873,7 +1884,7 @@
                         if (nutritionCell) nutritionCell.textContent = '-';
                     }
                 } else {
-                    // 优先使用标准差数据表（表B.9或B.10）
+                    // 年龄别BMI：优先使用附录B表B.9(男)/B.10(女)，键=月龄，Z=(bmi-mean)/SD
                     const bmiStdTable = gender === '男' ? ageBMIBoyStd : ageBMIGirlStd;
                     const std = calculateStdForValue(bmi, bmiTable, lookupAgeMonths, bmiStdTable);
                     if (std !== null) {
@@ -1881,13 +1892,9 @@
                         const eval = calculateEvaluationFromStd(std);
                         // 正常区间（空字符串）显示为 "-"
                         row.querySelector('.bmi-eval-result-cell').textContent = (eval.result === '' || !eval.result) ? '-' : eval.result;
-                        const nutrition = calculateNutritionFromStd(std, '年龄别BMI');
-                        // 确保评价结果正确显示
+                        const nutrition = sanitizeNutritionForHeightWeightOrBMI(calculateNutritionFromStd(std, '年龄别BMI'), '年龄别BMI');
                         const nutritionCell = row.querySelector('.age-bmi-eval-result-cell');
-                        if (nutritionCell) {
-                            // 正常区间（空字符串）显示为 "-"
-                            nutritionCell.textContent = (nutrition === '' || nutrition === null) ? '-' : nutrition;
-                        }
+                        if (nutritionCell) nutritionCell.textContent = (nutrition === '' || nutrition === null) ? '-' : nutrition;
                     } else {
                         row.querySelector('.age-bmi-cell').textContent = '-';
                         row.querySelector('.bmi-eval-result-cell').textContent = '-';
@@ -1897,7 +1904,7 @@
                 }
             }
 
-            // 身高别体重计算（使用查表年龄判断使用哪个表）
+            // 身高别体重计算（复核要点：Z值用附录B表B.5/B.6(0-2岁)或B.7/B.8(2-7岁)，键=身高cm，线性插值mean与SD）
             if (weight && height) {
                 let heightWeightTable;
                 // 如果超过7岁，使用2-7岁的表（84个月对应2-7岁表）
@@ -1907,18 +1914,14 @@
                 } else {
                     heightWeightTable = gender === '男' ? heightWeightBoy2_7 : heightWeightGirl2_7;
                 }
-                const heightRounded = Math.round(height);
+                const heightRounded = Math.round(height);  // 查表键：身高(cm)，与附录B一致
                 if (currentMode === 'percentile') {
                     const percentile = calculatePercentile(weight, heightWeightTable, heightRounded);
                     if (percentile) {
                         row.querySelector('.height-weight-cell').textContent = percentile;
-                        const nutrition = calculateNutritionFromPercentile(percentile, '身高别体重');
-                        // 确保评价结果正确显示
+                        const nutrition = sanitizeNutritionForHeightWeightOrBMI(calculateNutritionFromPercentile(percentile, '身高别体重'), '身高别体重');
                         const nutritionCell = row.querySelector('.height-weight-eval-result-cell');
-                        if (nutritionCell) {
-                            // 正常区间（空字符串）显示为 "-"
-                            nutritionCell.textContent = (nutrition === '' || nutrition === null) ? '-' : nutrition;
-                        }
+                        if (nutritionCell) nutritionCell.textContent = (nutrition === '' || nutrition === null) ? '-' : nutrition;
                     } else {
                         row.querySelector('.height-weight-cell').textContent = '-';
                         const nutritionCell = row.querySelector('.height-weight-eval-result-cell');
@@ -1935,13 +1938,9 @@
                     const std = calculateStdForValue(weight, heightWeightTable, heightRounded, heightWeightStdTable);
                     if (std !== null) {
                         row.querySelector('.height-weight-cell').textContent = std.toFixed(2) + 'SD';
-                        const nutrition = calculateNutritionFromStd(std, '身高别体重');
-                        // 确保评价结果正确显示
+                        const nutrition = sanitizeNutritionForHeightWeightOrBMI(calculateNutritionFromStd(std, '身高别体重'), '身高别体重');
                         const nutritionCell = row.querySelector('.height-weight-eval-result-cell');
-                        if (nutritionCell) {
-                            // 正常区间（空字符串）显示为 "-"
-                            nutritionCell.textContent = (nutrition === '' || nutrition === null) ? '-' : nutrition;
-                        }
+                        if (nutritionCell) nutritionCell.textContent = (nutrition === '' || nutrition === null) ? '-' : nutrition;
                     } else {
                         row.querySelector('.height-weight-cell').textContent = '-';
                         const nutritionCell = row.querySelector('.height-weight-eval-result-cell');

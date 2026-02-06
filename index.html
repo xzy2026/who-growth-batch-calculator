@@ -163,6 +163,15 @@
             background: #ffcd39;
         }
 
+        .btn-secondary {
+            background: #6c757d;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
         .btn-template {
             background: #6f42c1;
             color: white;
@@ -377,13 +386,14 @@
         <div class="content">
             <div class="info-box">
                 <h3>使用说明</h3>
-                <p>1. 选择计算模式（百分位数值或标准差数值）</p>
-                <p>2. 点击"下载模板"按钮下载Excel数据模板，填写数据后使用"导入Excel"按钮导入（记得导入前将模版中的示例删除）</p>
-                <p>3. 点击"导入Excel"按钮可从Excel文件导入数据（支持姓名、性别、出生日期、测查日期、体重、身高、头围等）</p>
-                <p>4. 或点击"添加行"按钮手动添加儿童数据行</p>
-                <p>5. 输入儿童信息（性别和出生日期为必填项）</p>
-                <p>6. 点击"批量计算"按钮计算所有数据（导入Excel后会自动计算）</p>
-                <p>7. 点击"导出Excel"按钮导出结果</p>
+                <p>1. 选择计算模式：<strong>百分位数值</strong>或<strong>标准差数值</strong>，两种模式对应不同的评价方式。</p>
+                <p>2. 点击「下载模板」下载 Excel 数据模板，按模板填写姓名、性别、出生日期、测查日期、体重、身高、头围（3 岁以下可选）后，使用「导入Excel」导入（导入前请删除模板中的示例行）。</p>
+                <p>3. 或点击「添加行」手动添加数据行，在表格中直接输入儿童信息（<strong>性别、出生日期为必填</strong>）。</p>
+                <p>4. 点击「批量计算」对当前所有行进行计算（从 Excel 导入后也会自动计算）。</p>
+                <p>5. 导出方式二选一或都用：<br>
+                · <strong>导出评价表格</strong>：仅导出序号、姓名、性别、出生日期、实足年龄、测查日期、体重/身高/BMI/头围及各项<strong>评价结果</strong>，不含评价值、标准值，适合汇报与存档。<br>
+                · <strong>导出完整Excel</strong>：导出全部列（含标准值、评价值及评价结果），便于核对与二次处理。</p>
+                <p>6. 点击「清空所有」可清空表格中全部数据。</p>
             </div>
 
             <div class="toolbar">
@@ -396,7 +406,8 @@
                 <button class="btn btn-template" onclick="downloadTemplate()">下载模板</button>
                 <button class="btn btn-primary" onclick="addRow()">添加行</button>
                 <button class="btn btn-success" onclick="calculateAll()">批量计算</button>
-                <button class="btn btn-warning" onclick="exportExcel()">导出Excel</button>
+                <button class="btn btn-secondary" onclick="exportEvaluationExcel()">导出评价表格</button>
+                <button class="btn btn-warning" onclick="exportExcel()">导出完整Excel</button>
                 <button class="btn btn-danger" onclick="clearAll()">清空所有</button>
             </div>
 
@@ -2544,6 +2555,61 @@
             const fileName = `儿童生长标准计算表_${modeText}_${new Date().toISOString().split('T')[0]}.xlsx`;
             XLSX.writeFile(wb, fileName);
             alert('导出成功！');
+        }
+
+        // 导出评价表格（仅评价结果列，不含评价值、标准值）
+        function exportEvaluationExcel() {
+            const rows = document.querySelectorAll('#tableBody tr');
+            if (rows.length === 0) {
+                alert('没有数据可导出！');
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+            const wsData = [];
+
+            // 表头：序号 姓名 性别 出生日期 实足年龄 测查日期 体重(kg) 评价结果 身高(cm) 评价结果 BMI 评价结果 年龄别体重评价结果 身高别体重评价结果 年龄别BMI评价结果 头围(cm) 年龄别头围评价结果
+            wsData.push([
+                '序号', '姓名', '性别', '出生日期', '实足年龄', '测查日期',
+                '体重(kg)', '评价结果', '身高(cm)', '评价结果', 'BMI', '评价结果',
+                '年龄别体重评价结果', '身高别体重评价结果', '年龄别BMI评价结果',
+                '头围(cm)', '年龄别头围评价结果'
+            ]);
+
+            const getValue = (element, isInput = false) => {
+                if (!element) return '-';
+                const value = isInput ? element.value : element.textContent;
+                return (value && value.trim() !== '') ? value.trim() : '-';
+            };
+
+            rows.forEach(row => {
+                const rowData = [
+                    getValue(row.querySelector('td:first-child')),
+                    getValue(row.querySelector('.name-input'), true),
+                    getValue(row.querySelector('.gender-input'), true),
+                    getValue(row.querySelector('.birth-date-input'), true),
+                    getValue(row.querySelector('.age-cell')),
+                    getValue(row.querySelector('.check-date-input'), true),
+                    getValue(row.querySelector('.weight-input'), true),
+                    getValue(row.querySelector('.weight-eval-result-cell')),
+                    getValue(row.querySelector('.height-input'), true),
+                    getValue(row.querySelector('.height-eval-result-cell')),
+                    getValue(row.querySelector('.bmi-cell')),
+                    getValue(row.querySelector('.bmi-eval-result-cell')),
+                    getValue(row.querySelector('.age-weight-eval-result-cell')),
+                    getValue(row.querySelector('.height-weight-eval-result-cell')),
+                    getValue(row.querySelector('.age-bmi-eval-result-cell')),
+                    getValue(row.querySelector('.head-circ-input'), true),
+                    getValue(row.querySelector('.age-head-eval-result-cell'))
+                ];
+                wsData.push(rowData);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, '评价结果');
+            const fileName = `儿童生长评价表_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+            alert('评价表格导出成功！');
         }
 
         // 下载Excel模板

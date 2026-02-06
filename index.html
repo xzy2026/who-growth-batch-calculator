@@ -8,6 +8,7 @@
     <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
     <link rel="shortcut icon" type="image/jpeg" href="assets/logo.jpg">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -2483,18 +2484,16 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // 导出Excel
-        function exportExcel() {
+        // 导出完整Excel：除序号列外居中对齐，列宽与表头换行与评价表一致
+        async function exportExcel() {
             const rows = document.querySelectorAll('#tableBody tr');
             if (rows.length === 0) {
                 alert('没有数据可导出！');
                 return;
             }
 
-            const wb = XLSX.utils.book_new();
             const wsData = [];
-
-            // 表头
+            // 表头（27列）
             wsData.push([
                 '序号', '姓名', '性别', '出生日期', '实足年龄年月', '测查日期',
                 '体重(kg)', '标准体重(kg)', '评价值', '评价结果',
@@ -2507,15 +2506,13 @@
                 '头围', '年龄别头围', '评价结果'
             ]);
 
-            // 数据行
+            const getValue = (element, isInput = false) => {
+                if (!element) return '-';
+                const value = isInput ? element.value : element.textContent;
+                return (value && value.trim() !== '') ? value.trim() : '-';
+            };
+
             rows.forEach(row => {
-                // 辅助函数：将空值转换为"-"
-                const getValue = (element, isInput = false) => {
-                    if (!element) return '-';
-                    const value = isInput ? element.value : element.textContent;
-                    return (value && value.trim() !== '') ? value.trim() : '-';
-                };
-                
                 const rowData = [
                     getValue(row.querySelector('td:first-child')),
                     getValue(row.querySelector('.name-input'), true),
@@ -2548,26 +2545,60 @@
                 wsData.push(rowData);
             });
 
-            const ws = XLSX.utils.aoa_to_sheet(wsData);
-            XLSX.utils.book_append_sheet(wb, ws, '儿童生长标准');
+            const wb = new ExcelJS.Workbook();
+            const ws = wb.addWorksheet('儿童生长标准');
+            const centerAlign = { horizontal: 'center', vertical: 'middle' };
+            const centerWrap = { horizontal: 'center', vertical: 'middle', wrapText: true };
 
+            for (let r = 0; r < wsData.length; r++) {
+                for (let c = 0; c < wsData[r].length; c++) {
+                    const cell = ws.getCell(r + 1, c + 1);
+                    cell.value = wsData[r][c];
+                    if (r === 0) {
+                        cell.alignment = c >= 1 ? centerWrap : { vertical: 'middle', wrapText: true };
+                    } else if (c >= 1) {
+                        cell.alignment = centerAlign;
+                    }
+                }
+            }
+            ws.getRow(1).height = 36;
+
+            const colCount = wsData[0].length;
+            const minWidths = [6, 8, 6, 12, 12, 12, 10, 12, 8, 10, 10, 12, 8, 10, 8, 10, 12, 10, 10, 10, 10, 10, 10, 10, 8, 12, 10];
+            const maxColWidth = 14;
+            for (let c = 0; c < colCount; c++) {
+                let maxLen = 0;
+                for (let r = 0; r < wsData.length; r++) {
+                    const s = (wsData[r][c] != null ? wsData[r][c] : '').toString();
+                    let len = 0;
+                    for (let i = 0; i < s.length; i++) len += /[\u4e00-\u9fa5]/.test(s[i]) ? 2 : 1;
+                    if (len > maxLen) maxLen = len;
+                }
+                const w = Math.max(maxLen / 2 + 1, minWidths[c] || 8, 8);
+                ws.getColumn(c + 1).width = Math.min(w, maxColWidth);
+            }
+
+            const buffer = await wb.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
             const modeText = currentMode === 'percentile' ? '百分位' : '标准差';
-            const fileName = `儿童生长标准计算表_${modeText}_${new Date().toISOString().split('T')[0]}.xlsx`;
-            XLSX.writeFile(wb, fileName);
+            a.download = `儿童生长标准计算表_${modeText}_${new Date().toISOString().split('T')[0]}.xlsx`;
+            a.click();
+            URL.revokeObjectURL(url);
             alert('导出成功！');
         }
 
-        // 导出评价表格（仅评价结果列，不含评价值、标准值）
-        function exportEvaluationExcel() {
+        // 导出评价表格（仅评价结果列，不含评价值、标准值）：除序号列外居中对齐，列宽自适应
+        async function exportEvaluationExcel() {
             const rows = document.querySelectorAll('#tableBody tr');
             if (rows.length === 0) {
                 alert('没有数据可导出！');
                 return;
             }
 
-            const wb = XLSX.utils.book_new();
             const wsData = [];
-
             // 表头：序号 姓名 性别 出生日期 实足年龄 测查日期 体重(kg) 评价结果 身高(cm) 评价结果 BMI 评价结果 年龄别体重评价结果 身高别体重评价结果 年龄别BMI评价结果 头围(cm) 年龄别头围评价结果
             wsData.push([
                 '序号', '姓名', '性别', '出生日期', '实足年龄', '测查日期',
@@ -2605,10 +2636,51 @@
                 wsData.push(rowData);
             });
 
-            const ws = XLSX.utils.aoa_to_sheet(wsData);
-            XLSX.utils.book_append_sheet(wb, ws, '评价结果');
-            const fileName = `儿童生长评价表_${new Date().toISOString().split('T')[0]}.xlsx`;
-            XLSX.writeFile(wb, fileName);
+            // 使用 ExcelJS 支持居中对齐与列宽
+            const wb = new ExcelJS.Workbook();
+            const ws = wb.addWorksheet('评价结果');
+            const centerAlign = { horizontal: 'center', vertical: 'middle' };
+            const centerWrap = { horizontal: 'center', vertical: 'middle', wrapText: true };  // 表头可分行显示
+
+            for (let r = 0; r < wsData.length; r++) {
+                for (let c = 0; c < wsData[r].length; c++) {
+                    const cell = ws.getCell(r + 1, c + 1);
+                    cell.value = wsData[r][c];
+                    if (r === 0) {
+                        // 表头：除序号列外居中并可自动换行，保证列名完整显示
+                        cell.alignment = c >= 1 ? centerWrap : { vertical: 'middle', wrapText: true };
+                    } else if (c >= 1) {
+                        cell.alignment = centerAlign;
+                    }
+                }
+            }
+            // 表头行高加大，便于换行后的列名完整显示
+            ws.getRow(1).height = 36;
+
+            // 列宽：按每列最大字符长度计算，保证数据与列名都能展示；表头可换行，故设上限避免列过宽
+            const minWidths = [6, 8, 6, 12, 10, 12, 10, 8, 10, 8, 8, 8, 12, 12, 12, 10, 12];
+            const maxColWidth = 14;  // 列宽上限，长列名通过换行显示
+            const colCount = wsData[0].length;
+            for (let c = 0; c < colCount; c++) {
+                let maxLen = 0;
+                for (let r = 0; r < wsData.length; r++) {
+                    const s = (wsData[r][c] != null ? wsData[r][c] : '').toString();
+                    let len = 0;
+                    for (let i = 0; i < s.length; i++) len += /[\u4e00-\u9fa5]/.test(s[i]) ? 2 : 1;
+                    if (len > maxLen) maxLen = len;
+                }
+                const w = Math.max(maxLen / 2 + 1, minWidths[c] || 8, 8);
+                ws.getColumn(c + 1).width = Math.min(w, maxColWidth);
+            }
+
+            const buffer = await wb.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `儿童生长评价表_${new Date().toISOString().split('T')[0]}.xlsx`;
+            a.click();
+            URL.revokeObjectURL(url);
             alert('评价表格导出成功！');
         }
 

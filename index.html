@@ -1884,7 +1884,7 @@
                                 colMap.birthDate = index;
                                 console.log('找到出生日期列:', { index: index, header: header });
                             }
-                            else if (hClean.includes('测查日期') || hClean.includes('检查日期') || hClean.includes('测量日期') || h.includes('check') || (h.includes('date') && !h.includes('birth'))) {
+                            else if (hClean.includes('测查日期') || hClean.includes('检查日期') || hClean.includes('测量日期') || hClean.includes('测试完成时间') || hClean.includes('测试时间') || h.includes('check') || (h.includes('date') && !h.includes('birth'))) {
                                 colMap.checkDate = index;
                                 console.log('找到测查日期列:', { index: index, header: header });
                             }

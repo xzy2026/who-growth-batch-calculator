@@ -937,66 +937,25 @@
         // 注意：以下数据需要从PDF文档的表B.1-B.12中提取真实数据替换
         // 当前使用从百分位计算的估算值作为占位符，请用PDF中的真实mean和SD值替换
 
-        // 表B.1: 7岁以下男童年龄别体重的标准差数值 (单位: kg) - mean: 平均值, SD: 标准差
+        // 表B.1: 7岁以下男童年龄别体重的标准差数值 (单位: kg) - mean: 中位数, SD: +1SD-中位数（WS/T 423-2022 附录B）
         const ageWeightBoyStd = {
-            // 格式: 年龄(月): {mean: 平均值, SD: 标准差}
-            // 请从PDF表B.1中提取真实数据替换以下占位符
-            0: {mean: 3.5, SD: 0.4},  // 从PDF表B.1提取：+1SD=3.9, SD=3.9-3.5=0.4
-            1: {mean: 4.6, SD: 0.5},  // 从PDF表B.1提取：+1SD=5.1, SD=5.1-4.6=0.5
-            2: {mean: 5.8, SD: 0.7},  // 从PDF表B.1提取：+1SD=6.5, SD=6.5-5.8=0.7
-            3: {mean: 6.8, SD: 0.8},  // 从PDF表B.1提取：+1SD=7.6, SD=7.6-6.8=0.8
-            4: {mean: 7.5, SD: 0.8},  // 从PDF表B.1提取：+1SD=8.3, SD=8.3-7.5=0.8
-            5: {mean: 8.0, SD: 0.9},  // 从PDF表B.1提取：+1SD=8.9, SD=8.9-8.0=0.9
-            6: {mean: 8.4, SD: 1.0},  // 从PDF表B.1提取：+1SD=9.4, SD=9.4-8.4=1.0
-            7: {mean: 8.8, SD: 1.0},  // 从PDF表B.1提取：+1SD=9.8, SD=9.8-8.8=1.0
-            8: {mean: 9.1, SD: 1.0},  // 从PDF表B.1提取：+1SD=10.1, SD=10.1-9.1=1.0
-            9: {mean: 9.4, SD: 1.0},  // 从PDF表B.1提取：+1SD=10.4, SD=10.4-9.4=1.0
-            10: {mean: 9.6, SD: 1.1}, // 从PDF表B.1提取：+1SD=10.7, SD=10.7-9.6=1.1
-            11: {mean: 9.8, SD: 1.1}, // 从PDF表B.1提取：+1SD=10.9, SD=10.9-9.8=1.1
-            12: {mean: 10.1, SD: 1.1}, // 从PDF表B.1提取：+1SD=11.2, SD=11.2-10.1=1.1
-            13: {mean: 10.3, SD: 1.1}, // 从PDF表B.1提取：+1SD=11.4, SD=11.4-10.3=1.1
-            14: {mean: 10.5, SD: 1.1}, // 从PDF表B.1提取：+1SD=11.6, SD=11.6-10.5=1.1
-            15: {mean: 10.7, SD: 1.1}, // 从PDF表B.1提取：+1SD=11.8, SD=11.8-10.7=1.1
-            16: {mean: 10.9, SD: 1.1}, // 从PDF表B.1提取：+1SD=12.0, SD=12.0-10.9=1.1
-            17: {mean: 11.1, SD: 1.1}, // 从PDF表B.1提取：+1SD=12.2, SD=12.2-11.1=1.1
-            18: {mean: 11.3, SD: 1.1}, // 从PDF表B.1提取：+1SD=12.4, SD=12.4-11.3=1.1
-            19: {mean: 11.5, SD: 1.1}, // 从PDF表B.1提取：+1SD=12.6, SD=12.6-11.5=1.1
-            20: {mean: 11.7, SD: 1.1}, // 从PDF表B.1提取：+1SD=12.8, SD=12.8-11.7=1.1
-            21: {mean: 11.9, SD: 1.1}, // 从PDF表B.1提取：+1SD=13.0, SD=13.0-11.9=1.1
-            22: {mean: 12.2, SD: 1.1}, // 从PDF表B.1提取：+1SD=13.3, SD=13.3-12.2=1.1
-            23: {mean: 12.4, SD: 1.2}, // 从PDF表B.1提取：+1SD=13.6, SD=13.6-12.4=1.2
-            24: {mean: 12.6, SD: 1.2}, // 从PDF表B.1提取：+1SD=13.8, SD=13.8-12.6=1.2
-            27: {mean: 13.1, SD: 1.3},  // 从PDF表B.1：+1SD=14.4, SD=14.4-13.1
-            30: {mean: 13.7, SD: 1.3},  // 从PDF表B.1：+1SD=15.0-13.7
-            33: {mean: 14.2, SD: 1.4},  // 从PDF表B.1：+1SD=15.6-14.2
-            36: {mean: 14.6, SD: 1.4},  // 从PDF表B.1：+1SD=16.0-14.6
-            39: {mean: 15.2, SD: 1.4},  // 从PDF表B.1：+1SD=16.6-15.2
-            42: {mean: 15.7, SD: 1.4},  // 从PDF表B.1：+1SD=17.1-15.7
-            45: {mean: 16.2, SD: 1.4},  // 从PDF表B.1：+1SD=17.6-16.2
-            48: {mean: 16.7, SD: 1.1},  // 从PDF表B.1提取：+1SD=18.8, SD=18.8-16.7=1.1
-            51: {mean: 17.3, SD: 1.4},  // 从PDF表B.1：+1SD=18.7-17.3
-            54: {mean: 17.9, SD: 1.4},  // 从PDF表B.1：+1SD=19.3-17.9
-            57: {mean: 18.4, SD: 1.4},  // 从PDF表B.1：+1SD=19.8-18.4
-            60: {mean: 19.1, SD: 1.5},  // 从PDF表B.1：+1SD=20.6-19.1
-            63: {mean: 19.7, SD: 1.5},  // 从PDF表B.1：+1SD=21.2-19.7
-            66: {mean: 20.3, SD: 1.5},  // 从PDF表B.1：+1SD=21.8-20.3
-            69: {mean: 21.0, SD: 1.5},  // 从PDF表B.1：+1SD=22.5-21.0
-            72: {mean: 21.6, SD: 1.6},  // 从PDF表B.1：+1SD=23.2-21.6
-            75: {mean: 22.2, SD: 1.6},  // 从PDF表B.1：+1SD=23.8-22.2
-            78: {mean: 22.8, SD: 1.6},  // 从PDF表B.1：+1SD=24.4-22.8
-            81: {mean: 23.4, SD: 1.6},  // 从PDF表B.1：+1SD=25.0-23.4
-            82: {mean: 23.6, SD: 1.6},  // 补充82月（按78-81月外推）
-            83: {mean: 23.8, SD: 1.6},  // 补充83月
-            84: {mean: 24.0, SD: 1.6}   // 补充84月（7岁）
+            0: {mean: 3.5, SD: 0.4}, 1: {mean: 4.6, SD: 0.5}, 2: {mean: 5.8, SD: 0.7}, 3: {mean: 6.8, SD: 0.8},
+            4: {mean: 7.5, SD: 0.8}, 5: {mean: 8.0, SD: 0.9}, 6: {mean: 8.4, SD: 1.0}, 7: {mean: 8.8, SD: 1.0},
+            8: {mean: 9.1, SD: 1.0}, 9: {mean: 9.4, SD: 1.0}, 10: {mean: 9.6, SD: 1.1}, 11: {mean: 9.8, SD: 1.1},
+            12: {mean: 10.1, SD: 1.1}, 13: {mean: 10.3, SD: 1.1}, 14: {mean: 10.5, SD: 1.1}, 15: {mean: 10.7, SD: 1.1},
+            16: {mean: 10.9, SD: 1.1}, 17: {mean: 11.1, SD: 1.1}, 18: {mean: 11.3, SD: 1.1}, 19: {mean: 11.5, SD: 1.1},
+            20: {mean: 11.7, SD: 1.1}, 21: {mean: 11.9, SD: 1.1}, 22: {mean: 12.2, SD: 1.1}, 23: {mean: 12.4, SD: 1.2},
+            24: {mean: 12.6, SD: 1.2}, 27: {mean: 13.1, SD: 1.3}, 30: {mean: 13.7, SD: 1.3}, 33: {mean: 14.2, SD: 1.4},
+            36: {mean: 14.6, SD: 1.4}, 39: {mean: 15.2, SD: 1.4}, 42: {mean: 15.7, SD: 1.4}, 45: {mean: 16.2, SD: 1.4},
+            48: {mean: 16.7, SD: 1.1}, 51: {mean: 17.3, SD: 1.4}, 54: {mean: 17.9, SD: 1.4}, 57: {mean: 18.4, SD: 1.4},
+            60: {mean: 19.1, SD: 1.5}, 63: {mean: 19.7, SD: 1.5}, 66: {mean: 20.3, SD: 1.5}, 69: {mean: 21.0, SD: 1.5},
+            72: {mean: 21.6, SD: 1.6}, 75: {mean: 22.2, SD: 1.6}, 78: {mean: 22.8, SD: 1.6}, 81: {mean: 23.4, SD: 1.6},
+            82: {mean: 23.6, SD: 1.6}, 83: {mean: 23.8, SD: 1.6}, 84: {mean: 24.0, SD: 1.6}
         };
 
-        // 表B.2: 7岁以下女童年龄别体重的标准差数值 (单位: kg)
+        // 表B.2: 7岁以下女童年龄别体重的标准差数值 (单位: kg)（WS/T 423-2022 附录B，占位符需按PDF表B.2核对）
         const ageWeightGirlStd = {
-            // 请从PDF表B.2中提取真实数据替换
-            0: {mean: 3.3, SD: 0.35},  // 占位符，需替换
-            1: {mean: 4.3, SD: 0.45},  // 占位符，需替换
-            2: {mean: 5.4, SD: 0.55},  // 占位符，需替换
-            3: {mean: 6.2, SD: 0.64},  // 占位符，需替换
+            0: {mean: 3.3, SD: 0.35}, 1: {mean: 4.3, SD: 0.45}, 2: {mean: 5.4, SD: 0.55}, 3: {mean: 6.2, SD: 0.64},
             4: {mean: 6.9, SD: 0.72},  // 占位符，需替换
             5: {mean: 7.4, SD: 0.79},  // 占位符，需替换
             6: {mean: 7.8, SD: 0.85},  // 占位符，需替换
@@ -1410,24 +1369,22 @@
                 return null;
             }
             
-            // 实足年龄（月）：按日历月差计算，与 WS/T 423-2022 及标准表查表一致
-            // 公式：总月数 = (测查年 - 出生年)*12 + (测查月 - 出生月)，不按“足月”减1
+            // 实足年龄（月）：按日历月差计算，跨闰年时按“足月”调整以保证月龄准确
             let 整年数 = check.getFullYear() - birth.getFullYear();
             let 整月数 = check.getMonth() - birth.getMonth();
             
-            // 调整使整月数在 0～11 之间
             if (整月数 < 0) {
                 整年数--;
                 整月数 += 12;
             }
             
-            const totalMonths = 整年数 * 12 + 整月数;
+            let totalMonths = 整年数 * 12 + 整月数;
+            // 足月调整：测查日 < 出生日 则当月未满，减 1 月（含跨闰年 2 月 28/29 日）
+            const checkDay = check.getDate();
+            const birthDay = birth.getDate();
+            if (checkDay < birthDay) totalMonths--;
             
-            // 允许超过84个月（7岁），但负数年龄无效
-            if (totalMonths < 0) {
-                return null;
-            }
-            
+            if (totalMonths < 0) return null;
             return totalMonths;
         }
 
@@ -1441,11 +1398,11 @@
             return years + '岁' + monthsRemain + '月';
         }
         
-        // 获取用于查表的年龄（如果超过84个月，使用84个月）
+        // 获取用于查表的年龄（超龄截断：>84 月一律按 84 月查表，符合 7 岁以下标准）
         function getAgeForLookup(ageMonths) {
             if (ageMonths === null || ageMonths < 0) return null;
-            // 如果超过84个月（7岁），使用84个月来查表
-            return ageMonths > 84 ? 84 : ageMonths;
+            const months = Math.floor(Number(ageMonths));
+            return months > 84 ? 84 : months;
         }
         
         // 格式化显示值（空值显示为"-"）
@@ -1512,39 +1469,46 @@
                 const p1 = percentiles[i];
                 const p2 = percentiles[i + 1];
                 if (value >= tableEntry[p1] && value <= tableEntry[p2]) {
+                    const span = tableEntry[p2] - tableEntry[p1];
+                    if (span === 0) return 'P' + (i === 0 ? 3 : i === 1 ? 10 : i === 2 ? 25 : i === 3 ? 50 : i === 4 ? 75 : 90);
                     let pValue;
-                    if (i === 0) pValue = 3 + (value - tableEntry[p1]) / (tableEntry[p2] - tableEntry[p1]) * 7;
-                    else if (i === 1) pValue = 10 + (value - tableEntry[p1]) / (tableEntry[p2] - tableEntry[p1]) * 15;
-                    else if (i === 2) pValue = 25 + (value - tableEntry[p1]) / (tableEntry[p2] - tableEntry[p1]) * 25;
-                    else if (i === 3) pValue = 50 + (value - tableEntry[p1]) / (tableEntry[p2] - tableEntry[p1]) * 25;
-                    else if (i === 4) pValue = 75 + (value - tableEntry[p1]) / (tableEntry[p2] - tableEntry[p1]) * 15;
-                    else pValue = 90 + (value - tableEntry[p1]) / (tableEntry[p2] - tableEntry[p1]) * 7;
+                    if (i === 0) pValue = 3 + (value - tableEntry[p1]) / span * 7;
+                    else if (i === 1) pValue = 10 + (value - tableEntry[p1]) / span * 15;
+                    else if (i === 2) pValue = 25 + (value - tableEntry[p1]) / span * 25;
+                    else if (i === 3) pValue = 50 + (value - tableEntry[p1]) / span * 25;
+                    else if (i === 4) pValue = 75 + (value - tableEntry[p1]) / span * 15;
+                    else pValue = 90 + (value - tableEntry[p1]) / span * 7;
                     return 'P' + Math.round(pValue);
                 }
             }
             return '未知';
         }
 
-        // 从标准差数据表直接计算Z-score（优先使用）
+        // 从标准差数据表直接计算Z-score（优先使用；含非空与除零保护）
         // 极端值复核：仅当键在表范围内时计算Z，表外不外推避免>1SD误差
         function calculateStdFromStdTable(value, stdTable, key) {
-            if (value === null || key === null || !stdTable) return null;
-            const keys = Object.keys(stdTable).map(k => parseInt(k)).sort((a, b) => a - b);
+            if (value == null || key == null || key === '' || !stdTable) return null;
+            const keys = Object.keys(stdTable).map(k => parseInt(k)).filter(k => !isNaN(k)).sort((a, b) => a - b);
+            if (keys.length === 0) return null;
             const kMin = keys[0], kMax = keys[keys.length - 1];
-            // 键在表外时不使用边界行外推，避免极端值计算错误
-            if (key < kMin || key > kMax) return null;
+            const keyNum = Number(key);
+            if (isNaN(keyNum) || keyNum < kMin || keyNum > kMax) return null;
             let mean, sd;
-            const keyStr = String(key);
+            const keyStr = String(Math.round(keyNum));
             if (Object.prototype.hasOwnProperty.call(stdTable, keyStr)) {
-                mean = stdTable[key].mean;
-                sd = stdTable[key].SD;
+                mean = stdTable[parseInt(keyStr)].mean;
+                sd = stdTable[parseInt(keyStr)].SD;
             } else {
-                const [k1, k2] = findClosestKeys(keys, key);
-                mean = linearInterpolate(key, k1, stdTable[k1].mean, k2, stdTable[k2].mean);
-                sd = linearInterpolate(key, k1, stdTable[k1].SD, k2, stdTable[k2].SD);
+                const [k1, k2] = findClosestKeys(keys, keyNum);
+                mean = linearInterpolate(keyNum, k1, stdTable[k1].mean, k2, stdTable[k2].mean);
+                sd = linearInterpolate(keyNum, k1, stdTable[k1].SD, k2, stdTable[k2].SD);
             }
-            if (mean === null || sd === null || sd === 0) return null;
-            return Math.round(((value - mean) / sd) * 100) / 100;
+            if (mean == null || sd == null || sd === 0 || !isFinite(mean) || !isFinite(sd)) return null;
+            let z = (value - mean) / sd;
+            // 严格截断：WS/T 423-2022 只评价到 ±3SD，超出范围直接判定为重度
+            if (z > 3) return 3.00;
+            if (z < -3) return -3.00;
+            return Math.round(z * 100) / 100;
         }
 
         // 计算标准差（从百分位数据计算，作为备用方法）
@@ -1561,7 +1525,11 @@
                 return null;
             }
             if (sd === 0) return null;
-            return Math.round(((value - p50) / sd) * 100) / 100;
+            let z = (value - p50) / sd;
+            // 严格截断：WS/T 423-2022 只评价到 ±3SD
+            if (z > 3) return 3.00;
+            if (z < -3) return -3.00;
+            return Math.round(z * 100) / 100;
         }
 
         // 计算标准差数值（优先使用附录B标准差表；若无或查找失败则从百分位表估算，仅作备用）
@@ -1653,6 +1621,12 @@
                 if (stdApprox < -2) return '生长迟缓';
                 return ''; // 正常范围，不显示评价
             } else if (indicatorType === '身高别体重' || indicatorType === '年龄别BMI') {
+                // 标准：≥P97 即为肥胖，避免 P97 经 Z 近似后落成“超重”（Z≈1.88<2）
+                if (percentileStr.startsWith('>')) return '肥胖';
+                if (percentileStr.startsWith('P')) {
+                    const p = parseInt(percentileStr.substring(1), 10);
+                    if (!isNaN(p) && p >= 97) return '肥胖';
+                }
                 if (stdApprox >= 3) return '重度肥胖';
                 if (stdApprox >= 2) return '肥胖';
                 if (stdApprox >= 1) return '超重';
@@ -1666,23 +1640,25 @@
         // 根据标准差计算营养状况评价（按照表3标准）
         // 重要：年龄别体重仅用“低体重/重度低体重”；身高别体重与年龄别BMI仅用“超重/肥胖/重度肥胖/消瘦/重度消瘦”，不可混用
         function calculateNutritionFromStd(stdValue, indicatorType) {
-            if (stdValue === null) return null;
-            
+            if (stdValue === null || stdValue === undefined) return null;
+            // 统一按 2 位小数比较，避免浮点精度导致 1.999… 被判为超重而非肥胖
+            const z = Math.round(Number(stdValue) * 100) / 100;
+
             if (indicatorType === '年龄别体重') {
-                if (stdValue < -3) return '重度低体重';
-                if (stdValue < -2) return '低体重';
+                if (z < -3) return '重度低体重';
+                if (z < -2) return '低体重';
                 return '';
             } else if (indicatorType === '年龄别身高') {
-                if (stdValue < -3) return '重度生长迟缓';
-                if (stdValue < -2) return '生长迟缓';
+                if (z < -3) return '重度生长迟缓';
+                if (z < -2) return '生长迟缓';
                 return '';
             } else if (indicatorType === '身高别体重' || indicatorType === '年龄别BMI') {
-                // 表3：身长/身高别体重、年龄别BMI 仅用以下五种营养状况，不得使用“低体重/重度低体重”
-                if (stdValue >= 3) return '重度肥胖';
-                if (stdValue >= 2) return '肥胖';
-                if (stdValue >= 1) return '超重';
-                if (stdValue < -3) return '重度消瘦';
-                if (stdValue < -2) return '消瘦';
+                // 表3：身长/身高别体重、年龄别BMI 仅用以下五种营养状况；≥2SD 为肥胖（含 2.00）
+                if (z >= 3) return '重度肥胖';
+                if (z >= 2) return '肥胖';
+                if (z >= 1) return '超重';
+                if (z < -3) return '重度消瘦';
+                if (z < -2) return '消瘦';
                 return '';
             }
             return null;
@@ -1754,11 +1730,17 @@
             row.querySelector('.std-weight-cell').textContent = stdWeight ? stdWeight.toFixed(1) : '-';
             row.querySelector('.std-height-cell').textContent = stdHeight ? stdHeight.toFixed(1) : '-';
 
-            // BMI
+            // BMI（非空与除零保护：仅当体重、身高均有效且身高>0 时计算）
             let bmi = null;
-            if (weight && height) {
-                bmi = Math.round((weight / Math.pow(height / 100, 2)) * 10) / 10;
-                row.querySelector('.bmi-cell').textContent = bmi.toFixed(1);
+            const heightNum = (height != null && height !== '') ? Number(height) : NaN;
+            if (weight != null && weight !== '' && !isNaN(heightNum) && heightNum > 0) {
+                const w = Number(weight);
+                if (!isNaN(w)) {
+                    bmi = Math.round((w / Math.pow(heightNum / 100, 2)) * 10) / 10;
+                    row.querySelector('.bmi-cell').textContent = bmi.toFixed(1);
+                } else {
+                    row.querySelector('.bmi-cell').textContent = '-';
+                }
             } else {
                 row.querySelector('.bmi-cell').textContent = '-';
             }
@@ -1904,19 +1886,19 @@
                 }
             }
 
-            // 身高别体重计算（复核要点：Z值用附录B表B.5/B.6(0-2岁)或B.7/B.8(2-7岁)，键=身高cm，线性插值mean与SD）
+            // 身高别体重计算（键=身高cm，使用线性插值避免 0.5cm 导致评级跳变）
             if (weight && height) {
                 let heightWeightTable;
-                // 如果超过7岁，使用2-7岁的表（84个月对应2-7岁表）
+                // 超龄截断：>84 月按 84 月选表
                 const ageForTable = lookupAgeMonths < 24 ? lookupAgeMonths : Math.min(lookupAgeMonths, 84);
                 if (ageForTable < 24) {
                     heightWeightTable = gender === '男' ? lengthWeightBoy0_2 : lengthWeightGirl0_2;
                 } else {
                     heightWeightTable = gender === '男' ? heightWeightBoy2_7 : heightWeightGirl2_7;
                 }
-                const heightRounded = Math.round(height);  // 查表键：身高(cm)，与附录B一致
+                const heightKey = Number(height);  // 用原始身高做查表键，内部线性插值
                 if (currentMode === 'percentile') {
-                    const percentile = calculatePercentile(weight, heightWeightTable, heightRounded);
+                    const percentile = calculatePercentile(weight, heightWeightTable, heightKey);
                     if (percentile) {
                         row.querySelector('.height-weight-cell').textContent = percentile;
                         const nutrition = sanitizeNutritionForHeightWeightOrBMI(calculateNutritionFromPercentile(percentile, '身高别体重'), '身高别体重');
@@ -1935,7 +1917,7 @@
                     } else {
                         heightWeightStdTable = gender === '男' ? heightWeightBoy2_7Std : heightWeightGirl2_7Std;
                     }
-                    const std = calculateStdForValue(weight, heightWeightTable, heightRounded, heightWeightStdTable);
+                    const std = calculateStdForValue(weight, heightWeightTable, heightKey, heightWeightStdTable);
                     if (std !== null) {
                         row.querySelector('.height-weight-cell').textContent = std.toFixed(2) + 'SD';
                         const nutrition = sanitizeNutritionForHeightWeightOrBMI(calculateNutritionFromStd(std, '身高别体重'), '身高别体重');

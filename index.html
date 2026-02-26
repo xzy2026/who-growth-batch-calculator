@@ -1721,7 +1721,15 @@
                     heightWeightTable = gender === '男' ? heightWeightBoy2_7 : heightWeightGirl2_7;
                 }
                 const heightKey = Number(height);  // 用原始身高做查表键，内部线性插值
-                if (currentMode === 'percentile') {
+                // 身高范围校验：超出当前表键范围不评价，显示不适用（0-2岁表 45～100，2-7岁表 75～130）
+                const hwKeys = Object.keys(heightWeightTable).map(Number);
+                const minH = Math.min(...hwKeys);
+                const maxH = Math.max(...hwKeys);
+                if (heightKey < minH || heightKey > maxH) {
+                    row.querySelector('.height-weight-cell').textContent = '不适用';
+                    const nutritionCell = row.querySelector('.height-weight-eval-result-cell');
+                    if (nutritionCell) nutritionCell.textContent = '不适用';
+                } else if (currentMode === 'percentile') {
                     const percentile = calculatePercentile(weight, heightWeightTable, heightKey);
                     if (percentile) {
                         row.querySelector('.height-weight-cell').textContent = percentile;

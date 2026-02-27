@@ -1883,9 +1883,6 @@
             }
             if (mean == null || sd == null || sd === 0 || !isFinite(mean) || !isFinite(sd)) return null;
             let z = (value - mean) / sd;
-            // 严格截断：WS/T 423-2022 只评价到 ±3SD，超出范围直接判定为重度
-            if (z > 3) return 3.00;
-            if (z < -3) return -3.00;
             return Math.round(z * 100) / 100;
         }
 
@@ -1894,6 +1891,14 @@
             if (value === null || key === null) return null;
             if (!stdTable) return null;
             return calculateStdFromStdTable(value, stdTable, key);
+        }
+
+        // 标准差数值的展示格式：超出 ±3SD 显示为 >3SD / <-3SD（营养评价仍用真实 Z，重度肥胖/重度消瘦可正确判定）
+        function formatStdForDisplay(std) {
+            if (std === null || std === undefined) return '-';
+            if (std > 3) return '>3SD';
+            if (std < -3) return '<-3SD';
+            return std.toFixed(2) + 'SD';
         }
 
         // 根据百分位计算评价
@@ -1915,11 +1920,12 @@
         // 根据标准差计算评价
         function calculateEvaluationFromStd(stdValue) {
             if (stdValue === null) return {value: null, result: null};
-            if (stdValue >= 2) return {value: stdValue.toFixed(2) + 'SD', result: '上'};
-            if (stdValue >= 1) return {value: stdValue.toFixed(2) + 'SD', result: '中上'};
-            if (stdValue >= -1) return {value: stdValue.toFixed(2) + 'SD', result: '中'};
-            if (stdValue >= -2) return {value: stdValue.toFixed(2) + 'SD', result: '中下'};
-            return {value: stdValue.toFixed(2) + 'SD', result: '下'};
+            const val = formatStdForDisplay(stdValue);
+            if (stdValue >= 2) return {value: val, result: '上'};
+            if (stdValue >= 1) return {value: val, result: '中上'};
+            if (stdValue >= -1) return {value: val, result: '中'};
+            if (stdValue >= -2) return {value: val, result: '中下'};
+            return {value: val, result: '下'};
         }
 
         // 根据百分位计算营养状况评价（按照表3标准）
@@ -2103,7 +2109,7 @@
                     const weightStdTable = gender === '男' ? ageWeightBoyStd : ageWeightGirlStd;
                     const std = calculateStdForValue(weight, weightTable, lookupAgeMonths, weightStdTable);
                     if (std !== null) {
-                        row.querySelector('.age-weight-cell').textContent = std.toFixed(2) + 'SD';
+                        row.querySelector('.age-weight-cell').textContent = formatStdForDisplay(std);
                         const eval = calculateEvaluationFromStd(std);
                         row.querySelector('.weight-eval-value-cell').textContent = eval.value || '-';
                         // 正常区间（空字符串）显示为 "-"
@@ -2154,7 +2160,7 @@
                     const heightStdTable = gender === '男' ? ageHeightBoyStd : ageHeightGirlStd;
                     const std = calculateStdForValue(height, heightTable, lookupAgeMonths, heightStdTable);
                     if (std !== null) {
-                        row.querySelector('.age-height-cell').textContent = std.toFixed(2) + 'SD';
+                        row.querySelector('.age-height-cell').textContent = formatStdForDisplay(std);
                         const eval = calculateEvaluationFromStd(std);
                         row.querySelector('.height-eval-value-cell').textContent = eval.value || '-';
                         // 正常区间（空字符串）显示为 "-"
@@ -2199,7 +2205,7 @@
                     const bmiStdTable = gender === '男' ? ageBMIBoyStd : ageBMIGirlStd;
                     const std = calculateStdForValue(bmi, bmiTable, lookupAgeMonths, bmiStdTable);
                     if (std !== null) {
-                        row.querySelector('.age-bmi-cell').textContent = std.toFixed(2) + 'SD';
+                        row.querySelector('.age-bmi-cell').textContent = formatStdForDisplay(std);
                         const eval = calculateEvaluationFromStd(std);
                         // 正常区间（空字符串）显示为 "-"
                         row.querySelector('.bmi-eval-result-cell').textContent = (eval.result === '' || !eval.result) ? '-' : eval.result;
@@ -2256,7 +2262,7 @@
                     }
                     const std = calculateStdForValue(weight, heightWeightTable, heightKey, heightWeightStdTable);
                     if (std !== null) {
-                        row.querySelector('.height-weight-cell').textContent = std.toFixed(2) + 'SD';
+                        row.querySelector('.height-weight-cell').textContent = formatStdForDisplay(std);
                         const nutrition = sanitizeNutritionForHeightWeightOrBMI(calculateNutritionFromStd(std, '身高别体重'), '身高别体重');
                         const nutritionCell = row.querySelector('.height-weight-eval-result-cell');
                         if (nutritionCell) nutritionCell.textContent = (nutrition === '' || nutrition === null) ? '-' : nutrition;
@@ -2288,7 +2294,7 @@
                     const headStdTable = gender === '男' ? ageHeadBoyStd : ageHeadGirlStd;
                     const std = calculateStdForValue(headCirc, headTable, lookupAgeMonths, headStdTable);
                     if (std !== null) {
-                        row.querySelector('.age-head-cell').textContent = std.toFixed(2) + 'SD';
+                        row.querySelector('.age-head-cell').textContent = formatStdForDisplay(std);
                         const eval = calculateEvaluationFromStd(std);
                         // 正常区间（空字符串）显示为 "-"
                         row.querySelector('.age-head-eval-result-cell').textContent = (eval.result === '' || !eval.result) ? '-' : eval.result;

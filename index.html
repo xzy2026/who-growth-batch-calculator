@@ -309,6 +309,20 @@
             background: #c82333;
         }
 
+        .btn-report {
+            background: #366092;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-left: 4px;
+        }
+        .btn-report:hover {
+            background: #4a7ba7;
+        }
+
         .info-box {
             background: #e7f3ff;
             border-left: 4px solid #366092;
@@ -1647,7 +1661,7 @@
                 <td><input type="number" class="head-circ-input" step="0.1" placeholder="3岁以下"></td>
                 <td class="age-head-cell result-cell"></td>
                 <td class="age-head-eval-result-cell result-cell"></td>
-                <td><button class="delete-btn" onclick="deleteRow(${serialNum})">删除</button></td>
+                <td><button class="delete-btn" onclick="deleteRow(${serialNum})">删除</button><button class="btn-report" onclick="openReport(this)">生成报告</button></td>
             `;
             if (rowData) {
                 if (rowData.name != null && rowData.name !== '') row.querySelector('.name-input').value = rowData.name;
@@ -1696,6 +1710,63 @@
         function updateStatus() {
             const rowCount = document.querySelectorAll('#tableBody tr').length;
             document.getElementById('statusBar').textContent = `共 ${rowCount} 行数据`;
+        }
+
+        // 从当前行收集报告数据（供报告页使用）
+        function getRowReportData(row) {
+            const getVal = (sel) => {
+                const el = row.querySelector(sel);
+                return el ? (el.value !== undefined ? el.value : el.textContent || '').trim() : '';
+            };
+            const getText = (sel) => {
+                const el = row.querySelector(sel);
+                return el ? (el.textContent || '').trim() : '';
+            };
+            const indicators = [
+                { id: 'ageWeight', name: '年龄别体重', valueCell: '.age-weight-cell', resultCell: '.age-weight-eval-result-cell' },
+                { id: 'ageHeight', name: '年龄别身高', valueCell: '.age-height-cell', resultCell: '.age-height-eval-result-cell' },
+                { id: 'heightWeight', name: '身高别体重', valueCell: '.height-weight-cell', resultCell: '.height-weight-eval-result-cell' },
+                { id: 'ageBmi', name: '年龄别BMI', valueCell: '.age-bmi-cell', resultCell: '.age-bmi-eval-result-cell' },
+                { id: 'ageHead', name: '年龄别头围', valueCell: '.age-head-cell', resultCell: '.age-head-eval-result-cell' }
+            ];
+            const weight = parseFloat(getVal('.weight-input'));
+            const height = parseFloat(getVal('.height-input'));
+            const bmiText = getText('.bmi-cell');
+            const bmi = (bmiText && bmiText !== '-') ? parseFloat(bmiText) : null;
+            const headCirc = parseFloat(getVal('.head-circ-input'));
+            return {
+                mode: currentMode,
+                name: getVal('.name-input'),
+                gender: getVal('.gender-input'),
+                birthDate: getVal('.birth-date-input'),
+                checkDate: getVal('.check-date-input'),
+                ageText: getText('.age-cell'),
+                weight: isNaN(weight) ? null : weight,
+                height: isNaN(height) ? null : height,
+                bmi: (bmi != null && !isNaN(bmi)) ? bmi : null,
+                headCirc: (headCirc != null && !isNaN(headCirc)) ? headCirc : null,
+                stdWeight: getText('.std-weight-cell'),
+                stdHeight: getText('.std-height-cell'),
+                indicators: indicators.map(ind => ({
+                    id: ind.id,
+                    name: ind.name,
+                    value: getText(ind.valueCell),
+                    result: getText(ind.resultCell)
+                }))
+            };
+        }
+
+        // 打开报告页：收集当前行数据写入 localStorage（新窗口无法读取 sessionStorage）并新窗口打开 report.html
+        function openReport(buttonEl) {
+            const row = buttonEl && buttonEl.closest ? buttonEl.closest('tr') : null;
+            if (!row) return;
+            const data = getRowReportData(row);
+            try {
+                localStorage.setItem('childGrowthReport', JSON.stringify(data));
+                window.open('report.html', '_blank', 'noopener');
+            } catch (e) {
+                alert('无法打开报告页，请检查是否允许弹窗。');
+            }
         }
 
         // 计算年龄（月）
@@ -2229,7 +2300,7 @@
                 }
             }
 
-            // 身高别体重计算（键=身高cm，使用线性插值避免 0.5cm 导致评级跳变）
+            // 身高别体重计算（键=身高/身长cm，严格按文档：向下取整到整厘米查表，不插值）
             if (weight && height) {
                 let heightWeightTable;
                 // 年龄选表：0-23月用身长别体重，24+月用身高别体重（getAgeForLookup 已将82+截断到81）
@@ -2239,7 +2310,7 @@
                 } else {
                     heightWeightTable = gender === '男' ? heightWeightBoy2_7 : heightWeightGirl2_7;
                 }
-                const heightKey = Number(height);  // 用原始身高做查表键，内部线性插值
+                const heightKey = Math.floor(Number(height));  // 向下取整到整厘米，与文档每1cm一致，不插值
                 // 身高范围校验：超出当前表键范围不评价，显示不适用（0-2岁表 45～100，2-7岁表 75～130）
                 const hwKeys = Object.keys(heightWeightTable).map(Number);
                 const minH = Math.min(...hwKeys);

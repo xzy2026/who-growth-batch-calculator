@@ -18,15 +18,13 @@
         .report-title { text-align: center; margin-bottom: 20px; font-size: 18px; color: #333; }
         .overview-row { display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; margin-bottom: 24px; }
         .grade-circle { width: 120px; height: 120px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; color: #333; flex-shrink: 0; }
-        .grade-circle.excellent { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: #fff; }
-        .grade-circle.good { background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); color: #fff; }
+        .grade-circle.good { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: #fff; }
         .grade-circle.pass { background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%); color: #333; }
         .grade-circle.fail { background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: #fff; }
         .legend { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; align-items: center; }
         .legend-item { display: flex; align-items: center; gap: 6px; font-size: 14px; }
         .legend-dot { width: 14px; height: 14px; border-radius: 4px; }
-        .legend-dot.excellent { background: #28a745; }
-        .legend-dot.good { background: #17a2b8; }
+        .legend-dot.good { background: #28a745; }
         .legend-dot.pass { background: #ffc107; }
         .legend-dot.fail { background: #dc3545; }
         .tabs { display: flex; gap: 0; border-bottom: 2px solid #e0e0e0; margin-bottom: 20px; }
@@ -44,6 +42,10 @@
         .indicator-table { width: 100%; border-collapse: collapse; font-size: 14px; }
         .indicator-table th, .indicator-table td { border: 1px solid #ddd; padding: 10px 12px; }
         .indicator-table th { background: #e7f3ff; }
+        .eval-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 20px; }
+        .eval-table th, .eval-table td { border: 1px solid #ddd; padding: 8px 10px; text-align: center; }
+        .eval-table th { background: #366092; color: #fff; }
+        .eval-table td.first-col { text-align: left; background: #f9f9f9; font-weight: 500; min-width: 100px; }
         .suggestion-box { background: #e7f3ff; border-left: 4px solid #366092; padding: 16px 20px; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.7; color: #333; }
         .back-row { text-align: center; margin-top: 24px; }
         .back-btn { display: inline-block; padding: 10px 24px; background: #366092; color: #fff; text-decoration: none; border-radius: 8px; font-size: 14px; }
@@ -68,7 +70,6 @@
                 <div class="overview-row">
                     <div class="grade-circle" id="gradeCircle">—</div>
                     <div class="legend">
-                        <span class="legend-item"><span class="legend-dot excellent"></span>优秀</span>
                         <span class="legend-item"><span class="legend-dot good"></span>良好</span>
                         <span class="legend-item"><span class="legend-dot pass"></span>合格</span>
                         <span class="legend-item"><span class="legend-dot fail"></span>不合格</span>
@@ -92,10 +93,12 @@
                 <div id="panelDetail" class="panel">
                     <div class="chart-box">
                         <table class="info-table" id="infoTable"></table>
-                        <div class="chart-title">指标评价明细</div>
-                        <table class="indicator-table" id="indicatorTable"></table>
-                        <div class="chart-title">Z 分柱状图</div>
-                        <div id="barChartDetail" style="height: 280px;"></div>
+                        <div class="chart-title">表1 儿童生长水平的百分位数评价方法</div>
+                        <table class="eval-table" id="table1Percentile"></table>
+                        <div class="chart-title">表2 儿童生长水平的标准差评价方法</div>
+                        <table class="eval-table" id="table2StdLevel"></table>
+                        <div class="chart-title">表3 儿童营养状况的标准差评价方法</div>
+                        <table class="eval-table" id="table3StdNutrition"></table>
                     </div>
                 </div>
                 <div id="panelSuggestion" class="panel">
@@ -157,15 +160,12 @@
                 }
                 if (hasSevere) return { level: 'fail', label: '不合格', cls: 'fail' };
                 if (hasAbnormal) return { level: 'pass', label: '合格', cls: 'pass' };
-                var anyOff = results.some(function(r) { return r && r !== '-' && (r === '中上' || r === '中下'); });
-                if (anyOff) return { level: 'good', label: '良好', cls: 'good' };
-                return { level: 'excellent', label: '优秀', cls: 'excellent' };
+                return { level: 'good', label: '良好', cls: 'good' };
             }
 
             function getSuggestionText(tier, data) {
                 var name = (data.name || '该儿童').trim() || '该儿童';
-                if (tier.level === 'excellent') return '根据本次评估，' + name + ' 各生长指标均在正常范围内，整体生长状况良好。建议继续保持均衡饮食与适度活动，并定期进行生长监测。';
-                if (tier.level === 'good') return '根据本次评估，' + name + ' 部分指标略偏离同年龄同性别参考范围，整体仍属正常。建议关注饮食与作息，定期复查。';
+                if (tier.level === 'good') return '根据本次评估，' + name + ' 各生长指标均在正常范围内或仅有轻度偏离，整体生长状况良好。建议继续保持均衡饮食与适度活动，并定期进行生长监测。';
                 if (tier.level === 'pass') return '根据本次评估，' + name + ' 存在一项或多项生长指标异常（如低体重、生长迟缓、消瘦、超重或肥胖等）。建议至儿保科或营养科进一步评估，并在医生指导下进行干预。';
                 return '根据本次评估，' + name + ' 存在重度生长偏离，建议尽快至医疗机构儿保科或营养科就诊，在医生指导下进行系统评估与干预。';
             }
@@ -209,11 +209,131 @@
                 var infoHtml = infoRows.map(function(r) { return '<tr><th>' + r[0] + '</th><td>' + r[1] + '</td></tr>'; }).join('');
                 document.getElementById('infoTable').innerHTML = infoHtml;
 
-                var indRows = [];
+                function getZFromValue(valueStr, mode) {
+                    var z = parseValueToZ(valueStr, mode);
+                    return z === null ? null : z;
+                }
+                function getGrowthLevel(valueStr, mode) {
+                    if (!valueStr || valueStr === '-') return null;
+                    valueStr = String(valueStr).trim();
+                    if (mode === 'percentile') {
+                        if (valueStr.indexOf('<') === 0) return '下';
+                        if (valueStr.indexOf('>') >= 0 || valueStr.indexOf('≥') >= 0) return '上';
+                        var pMatch = valueStr.match(/^P(\d+)$/);
+                        if (pMatch) {
+                            var p = parseInt(pMatch[1], 10);
+                            if (p >= 97) return '上';
+                            if (p >= 75) return '中上';
+                            if (p >= 25) return '中';
+                            if (p >= 3) return '中下';
+                            return '下';
+                        }
+                        return null;
+                    }
+                    var z = getZFromValue(valueStr, mode);
+                    if (z === null) return null;
+                    if (z >= 2) return '上';
+                    if (z >= 1) return '中上';
+                    if (z >= -1) return '中';
+                    if (z >= -2) return '中下';
+                    return '下';
+                }
+                var colNames = ['年龄别体重', '年龄别身长/身高', '身长/身高体重', '年龄别BMI'];
+                var indByCol = { '年龄别体重': 0, '年龄别身长/身高': 1, '年龄别身高': 1, '身长/身高体重': 2, '身高别体重': 2, '年龄别BMI': 3 };
+                var indMap = {};
                 indicators.forEach(function(ind) {
-                    indRows.push('<tr><td>' + ind.name + '</td><td>' + (ind.value || '—') + '</td><td>' + (ind.result || '—') + '</td></tr>');
+                    if (indByCol[ind.name] !== undefined) indMap[indByCol[ind.name]] = ind;
                 });
-                document.getElementById('indicatorTable').innerHTML = '<thead><tr><th>指标</th><th>评价值</th><th>评价结果</th></tr></thead><tbody>' + indRows.join('') + '</tbody>';
+
+                var table1Rows = [
+                    { label: '≥P97', level: '上' },
+                    { label: 'P75～<P97', level: '中上' },
+                    { label: 'P25～<P75', level: '中' },
+                    { label: 'P3～<P25', level: '中下' },
+                    { label: '<P3', level: '下' }
+                ];
+                var table2Rows = [
+                    { label: '≥+2 SD', level: '上' },
+                    { label: '+1 SD～<+2 SD', level: '中上' },
+                    { label: '-1 SD～<+1 SD', level: '中' },
+                    { label: '-2 SD～<-1 SD', level: '中下' },
+                    { label: '<-2 SD', level: '下' }
+                ];
+                function cellForGrowthLevel(colIdx, rowLevel, normalRowLevel) {
+                    var ind = indMap[colIdx];
+                    if (!ind) return '';
+                    var gl = getGrowthLevel(ind.value, mode);
+                    if (gl === null) return rowLevel === normalRowLevel ? '—' : '';
+                    if (gl === rowLevel) return gl;
+                    if (rowLevel === normalRowLevel) return '—';
+                    return '';
+                }
+                var normalLevel = '中';
+                var t1Html = '<thead><tr><th>百分位数法</th><th>年龄别体重</th><th>年龄别身长/身高</th><th>身长/身高体重</th><th>年龄别BMI</th></tr></thead><tbody>';
+                table1Rows.forEach(function(row) {
+                    t1Html += '<tr><td class="first-col">' + row.label + '</td>';
+                    for (var c = 0; c < 4; c++) t1Html += '<td>' + cellForGrowthLevel(c, row.level, normalLevel) + '</td>';
+                    t1Html += '</tr>';
+                });
+                t1Html += '</tbody>';
+                document.getElementById('table1Percentile').innerHTML = t1Html;
+
+                var t2Html = '<thead><tr><th>标准差法</th><th>年龄别体重</th><th>年龄别身长/身高</th><th>身长/身高体重</th><th>年龄别BMI</th></tr></thead><tbody>';
+                table2Rows.forEach(function(row) {
+                    t2Html += '<tr><td class="first-col">' + row.label + '</td>';
+                    for (var c = 0; c < 4; c++) t2Html += '<td>' + cellForGrowthLevel(c, row.level, normalLevel) + '</td>';
+                    t2Html += '</tr>';
+                });
+                t2Html += '</tbody>';
+                document.getElementById('table2StdLevel').innerHTML = t2Html;
+
+                var table3Rows = [
+                    { label: '≥+3 SD', r: { ageW: '', ageH: '', hw: '重度肥胖', bmi: '重度肥胖' } },
+                    { label: '+2 SD～<+3 SD', r: { ageW: '', ageH: '', hw: '肥胖', bmi: '肥胖' } },
+                    { label: '+1 SD～<+2 SD', r: { ageW: '', ageH: '', hw: '超重', bmi: '超重' } },
+                    { label: '-1 SD～<+1 SD', r: { ageW: '—', ageH: '—', hw: '—', bmi: '—' } },
+                    { label: '-2 SD～<-1 SD', r: { ageW: '', ageH: '', hw: '消瘦', bmi: '消瘦' } },
+                    { label: '-3 SD～<-2 SD', r: { ageW: '低体重', ageH: '生长迟缓', hw: '', bmi: '' } },
+                    { label: '<-3 SD', r: { ageW: '重度低体重', ageH: '重度生长迟缓', hw: '重度消瘦', bmi: '重度消瘦' } }
+                ];
+                var nutritionKeys = ['ageW', 'ageH', 'hw', 'bmi'];
+                function getNutritionRowIndex(colIdx, result) {
+                    var r = (result || '').trim();
+                    if (r === '' || r === '—' || r === '-') return 3;
+                    if (colIdx === 0) {
+                        if (r === '重度低体重') return 6;
+                        if (r === '低体重') return 5;
+                        return 3;
+                    }
+                    if (colIdx === 1) {
+                        if (r === '重度生长迟缓') return 6;
+                        if (r === '生长迟缓') return 5;
+                        return 3;
+                    }
+                    if (r === '重度肥胖') return 0;
+                    if (r === '肥胖') return 1;
+                    if (r === '超重') return 2;
+                    if (r === '消瘦') return 4;
+                    if (r === '重度消瘦') return 6;
+                    return 3;
+                }
+                var t3Html = '<thead><tr><th>标准差法</th><th>年龄别体重</th><th>年龄别身长/身高</th><th>身长/身高体重</th><th>年龄别BMI</th></tr></thead><tbody>';
+                table3Rows.forEach(function(row, rowIdx) {
+                    t3Html += '<tr><td class="first-col">' + row.label + '</td>';
+                    for (var c = 0; c < 4; c++) {
+                        var ind = indMap[c];
+                        var res = ind ? (ind.result || '').trim() : '';
+                        if (res === '-') res = '';
+                        var matchRow = getNutritionRowIndex(c, ind ? ind.result : '');
+                        var cell = '';
+                        if (matchRow === rowIdx) cell = res || '—';
+                        else if (rowIdx === 3) cell = '—';
+                        t3Html += '<td>' + cell + '</td>';
+                    }
+                    t3Html += '</tr>';
+                });
+                t3Html += '</tbody>';
+                document.getElementById('table3StdNutrition').innerHTML = t3Html;
 
                 if (typeof echarts !== 'undefined') {
                     var radarMax = 2.5;
@@ -244,14 +364,11 @@
                     };
                     var barChart = echarts.init(document.getElementById('barChart'));
                     barChart.setOption(barOption);
-
-                    var barDetail = echarts.init(document.getElementById('barChartDetail'));
-                    barDetail.setOption(barOption);
                 }
             }
 
             function resizeCharts() {
-                [document.getElementById('radarChart'), document.getElementById('barChart'), document.getElementById('barChartDetail')].forEach(function(el) {
+                [document.getElementById('radarChart'), document.getElementById('barChart')].forEach(function(el) {
                     if (el && typeof echarts !== 'undefined' && echarts.getInstanceByDom(el)) echarts.getInstanceByDom(el).resize();
                 });
             }

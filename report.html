@@ -263,9 +263,8 @@
                     var ind = indMap[colIdx];
                     if (!ind) return '';
                     var gl = getGrowthLevel(ind.value, mode);
-                    if (gl === null) return rowLevel === normalRowLevel ? '—' : '';
+                    if (gl === null) return '';
                     if (gl === rowLevel) return gl;
-                    if (rowLevel === normalRowLevel) return '—';
                     return '';
                 }
                 var normalLevel = '中';
@@ -291,7 +290,7 @@
                     { label: '≥+3 SD', r: { ageW: '', ageH: '', hw: '重度肥胖', bmi: '重度肥胖' } },
                     { label: '+2 SD～<+3 SD', r: { ageW: '', ageH: '', hw: '肥胖', bmi: '肥胖' } },
                     { label: '+1 SD～<+2 SD', r: { ageW: '', ageH: '', hw: '超重', bmi: '超重' } },
-                    { label: '-1 SD～<+1 SD', r: { ageW: '—', ageH: '—', hw: '—', bmi: '—' } },
+                    { label: '-1 SD～<+1 SD', r: { ageW: '', ageH: '', hw: '', bmi: '' } },
                     { label: '-2 SD～<-1 SD', r: { ageW: '', ageH: '', hw: '消瘦', bmi: '消瘦' } },
                     { label: '-3 SD～<-2 SD', r: { ageW: '低体重', ageH: '生长迟缓', hw: '', bmi: '' } },
                     { label: '<-3 SD', r: { ageW: '重度低体重', ageH: '重度生长迟缓', hw: '重度消瘦', bmi: '重度消瘦' } }
@@ -326,8 +325,8 @@
                         if (res === '-') res = '';
                         var matchRow = getNutritionRowIndex(c, ind ? ind.result : '');
                         var cell = '';
-                        if (matchRow === rowIdx) cell = res || '—';
-                        else if (rowIdx === 3) cell = '—';
+                        if (matchRow === rowIdx) cell = res || '';
+                        else if (rowIdx === 3) cell = '';
                         t3Html += '<td>' + cell + '</td>';
                     }
                     t3Html += '</tr>';

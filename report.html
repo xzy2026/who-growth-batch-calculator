@@ -6,6 +6,9 @@
     <title>儿童生长评价报告 - 享智云</title>
     <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
     <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Microsoft YaHei', Arial, sans-serif; font-size: 16px; background: #f5f5f5; min-height: 100vh; }
@@ -46,6 +49,10 @@
         .eval-table th, .eval-table td { border: 1px solid #ddd; padding: 8px 10px; text-align: center; }
         .eval-table th { background: #366092; color: #fff; }
         .eval-table td.first-col { text-align: left; background: #f9f9f9; font-weight: 500; min-width: 100px; }
+        .chart-values-summary { margin-top: 16px; font-size: 14px; }
+        .chart-values-summary table { width: 100%; border-collapse: collapse; }
+        .chart-values-summary th, .chart-values-summary td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+        .chart-values-summary th { background: #e7f3ff; width: 140px; }
         .suggestion-box { background: #e7f3ff; border-left: 4px solid #366092; padding: 16px 20px; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.7; color: #333; }
         .back-row { text-align: center; margin-top: 24px; }
         .back-btn { display: inline-block; padding: 10px 24px; background: #366092; color: #fff; text-decoration: none; border-radius: 8px; font-size: 14px; }
@@ -84,6 +91,7 @@
                     <div class="chart-box">
                         <div class="chart-title">各指标 Z 分雷达图（中心为 0，外圈为 ±2）</div>
                         <div id="radarChart"></div>
+                        <div class="chart-values-summary" id="chartValuesSummary"></div>
                     </div>
                     <div class="chart-box">
                         <div class="chart-title">各指标 Z 分柱状图</div>
@@ -106,6 +114,7 @@
                 </div>
                 <div class="back-row">
                     <a href="javascript:window.close()" class="back-btn">关闭报告</a>
+                    <a href="javascript:void(0)" class="back-btn" id="downloadReportBtn" style="margin-left: 12px;">下载报告</a>
                 </div>
             </div>
         </div>
@@ -188,6 +197,16 @@
                     else validCount++;
                     zValues.push(z);
                 }
+                var valuesSummaryHtml = '<p style="margin-bottom:8px;font-weight:bold;">各指标数值（下图对应）</p><table><thead><tr><th>指标</th><th>评价值</th><th>Z分</th></tr></thead><tbody>';
+                for (var i = 0; i < indicators.length; i++) {
+                    var val = indicators[i].value && indicators[i].value !== '-' ? indicators[i].value : '—';
+                    var zStr = (zValues[i] != null && validCount > 0) ? (typeof zValues[i] === 'number' ? zValues[i].toFixed(2) : zValues[i]) : '—';
+                    valuesSummaryHtml += '<tr><td>' + (indicators[i].name || '') + '</td><td>' + val + '</td><td>' + zStr + '</td></tr>';
+                }
+                valuesSummaryHtml += '</tbody></table>';
+                var sumEl = document.getElementById('chartValuesSummary');
+                if (sumEl) sumEl.innerHTML = valuesSummaryHtml;
+
                 var tier = getTierLevel(data);
                 document.getElementById('noData').style.display = 'none';
                 document.getElementById('reportBody').style.display = 'block';
@@ -389,11 +408,145 @@
                 });
             }
 
+            function downloadReport() {
+                if (typeof html2pdf === 'undefined') { alert('请稍候再试或刷新页面后下载。'); return; }
+                var radarEl = document.getElementById('radarChart');
+                var barEl = document.getElementById('barChart');
+                var radarChart = radarEl && typeof echarts !== 'undefined' ? echarts.getInstanceByDom(radarEl) : null;
+                var barChart = barEl && typeof echarts !== 'undefined' ? echarts.getInstanceByDom(barEl) : null;
+                if (!radarChart || !barChart) { alert('图表未就绪，请稍候再试。'); return; }
+                var radarDataUrl = radarChart.getDataURL({ type: 'png', pixelRatio: 2 });
+                var barDataUrl = barChart.getDataURL({ type: 'png', pixelRatio: 2 });
+
+                var title = document.getElementById('reportTitle');
+                var gradeCircle = document.getElementById('gradeCircle');
+                var legend = document.querySelector('.overview-row .legend');
+                var panelDetail = document.getElementById('panelDetail');
+                var suggestionBox = document.getElementById('suggestionBox');
+                if (!title || !gradeCircle || !panelDetail || !suggestionBox) { alert('报告内容未加载完整。'); return; }
+
+                var valuesSummaryPdf = '';
+                try {
+                    var pdfDataRaw = localStorage.getItem(STORAGE_KEY);
+                    if (pdfDataRaw) {
+                        var pdfData = JSON.parse(pdfDataRaw);
+                        var pdfInd = pdfData.indicators || [];
+                        var pdfMode = pdfData.mode || 'percentile';
+                        valuesSummaryPdf = '<div style="margin-bottom:16px;"><p style="margin-bottom:8px;font-weight:bold;">各指标数值（下图对应）</p><table style="width:100%;border-collapse:collapse;font-size:13px;"><tr style="background:#e7f3ff;"><th style="border:1px solid #ddd;padding:8px;text-align:left;">指标</th><th style="border:1px solid #ddd;padding:8px;text-align:left;">评价值</th><th style="border:1px solid #ddd;padding:8px;text-align:left;">Z分</th></tr>';
+                        for (var idx = 0; idx < pdfInd.length; idx++) {
+                            var v = pdfInd[idx].value && pdfInd[idx].value !== '-' ? pdfInd[idx].value : '—';
+                            var z = parseValueToZ(pdfInd[idx].value, pdfMode);
+                            var zs = (z != null) ? Number(z).toFixed(2) : '—';
+                            valuesSummaryPdf += '<tr><td style="border:1px solid #ddd;padding:8px;">' + (pdfInd[idx].name || '') + '</td><td style="border:1px solid #ddd;padding:8px;">' + v + '</td><td style="border:1px solid #ddd;padding:8px;">' + zs + '</td></tr>';
+                        }
+                        valuesSummaryPdf += '</table></div>';
+                    }
+                } catch (e) {}
+
+                var wrapper = document.createElement('div');
+                wrapper.style.cssText = 'position:fixed;top:0;left:0;z-index:99999;width:800px;max-height:100vh;overflow:auto;font-family:Microsoft YaHei,Arial,sans-serif;font-size:14px;color:#333;background:#fff;padding:20px;box-sizing:border-box;';
+
+                var page1 = document.createElement('div');
+                page1.style.width = '800px';
+                page1.style.background = '#fff';
+                page1.innerHTML = '<div style="text-align:center;margin-bottom:16px;font-size:18px;">' + (title.textContent || '生长评价报告') + '</div>' +
+                    '<div style="display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:20px;">' +
+                    '<div style="width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:16px;color:#fff;background:#dc3545;" id="pdfGradeCircle"></div>' +
+                    '<div style="font-size:13px;">良好 · 合格 · 不合格</div></div>' +
+                    '<div style="margin-bottom:12px;font-size:15px;">各指标 Z 分雷达图（中心为 0，外圈为 ±2）</div>' +
+                    '<img src="' + radarDataUrl + '" style="width:100%;height:320px;display:block;margin-bottom:20px;" />' +
+                    valuesSummaryPdf +
+                    '<div style="margin-bottom:12px;font-size:15px;">各指标 Z 分柱状图</div>' +
+                    '<img src="' + barDataUrl + '" style="width:100%;height:320px;display:block;" />';
+                var pdfGrade = page1.querySelector('#pdfGradeCircle');
+                if (pdfGrade) {
+                    pdfGrade.textContent = gradeCircle.textContent || '—';
+                    var cls = gradeCircle.className.match(/good|pass|fail/);
+                    if (cls) {
+                        if (cls[0] === 'good') pdfGrade.style.background = '#28a745';
+                        else if (cls[0] === 'pass') {
+                            pdfGrade.style.background = '#ffc107';
+                            pdfGrade.style.color = '#333';
+                        } else pdfGrade.style.background = '#dc3545';
+                    }
+                }
+                wrapper.appendChild(page1);
+
+                var page2 = document.createElement('div');
+                page2.className = 'pdf-page-break';
+                page2.style.width = '800px';
+                page2.style.background = '#fff';
+                page2.style.pageBreakBefore = 'always';
+                var detailClone = panelDetail.cloneNode(true);
+                detailClone.style.display = 'block';
+                detailClone.querySelectorAll('.chart-box').forEach(function(b) { b.style.marginBottom = '16px'; });
+                page2.appendChild(detailClone);
+                wrapper.appendChild(page2);
+
+                var page3 = document.createElement('div');
+                page3.className = 'pdf-page-break';
+                page3.style.width = '800px';
+                page3.style.background = '#fff';
+                page3.style.pageBreakBefore = 'always';
+                var suggestionText = (suggestionBox.innerText || suggestionBox.textContent || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                page3.innerHTML = '<div style="margin-bottom:12px;font-size:16px;font-weight:bold;">方案建议</div>' +
+                    '<div style="background:#e7f3ff;border-left:4px solid #366092;padding:16px 20px;font-size:14px;line-height:1.8;">' + suggestionText + '</div>';
+                wrapper.appendChild(page3);
+
+                document.body.appendChild(wrapper);
+                var name = (function() {
+                    try {
+                        var d = localStorage.getItem(STORAGE_KEY);
+                        if (d) { var o = JSON.parse(d); return (o.name || '').trim() || '报告'; }
+                    } catch (e) {}
+                    return '报告';
+                })();
+                var filename = '儿童生长评价报告_' + name + '_' + new Date().toISOString().slice(0, 10) + '.pdf';
+                function removeWrapper() { if (wrapper.parentNode) document.body.removeChild(wrapper); }
+                var canvasOpt = { scale: 1.5, useCORS: true, allowTaint: true, logging: false, width: 800 };
+                function doPdf() {
+                    if (typeof html2canvas === 'undefined' || typeof jspdf === 'undefined') {
+                        html2pdf().set({ margin: 12, filename: filename, image: { type: 'jpeg', quality: 0.95 }, html2canvas: { scale: 1.5 }, pagebreak: { before: '.pdf-page-break' } }).from(wrapper).save().then(removeWrapper).catch(removeWrapper);
+                        return;
+                    }
+                    var JsPDF = window.jspdf && window.jspdf.jsPDF ? window.jspdf.jsPDF : (window.jspdf || window.JsPDF);
+                    if (!JsPDF) { html2pdf().set({ margin: 12, filename: filename }).from(wrapper).save().then(removeWrapper).catch(removeWrapper); return; }
+                    html2canvas(page1, canvasOpt).then(function(c1) {
+                        html2canvas(page2, canvasOpt).then(function(c2) {
+                            html2canvas(page3, canvasOpt).then(function(c3) {
+                                var pdf = new JsPDF('p', 'mm', 'a4');
+                                var w = pdf.internal.pageSize.getWidth();
+                                var h = pdf.internal.pageSize.getHeight();
+                                var imgW = w;
+                                var imgH1 = (c1.height * w) / c1.width;
+                                var imgH2 = (c2.height * w) / c2.width;
+                                var imgH3 = (c3.height * w) / c3.width;
+                                pdf.addImage(c1.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, imgW, Math.min(imgH1, h));
+                                pdf.addPage();
+                                pdf.addImage(c2.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, imgW, Math.min(imgH2, h));
+                                pdf.addPage();
+                                pdf.addImage(c3.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, imgW, Math.min(imgH3, h));
+                                pdf.save(filename);
+                                removeWrapper();
+                            }).catch(function() { removeWrapper(); });
+                        }).catch(function() { removeWrapper(); });
+                    }).catch(function() { removeWrapper(); });
+                }
+                var imgs = page1.querySelectorAll('img');
+                var loaded = 0;
+                var total = imgs.length;
+                function maybeDoPdf() { loaded++; if (loaded >= total) setTimeout(doPdf, 250); }
+                imgs.forEach(function(img) { if (img.complete) maybeDoPdf(); else img.onload = maybeDoPdf; });
+                if (total === 0) setTimeout(doPdf, 250);
+            }
+
             var raw = localStorage.getItem(STORAGE_KEY);
             if (raw) {
                 try { renderReport(raw); } catch (e) { document.getElementById('noData').textContent = '报告数据解析失败。'; }
             }
             initTabs();
+            var downloadBtn = document.getElementById('downloadReportBtn');
+            if (downloadBtn) downloadBtn.addEventListener('click', downloadReport);
             window.addEventListener('resize', resizeCharts);
         })();
     </script>

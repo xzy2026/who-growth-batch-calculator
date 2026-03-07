@@ -190,6 +190,7 @@
 
                 var avgZ = [];
                 for (var i = 0; i < 5; i++) avgZ.push(countZ[i] > 0 ? sumZ[i] / countZ[i] : 0);
+                var avgZ3 = avgZ.map(function(v) { return typeof v === 'number' && !isNaN(v) ? parseFloat(v.toFixed(3)) : v; });
 
                 document.getElementById('noData').style.display = 'none';
                 document.getElementById('reportBody').style.display = 'block';
@@ -212,20 +213,20 @@
                     tooltip: {},
                     radar: { indicator: indNames.map(function(n) { return { name: n, max: radarMax, min: -radarMax }; }), center: ['50%', '52%'], radius: '60%' },
                     series: [{ type: 'radar', data: [
-                        { value: avgZ, name: '批次平均', lineStyle: { width: 2 }, areaStyle: { opacity: 0.3 } },
+                        { value: avgZ3, name: '批次平均', lineStyle: { width: 2 }, areaStyle: { opacity: 0.3 } },
                         { value: [0,0,0,0,0], name: '参考中位', lineStyle: { type: 'dashed', width: 1 }, symbol: 'none' }
                     ]}]
                 });
 
                 var cardHtml = '';
                 for (var i = 0; i < 5; i++) {
-                    var avg = countZ[i] > 0 ? avgZ[i].toFixed(2) : '—';
+                    var avg = countZ[i] > 0 ? avgZ[i].toFixed(3) : '—';
                     var passRate = rows.length > 0 ? ((passCounts[i] / rows.length) * 100).toFixed(0) : '—';
                     cardHtml += '<div class="indicator-card"><div class="icon">📊</div><div class="content"><div class="name">' + indNames[i] + '</div><div class="values">平均 Z 分：' + avg + ' · 合格率：' + passRate + '%</div></div></div>';
                 }
                 document.getElementById('cardList').innerHTML = cardHtml;
                 document.getElementById('suggestionBox').textContent = getBatchSuggestion(counts);
-                window._batchReportData = { counts: counts, avgZ: avgZ, indNames: indNames, total: total };
+                window._batchReportData = { counts: counts, avgZ: avgZ3, indNames: indNames, total: total };
             }
 
             function initTabs() {

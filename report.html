@@ -52,7 +52,16 @@
         .chart-values-summary { margin-top: 16px; font-size: 14px; }
         .chart-values-summary table { width: 100%; border-collapse: collapse; }
         .chart-values-summary th, .chart-values-summary td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
-        .chart-values-summary th { background: #e7f3ff; width: 140px; }
+        .chart-values-summary th { background: #e7f3ff; }
+        .z-good { color: #28a745; font-weight: 500; }
+        .z-warn { color: #e69500; font-weight: 500; }
+        .z-alert { color: #dc3545; font-weight: 500; }
+        .collapse-toggle { cursor: pointer; padding: 10px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 8px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+        .collapse-toggle:hover { background: #eee; }
+        .collapse-toggle::before { content: '▶'; font-size: 10px; transition: transform 0.2s; }
+        .collapse-toggle.open::before { transform: rotate(90deg); }
+        .collapse-content { display: none; margin-bottom: 16px; }
+        .collapse-content.open { display: block; }
         .suggestion-box { background: #e7f3ff; border-left: 4px solid #366092; padding: 16px 20px; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.7; color: #333; }
         .back-row { text-align: center; margin-top: 24px; }
         .back-btn { display: inline-block; padding: 10px 24px; background: #366092; color: #fff; text-decoration: none; border-radius: 8px; font-size: 14px; }
@@ -101,12 +110,20 @@
                 <div id="panelDetail" class="panel">
                     <div class="chart-box">
                         <table class="info-table" id="infoTable"></table>
-                        <div class="chart-title">表1 儿童生长水平的百分位数评价方法</div>
-                        <table class="eval-table" id="table1Percentile"></table>
-                        <div class="chart-title">表2 儿童生长水平的标准差评价方法</div>
-                        <table class="eval-table" id="table2StdLevel"></table>
-                        <div class="chart-title">表3 儿童营养状况的标准差评价方法</div>
-                        <table class="eval-table" id="table3StdNutrition"></table>
+                        <div class="chart-title">综合评估</div>
+                        <table class="eval-table" id="comprehensiveTable"></table>
+                        <div class="collapse-toggle" id="toggleTable1">表1 儿童生长水平的百分位数评价方法</div>
+                        <div class="collapse-content" id="collapseTable1">
+                            <table class="eval-table" id="table1Percentile"></table>
+                        </div>
+                        <div class="collapse-toggle" id="toggleTable2">表2 儿童生长水平的标准差评价方法</div>
+                        <div class="collapse-content" id="collapseTable2">
+                            <table class="eval-table" id="table2StdLevel"></table>
+                        </div>
+                        <div class="collapse-toggle" id="toggleTable3">表3 儿童营养状况的标准差评价方法</div>
+                        <div class="collapse-content" id="collapseTable3">
+                            <table class="eval-table" id="table3StdNutrition"></table>
+                        </div>
                     </div>
                 </div>
                 <div id="panelSuggestion" class="panel">
@@ -172,6 +189,32 @@
                 return { level: 'good', label: '良好', cls: 'good' };
             }
 
+            function getGrowthLevelFromZ(z) {
+                if (z == null || isNaN(z)) return null;
+                if (z >= 2) return '上';
+                if (z >= 1) return '中上';
+                if (z >= -1) return '中';
+                if (z >= -2) return '中下';
+                return '下';
+            }
+            function getZColorClass(z) {
+                if (z == null || isNaN(z)) return '';
+                if (z >= -1 && z <= 1) return 'z-good';
+                if (z >= -2 && z < -1 || z > 1 && z <= 2) return 'z-warn';
+                return 'z-alert';
+            }
+            function getPlainLanguageInterpretation(z, indName, result) {
+                if (z == null || isNaN(z)) return '—';
+                var absZ = Math.abs(z);
+                var dir = z < 0 ? '低' : '高';
+                var s = '您的孩子' + (indName || '该指标') + 'Z分为' + z.toFixed(2) + '，相当于比同龄平均值' + dir + '约' + absZ.toFixed(1) + '个标准差，';
+                if (z >= -1 && z <= 1) return s + '属于正常范围，继续保持均衡营养和规律作息即可。';
+                if (z > 1 && z <= 2) return s + '略高于平均水平，建议关注饮食结构，避免过度摄入高热量食物。';
+                if (z >= 2) return s + '明显偏高，建议到儿保科或营养科进行专业评估。';
+                if (z < -1 && z >= -2) return s + '略低于平均水平，建议关注营养摄入和睡眠质量，可定期复查。';
+                return s + '明显偏低，建议到儿保科进行全面检查，及早干预。';
+            }
+
             function getSuggestionText(tier, data) {
                 var name = (data.name || '该儿童').trim() || '该儿童';
                 if (tier.level === 'good') {
@@ -197,11 +240,16 @@
                     else validCount++;
                     zValues.push(z);
                 }
-                var valuesSummaryHtml = '<p style="margin-bottom:8px;font-weight:bold;">各指标数值（下图对应）</p><table><thead><tr><th>指标</th><th>评价值</th><th>Z分</th></tr></thead><tbody>';
+                var valuesSummaryHtml = '<p style="margin-bottom:8px;font-weight:bold;">各指标数值（下图对应）</p><p style="margin-bottom:8px;font-size:12px;color:#666;">颜色说明：<span class="z-good">正常范围</span> · <span class="z-warn">预警</span> · <span class="z-alert">需干预</span></p><table><thead><tr><th>指标</th><th>评价值</th><th>Z分</th><th>等级</th><th>通俗解读</th></tr></thead><tbody>';
                 for (var i = 0; i < indicators.length; i++) {
                     var val = indicators[i].value && indicators[i].value !== '-' ? indicators[i].value : '—';
-                    var zStr = (zValues[i] != null && validCount > 0) ? (typeof zValues[i] === 'number' ? zValues[i].toFixed(2) : zValues[i]) : '—';
-                    valuesSummaryHtml += '<tr><td>' + (indicators[i].name || '') + '</td><td>' + val + '</td><td>' + zStr + '</td></tr>';
+                    var z = zValues[i];
+                    var zStr = (z != null && validCount > 0) ? (typeof z === 'number' ? z.toFixed(2) : z) : '—';
+                    var level = getGrowthLevelFromZ(z);
+                    var levelStr = level || '—';
+                    var colorCls = getZColorClass(z);
+                    var plainText = getPlainLanguageInterpretation(z, indicators[i].name, indicators[i].result);
+                    valuesSummaryHtml += '<tr><td>' + (indicators[i].name || '') + '</td><td>' + val + '</td><td>' + zStr + '</td><td><span class="' + colorCls + '">' + levelStr + '</span></td><td style="font-size:13px;max-width:320px;">' + plainText + '</td></tr>';
                 }
                 valuesSummaryHtml += '</tbody></table>';
                 var sumEl = document.getElementById('chartValuesSummary');
@@ -231,6 +279,22 @@
                 ];
                 var infoHtml = infoRows.map(function(r) { return '<tr><th>' + r[0] + '</th><td>' + r[1] + '</td></tr>'; }).join('');
                 document.getElementById('infoTable').innerHTML = infoHtml;
+
+                var compHtml = '<thead><tr><th>指标</th><th>评价值</th><th>Z分</th><th>等级</th><th>评价结果</th><th>通俗解读</th></tr></thead><tbody>';
+                for (var ci = 0; ci < indicators.length; ci++) {
+                    var ind = indicators[ci];
+                    var ival = ind.value && ind.value !== '-' ? ind.value : '—';
+                    var iz = zValues[ci];
+                    var izStr = (iz != null) ? (typeof iz === 'number' ? iz.toFixed(2) : iz) : '—';
+                    var ilevel = getGrowthLevelFromZ(iz);
+                    var ires = (ind.result || '').trim() || '—';
+                    if (ires === '-') ires = '—';
+                    var iColorCls = getZColorClass(iz);
+                    var iPlain = getPlainLanguageInterpretation(iz, ind.name, ind.result);
+                    compHtml += '<tr><td>' + (ind.name || '') + '</td><td>' + ival + '</td><td>' + izStr + '</td><td><span class="' + iColorCls + '">' + (ilevel || '—') + '</span></td><td>' + ires + '</td><td style="font-size:12px;max-width:280px;">' + iPlain + '</td></tr>';
+                }
+                compHtml += '</tbody>';
+                document.getElementById('comprehensiveTable').innerHTML = compHtml;
 
                 function getZFromValue(valueStr, mode) {
                     var z = parseValueToZ(valueStr, mode);
@@ -377,12 +441,20 @@
                     var radarChart = echarts.init(document.getElementById('radarChart'));
                     radarChart.setOption(radarOption);
 
+                    var barColors = zValues.map(function(z) {
+                        var c = getZColorClass(z);
+                        if (c === 'z-good') return '#28a745';
+                        if (c === 'z-warn') return '#e69500';
+                        if (c === 'z-alert') return '#dc3545';
+                        return '#366092';
+                    });
+                    var barData = zValues.map(function(z, i) { return { value: z, itemStyle: { color: barColors[i] } }; });
                     var barOption = {
                         tooltip: { trigger: 'axis' },
                         grid: { left: '12%', right: '8%', top: '10%', bottom: '15%' },
                         xAxis: { type: 'category', data: names, axisLabel: { interval: 0, rotate: 20 } },
                         yAxis: { type: 'value', name: 'Z分', min: -3, max: 3, axisLine: { show: true }, splitLine: { lineStyle: { type: 'dashed', opacity: 0.5 } } },
-                        series: [{ type: 'bar', data: zValues, itemStyle: { color: '#366092' }, barWidth: '50%' }]
+                        series: [{ type: 'bar', data: barData, barWidth: '50%' }]
                     };
                     var barChart = echarts.init(document.getElementById('barChart'));
                     barChart.setOption(barOption);
@@ -392,6 +464,18 @@
             function resizeCharts() {
                 [document.getElementById('radarChart'), document.getElementById('barChart')].forEach(function(el) {
                     if (el && typeof echarts !== 'undefined' && echarts.getInstanceByDom(el)) echarts.getInstanceByDom(el).resize();
+                });
+            }
+            function initCollapseToggles() {
+                ['Table1', 'Table2', 'Table3'].forEach(function(id) {
+                    var toggle = document.getElementById('toggle' + id);
+                    var content = document.getElementById('collapse' + id);
+                    if (toggle && content) {
+                        toggle.addEventListener('click', function() {
+                            toggle.classList.toggle('open');
+                            content.classList.toggle('open');
+                        });
+                    }
                 });
             }
             function initTabs() {
@@ -432,12 +516,21 @@
                         var pdfData = JSON.parse(pdfDataRaw);
                         var pdfInd = pdfData.indicators || [];
                         var pdfMode = pdfData.mode || 'percentile';
-                        valuesSummaryPdf = '<div style="margin-bottom:16px;"><p style="margin-bottom:8px;font-weight:bold;">各指标数值（下图对应）</p><table style="width:100%;border-collapse:collapse;font-size:13px;"><tr style="background:#e7f3ff;"><th style="border:1px solid #ddd;padding:8px;text-align:left;">指标</th><th style="border:1px solid #ddd;padding:8px;text-align:left;">评价值</th><th style="border:1px solid #ddd;padding:8px;text-align:left;">Z分</th></tr>';
+                        valuesSummaryPdf = '<div style="margin-bottom:16px;"><p style="margin-bottom:8px;font-weight:bold;">各指标数值（下图对应）</p><table style="width:100%;border-collapse:collapse;font-size:12px;"><tr style="background:#e7f3ff;"><th style="border:1px solid #ddd;padding:6px;text-align:left;">指标</th><th style="border:1px solid #ddd;padding:6px;">评价值</th><th style="border:1px solid #ddd;padding:6px;">Z分</th><th style="border:1px solid #ddd;padding:6px;">等级</th><th style="border:1px solid #ddd;padding:6px;text-align:left;">通俗解读</th></tr>';
                         for (var idx = 0; idx < pdfInd.length; idx++) {
                             var v = pdfInd[idx].value && pdfInd[idx].value !== '-' ? pdfInd[idx].value : '—';
                             var z = parseValueToZ(pdfInd[idx].value, pdfMode);
                             var zs = (z != null) ? Number(z).toFixed(2) : '—';
-                            valuesSummaryPdf += '<tr><td style="border:1px solid #ddd;padding:8px;">' + (pdfInd[idx].name || '') + '</td><td style="border:1px solid #ddd;padding:8px;">' + v + '</td><td style="border:1px solid #ddd;padding:8px;">' + zs + '</td></tr>';
+                            var lvl = getGrowthLevelFromZ(z);
+                            var plc = getPlainLanguageInterpretation(z, pdfInd[idx].name, pdfInd[idx].result);
+                            var lvlColor = '';
+                            if (z != null && !isNaN(z)) {
+                                if (z >= -1 && z <= 1) lvlColor = '#28a745';
+                                else if ((z >= -2 && z < -1) || (z > 1 && z <= 2)) lvlColor = '#e69500';
+                                else lvlColor = '#dc3545';
+                            }
+                            var plcEsc = (plc || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                            valuesSummaryPdf += '<tr><td style="border:1px solid #ddd;padding:6px;">' + (pdfInd[idx].name || '') + '</td><td style="border:1px solid #ddd;padding:6px;">' + v + '</td><td style="border:1px solid #ddd;padding:6px;">' + zs + '</td><td style="border:1px solid #ddd;padding:6px;color:' + lvlColor + ';font-weight:500;">' + (lvl || '—') + '</td><td style="border:1px solid #ddd;padding:6px;font-size:11px;">' + plcEsc + '</td></tr>';
                         }
                         valuesSummaryPdf += '</table></div>';
                     }
@@ -480,6 +573,8 @@
                 var detailClone = panelDetail.cloneNode(true);
                 detailClone.style.display = 'block';
                 detailClone.querySelectorAll('.chart-box').forEach(function(b) { b.style.marginBottom = '16px'; });
+                detailClone.querySelectorAll('.collapse-toggle').forEach(function(t) { t.classList.add('open'); });
+                detailClone.querySelectorAll('.collapse-content').forEach(function(c) { c.classList.add('open'); });
                 page2.appendChild(detailClone);
                 wrapper.appendChild(page2);
 
@@ -545,6 +640,7 @@
                 try { renderReport(raw); } catch (e) { document.getElementById('noData').textContent = '报告数据解析失败。'; }
             }
             initTabs();
+            initCollapseToggles();
             var downloadBtn = document.getElementById('downloadReportBtn');
             if (downloadBtn) downloadBtn.addEventListener('click', downloadReport);
             window.addEventListener('resize', resizeCharts);

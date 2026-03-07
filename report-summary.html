@@ -26,6 +26,8 @@
         .chart-box { background: #fafafa; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
         .chart-title { font-size: 15px; margin-bottom: 12px; color: #333; }
         #pieChart, #radarChart { width: 100%; height: 320px; }
+        #failBarChart { width: 100%; height: 260px; }
+        .fail-summary { margin-top: 16px; padding: 12px 16px; background: #fff5f5; border-left: 4px solid #dc3545; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.8; color: #333; }
         .card-list { display: flex; flex-direction: column; gap: 12px; }
         .indicator-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; }
         .indicator-card .icon { width: 48px; height: 48px; background: #e7f3ff; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #366092; flex-shrink: 0; }
@@ -73,6 +75,11 @@
                 <div id="panelDetail" class="panel">
                     <div class="chart-title">各指标批次统计</div>
                     <div class="card-list" id="cardList"></div>
+                    <div class="chart-box" id="failBreakdownBox" style="display: none; margin-top: 24px;">
+                        <div class="chart-title">不合格原因分布</div>
+                        <div id="failBarChart"></div>
+                        <div class="fail-summary" id="failSummary"></div>
+                    </div>
                 </div>
                 <div id="panelSuggestion" class="panel">
                     <div class="chart-title">健康建议</div>
@@ -135,6 +142,30 @@
                 if (hasSevere) return 'fail';
                 if (hasAbnormal) return 'pass';
                 return 'good';
+            }
+
+            function getFailReasonCategory(indId, resultStr) {
+                if (!resultStr || resultStr === '-') return null;
+                var r = String(resultStr).trim();
+                if (indId === 'ageHeight') {
+                    if (r.indexOf('生长迟缓') !== -1) return 'heightShort';
+                    return null;
+                }
+                if (indId === 'ageHead') {
+                    if (r.indexOf('正常') === -1) return 'headAbnormal';
+                    return null;
+                }
+                if (indId === 'ageWeight') {
+                    if (r.indexOf('低体重') !== -1) return 'underweight';
+                    if (r.indexOf('超重') !== -1 || r.indexOf('肥胖') !== -1) return 'overweight';
+                    return null;
+                }
+                if (indId === 'heightWeight' || indId === 'ageBmi') {
+                    if (r.indexOf('消瘦') !== -1) return 'underweight';
+                    if (r.indexOf('超重') !== -1 || r.indexOf('肥胖') !== -1) return 'overweight';
+                    return null;
+                }
+                return null;
             }
 
             function getBatchSuggestion(counts) {
@@ -226,7 +257,51 @@
                 }
                 document.getElementById('cardList').innerHTML = cardHtml;
                 document.getElementById('suggestionBox').textContent = getBatchSuggestion(counts);
-                window._batchReportData = { counts: counts, avgZ: avgZ3, indNames: indNames, total: total };
+
+                var failReasonCounts = { heightShort: 0, overweight: 0, underweight: 0, headAbnormal: 0 };
+                var failRows = [];
+                rows.forEach(function(row) {
+                    if (getTierLevel(row) === 'fail') failRows.push(row);
+                });
+                failRows.forEach(function(row) {
+                    var inds = row.indicators || [];
+                    inds.forEach(function(ind) {
+                        var cat = getFailReasonCategory(ind.id, ind.result);
+                        if (cat && failReasonCounts[cat] !== undefined) failReasonCounts[cat]++;
+                    });
+                });
+
+                var failBreakdownBox = document.getElementById('failBreakdownBox');
+                if (counts.fail > 0 && failBreakdownBox) {
+                    failBreakdownBox.style.display = 'block';
+                    var labels = ['身高偏矮', '超重/肥胖', '消瘦/低体重', '头围异常'];
+                    var keys = ['heightShort', 'overweight', 'underweight', 'headAbnormal'];
+                    var values = keys.map(function(k) { return failReasonCounts[k] || 0; });
+                    var pct = counts.fail > 0 ? counts.fail : 1;
+                    var parts = [];
+                    labels.forEach(function(lbl, i) {
+                        var n = values[i];
+                        if (n > 0) parts.push(lbl + ' ' + n + '人（' + ((n / pct) * 100).toFixed(0) + '%）');
+                    });
+                    var summaryText = '本批次不合格儿童中，' + (parts.length > 0 ? parts.join('，') + '。同一儿童可能涉及多项异常，故合计可能超过100%。' : '暂无细分数据。');
+                    document.getElementById('failSummary').textContent = summaryText;
+
+                    var failBarDom = document.getElementById('failBarChart');
+                    var failBarChart = echarts.init(failBarDom);
+                    var failBarOption = {
+                        tooltip: { trigger: 'axis', formatter: '{b}: {c} 人' },
+                        grid: { left: 80, right: 24, top: 24, bottom: 40 },
+                        xAxis: { type: 'category', data: labels, axisLabel: { rotate: 0 } },
+                        yAxis: { type: 'value', name: '人数', minInterval: 1 },
+                        series: [{ type: 'bar', data: values, itemStyle: { color: '#dc3545' }, barWidth: '50%' }]
+                    };
+                    failBarChart.setOption(failBarOption);
+
+                    window._batchReportData = { counts: counts, avgZ: avgZ3, indNames: indNames, total: total, failReasonCounts: failReasonCounts, failBarOption: failBarOption, failSummaryText: summaryText };
+                } else {
+                    if (failBreakdownBox) failBreakdownBox.style.display = 'none';
+                    window._batchReportData = { counts: counts, avgZ: avgZ3, indNames: indNames, total: total };
+                }
             }
 
             function initTabs() {
@@ -241,8 +316,10 @@
                         setTimeout(function() {
                             var pie = document.getElementById('pieChart');
                             var radar = document.getElementById('radarChart');
+                            var failBar = document.getElementById('failBarChart');
                             if (pie && echarts.getInstanceByDom(pie)) echarts.getInstanceByDom(pie).resize();
                             if (radar && echarts.getInstanceByDom(radar)) echarts.getInstanceByDom(radar).resize();
+                            if (failBar && echarts.getInstanceByDom(failBar)) echarts.getInstanceByDom(failBar).resize();
                         }, 50);
                     });
                 });
@@ -269,7 +346,20 @@
 
                 var page2 = document.createElement('div');
                 page2.style.cssText = 'width:800px;background:#fff;page-break-before:always;';
-                page2.innerHTML = '<div style="margin-bottom:16px;font-size:16px;">各指标批次统计</div>' + document.getElementById('cardList').innerHTML;
+                var page2Content = '<div style="margin-bottom:16px;font-size:16px;">各指标批次统计</div>' + document.getElementById('cardList').innerHTML;
+                if (d.failBarOption && d.failSummaryText && d.counts && d.counts.fail > 0) {
+                    var tempBar = document.createElement('div');
+                    tempBar.style.cssText = 'position:absolute;left:-9999px;width:752px;height:260px;';
+                    document.body.appendChild(tempBar);
+                    var tempBarChart = echarts.init(tempBar);
+                    tempBarChart.setOption(d.failBarOption);
+                    var failBarUrl = tempBarChart.getDataURL({ type: 'png', pixelRatio: 2 });
+                    tempBarChart.dispose();
+                    document.body.removeChild(tempBar);
+                    var st2 = (d.failSummaryText || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                    page2Content += '<div style="margin-top:24px;margin-bottom:12px;font-size:16px;">不合格原因分布</div><img src="' + failBarUrl + '" style="width:100%;height:260px;display:block;margin-bottom:16px;" /><div style="background:#fff5f5;border-left:4px solid #dc3545;padding:12px 16px;font-size:14px;line-height:1.8;">' + st2 + '</div>';
+                }
+                page2.innerHTML = page2Content;
                 wrapper.appendChild(page2);
 
                 var page3 = document.createElement('div');
@@ -309,8 +399,10 @@
             window.addEventListener('resize', function() {
                 var pie = document.getElementById('pieChart');
                 var radar = document.getElementById('radarChart');
+                var failBar = document.getElementById('failBarChart');
                 if (pie && echarts.getInstanceByDom(pie)) echarts.getInstanceByDom(pie).resize();
                 if (radar && echarts.getInstanceByDom(radar)) echarts.getInstanceByDom(radar).resize();
+                if (failBar && echarts.getInstanceByDom(failBar)) echarts.getInstanceByDom(failBar).resize();
             });
         })();
     </script>

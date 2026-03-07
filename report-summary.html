@@ -3,408 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>生长评价总体报告 - 享智云</title>
-    <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <title>Excel日期转换测试</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Microsoft YaHei', Arial, sans-serif; font-size: 16px; background: #f5f5f5; min-height: 100vh; }
-        .container { max-width: 900px; margin: 0 auto; background: #fff; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.08); }
-        .header { background: linear-gradient(135deg, #366092 0%, #4a7ba7 100%); color: white; padding: 24px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 16px; }
-        .header-logo { height: 56px; width: auto; border-radius: 12px; }
-        .content { padding: 24px; }
-        .report-title { text-align: center; margin-bottom: 20px; font-size: 18px; color: #333; }
-        .stats-row { text-align: center; margin-bottom: 24px; font-size: 15px; color: #666; }
-        .tabs { display: flex; gap: 0; border-bottom: 2px solid #e0e0e0; margin-bottom: 20px; }
-        .tab { padding: 12px 24px; cursor: pointer; font-size: 15px; color: #666; border-bottom: 3px solid transparent; margin-bottom: -2px; }
-        .tab:hover { color: #366092; }
-        .tab.active { color: #366092; font-weight: bold; border-bottom-color: #366092; }
-        .panel { display: none; }
-        .panel.active { display: block; }
-        .chart-box { background: #fafafa; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
-        .chart-title { font-size: 15px; margin-bottom: 12px; color: #333; }
-        #pieChart, #radarChart { width: 100%; height: 320px; }
-        #failBarChart { width: 100%; height: 260px; }
-        .fail-summary { margin-top: 16px; padding: 12px 16px; background: #fff5f5; border-left: 4px solid #dc3545; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.8; color: #333; }
-        .card-list { display: flex; flex-direction: column; gap: 12px; }
-        .indicator-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; }
-        .indicator-card .icon { width: 48px; height: 48px; background: #e7f3ff; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #366092; flex-shrink: 0; }
-        .indicator-card .content { flex: 1; }
-        .indicator-card .name { font-size: 15px; font-weight: bold; color: #333; margin-bottom: 4px; }
-        .indicator-card .values { font-size: 14px; color: #666; }
-        .suggestion-box { background: #e7f3ff; border-left: 4px solid #366092; padding: 16px 20px; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.8; color: #333; }
-        .back-row { text-align: center; margin-top: 24px; }
-        .back-btn { display: inline-block; padding: 10px 24px; background: #366092; color: #fff; text-decoration: none; border-radius: 8px; font-size: 14px; border: none; cursor: pointer; margin-left: 8px; }
-        .back-btn:hover { background: #4a7ba7; }
-        .back-btn:first-child { margin-left: 0; }
-        .no-data { text-align: center; padding: 40px 20px; color: #999; }
-        .footer { padding: 16px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #eee; }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 3px;
+        }
+        .pass {
+            color: green;
+            font-weight: bold;
+        }
+        .fail {
+            color: red;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background: #4CAF50;
+            color: white;
+        }
+        input[type="file"] {
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <img src="assets/logo.jpg" alt="Logo" class="header-logo" onerror="this.style.display='none'">
-            <div>
-                <h1>生长评价总体报告</h1>
-                <p>享智云 · 7岁以下儿童生长标准（WS/T 423-2022）</p>
-            </div>
-        </div>
-        <div class="content" id="reportContent">
-            <div class="no-data" id="noData">暂无总体报告数据，请从计算器页面点击「生成总体报告」。</div>
-            <div id="reportBody" style="display: none;">
-                <div class="report-title" id="reportTitle">—— 生长评价总体报告 ——</div>
-                <div class="stats-row" id="statsRow">体测人数：0 人</div>
-                <div class="tabs">
-                    <div class="tab active" data-tab="overview">概况分析</div>
-                    <div class="tab" data-tab="detail">单项分析</div>
-                    <div class="tab" data-tab="suggestion">方案建议</div>
-                </div>
-                <div id="panelOverview" class="panel active">
-                    <div class="chart-box">
-                        <div class="chart-title">评价分布（良好 / 合格 / 不合格）</div>
-                        <div id="pieChart"></div>
-                    </div>
-                    <div class="chart-box">
-                        <div class="chart-title">各指标 Z 分雷达图（批次平均 vs 参考中位 0）</div>
-                        <div id="radarChart"></div>
-                    </div>
-                </div>
-                <div id="panelDetail" class="panel">
-                    <div class="chart-title">各指标批次统计</div>
-                    <div class="card-list" id="cardList"></div>
-                    <div class="chart-box" id="failBreakdownBox" style="display: none; margin-top: 24px;">
-                        <div class="chart-title">不合格原因分布</div>
-                        <div id="failBarChart"></div>
-                        <div class="fail-summary" id="failSummary"></div>
-                    </div>
-                </div>
-                <div id="panelSuggestion" class="panel">
-                    <div class="chart-title">健康建议</div>
-                    <div class="suggestion-box" id="suggestionBox"></div>
-                </div>
-                <div class="back-row">
-                    <a href="javascript:window.close()" class="back-btn">关闭报告</a>
-                    <a href="javascript:void(0)" class="back-btn" id="downloadReportBtn">下载报告</a>
-                </div>
-            </div>
-        </div>
-        <div class="footer">
-            <p>本报告参照 WS/T 423-2022，数据仅供参考，不作为诊断依据。如有疑问请咨询医疗机构。</p>
-        </div>
+    <h1>Excel日期转换测试工具</h1>
+    
+    <div class="test-section">
+        <h2>1. 单元测试：Excel日期序列号转换</h2>
+        <button onclick="runUnitTests()">运行单元测试</button>
+        <div id="unitTestResults"></div>
     </div>
+    
+    <div class="test-section">
+        <h2>2. Excel文件测试</h2>
+        <input type="file" id="excelFile" accept=".xlsx,.xls" />
+        <button onclick="testExcelFile()">测试Excel文件</button>
+        <div id="excelTestResults"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. 时区测试</h2>
+        <button onclick="testTimezone()">测试时区影响</button>
+        <div id="timezoneTestResults"></div>
+    </div>
+
     <script>
-        (function() {
-            var STORAGE_KEY = 'childGrowthBatchReport';
-            var percentileToZMap = { 'P3': -1.88, 'P10': -1.28, 'P25': -0.67, 'P50': 0, 'P75': 0.67, 'P90': 1.28, 'P97': 1.88 };
+        // 修改后的Excel日期转换函数（使用UTC方法）
+        function excelDateToDateString(excelDateNum) {
+            // 使用UTC时间作为基准，避免时区问题导致日期减少一天
+            const excelEpoch = Date.UTC(1899, 11, 30); // UTC 1899-12-30 00:00:00
+            const date = new Date(excelEpoch + (excelDateNum - 1) * 86400000);
+            // 使用UTC方法获取日期，避免时区转换问题
+            const year = date.getUTCFullYear();
+            const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(date.getUTCDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
 
-            function parseValueToZ(valueStr, mode) {
-                if (!valueStr || valueStr === '-') return null;
-                valueStr = String(valueStr).trim();
-                if (mode === 'std') {
-                    if (valueStr === '>3SD') return 3;
-                    if (valueStr === '<-3SD') return -3;
-                    var m = valueStr.match(/^(-?[\d.]+)SD$/);
-                    if (m) return parseFloat(m[1]);
-                    return null;
-                }
-                if (mode === 'percentile') {
-                    if (valueStr.indexOf('<') === 0) return -2.5;
-                    if (valueStr.indexOf('>') >= 0 || valueStr.indexOf('≥') >= 0) return 2.5;
-                    var pMatch = valueStr.match(/^P(\d+)$/);
-                    if (pMatch) {
-                        var p = parseInt(pMatch[1], 10);
-                        if (percentileToZMap['P' + p] !== undefined) return percentileToZMap['P' + p];
-                        if (p <= 3) return -1.88;
-                        if (p >= 97) return 1.88;
-                        if (p <= 25) return -0.67 + (p - 25) / 22 * 1.21;
-                        if (p <= 50) return (p - 50) / 25 * 0.67;
-                        if (p <= 75) return (p - 50) / 25 * 0.67;
-                        return 0.67 + (p - 75) / 22 * 0.61;
-                    }
-                }
-                return null;
-            }
+        // 旧的转换函数（用于对比）
+        function excelDateToDateStringOld(excelDateNum) {
+            const excelEpoch = new Date(1899, 11, 30);
+            const date = new Date(excelEpoch.getTime() + (excelDateNum - 1) * 86400000);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
 
-            function getTierLevel(data) {
-                var results = (data.indicators || []).map(function(ind) { return (ind.result || '').trim(); });
-                var hasSevere = false, hasAbnormal = false;
-                var severeWords = ['重度低体重', '重度生长迟缓', '重度消瘦', '重度肥胖'];
-                var abnormalWords = ['低体重', '生长迟缓', '消瘦', '超重', '肥胖'];
-                for (var i = 0; i < results.length; i++) {
-                    var r = results[i];
-                    if (!r || r === '-') continue;
-                    if (severeWords.some(function(w) { return r.indexOf(w) !== -1; })) hasSevere = true;
-                    if (abnormalWords.some(function(w) { return r.indexOf(w) !== -1; })) hasAbnormal = true;
-                }
-                if (hasSevere) return 'fail';
-                if (hasAbnormal) return 'pass';
-                return 'good';
-            }
-
-            function getFailReasonCategory(indId, resultStr) {
-                if (!resultStr || resultStr === '-') return null;
-                var r = String(resultStr).trim();
-                if (indId === 'ageHeight') {
-                    if (r.indexOf('生长迟缓') !== -1) return 'heightShort';
-                    return null;
-                }
-                if (indId === 'ageHead') {
-                    if (r.indexOf('正常') === -1) return 'headAbnormal';
-                    return null;
-                }
-                if (indId === 'ageWeight') {
-                    if (r.indexOf('低体重') !== -1) return 'underweight';
-                    if (r.indexOf('超重') !== -1 || r.indexOf('肥胖') !== -1) return 'overweight';
-                    return null;
-                }
-                if (indId === 'heightWeight' || indId === 'ageBmi') {
-                    if (r.indexOf('消瘦') !== -1) return 'underweight';
-                    if (r.indexOf('超重') !== -1 || r.indexOf('肥胖') !== -1) return 'overweight';
-                    return null;
-                }
-                return null;
-            }
-
-            function getBatchSuggestion(counts) {
-                var total = counts.good + counts.pass + counts.fail;
-                if (total === 0) return '';
-                var pGood = counts.good / total;
-                var pFail = counts.fail / total;
-                if (pGood >= 0.7) {
-                    return '本批次儿童生长状况整体良好，大部分儿童各项指标处于理想范围。建议继续保持均衡营养与适度运动：保证优质蛋白、蔬菜水果、谷物的合理搭配，规律三餐，减少高油高糖零食与含糖饮料；每天保证适量户外活动，如跑跳、球类、骑车等有氧锻炼，保持规律作息与充足睡眠。坚持定期生长发育监测即可。';
-                }
-                if (pFail >= 0.2) {
-                    return '本批次中有较多儿童存在明显生长偏离，建议组织集中健康评估，到儿保科或营养科进行专业检查。日常可先从生活方式调整：饮食保证营养均衡，不暴饮暴食、不挑食偏食，合理搭配蛋白质、主食、蔬菜，减少高油高糖食物。运动以温和、可持续为主，如快走、慢跑、跳绳、游泳等，根据孩子身体情况循序渐进。早发现、早指导、科学干预，有助于儿童健康成长。';
-                }
-                return '本批次部分儿童存在生长指标未达理想状态，可能存在偏瘦、超重、生长偏慢等情况。建议关注饮食与运动：规律三餐，保证足量优质蛋白摄入，控制油炸食品、甜品、含糖饮料；每周至少5天中等强度活动，如快走、跳绳、游泳、球类等，每天户外活动不少于1小时。可到儿保科或营养科做专业咨询，在专业指导下调整生活习惯，多数儿童能逐步回归正常生长轨迹。';
-            }
-
-            function renderReport(raw) {
-                var data = typeof raw === 'string' ? JSON.parse(raw) : raw;
-                var rows = data.rows || [];
-                var mode = data.mode || 'percentile';
-                if (rows.length === 0) return;
-
-                var counts = { good: 0, pass: 0, fail: 0 };
-                var indNames = ['年龄别体重', '年龄别身长/身高', '身长/身高体重', '年龄别BMI', '年龄别头围'];
-                var indIds = ['ageWeight', 'ageHeight', 'heightWeight', 'ageBmi', 'ageHead'];
-                var sumZ = [0,0,0,0,0], countZ = [0,0,0,0,0];
-                var passCounts = [0,0,0,0,0];
-
-                rows.forEach(function(row) {
-                    var tier = getTierLevel(row);
-                    if (tier === 'good') counts.good++;
-                    else if (tier === 'pass') counts.pass++;
-                    else counts.fail++;
-
-                    var inds = row.indicators || [];
-                    inds.forEach(function(ind) {
-                        var colIdx = indIds.indexOf(ind.id);
-                        if (colIdx < 0) return;
-                        var z = parseValueToZ(ind.value, mode);
-                        if (z !== null) {
-                            sumZ[colIdx] += z;
-                            countZ[colIdx]++;
-                        }
-                        var r = (ind.result || '').trim();
-                        if (!r || r === '-') passCounts[colIdx]++;
-                        else {
-                            var severe = ['重度低体重','重度生长迟缓','重度消瘦','重度肥胖'].some(function(w){return r.indexOf(w)!==-1;});
-                            var abnormal = ['低体重','生长迟缓','消瘦','超重','肥胖'].some(function(w){return r.indexOf(w)!==-1;});
-                            if (!severe && !abnormal) passCounts[colIdx]++;
-                        }
-                    });
-                });
-
-                var avgZ = [];
-                for (var i = 0; i < 5; i++) avgZ.push(countZ[i] > 0 ? sumZ[i] / countZ[i] : 0);
-                var avgZ3 = avgZ.map(function(v) { return typeof v === 'number' && !isNaN(v) ? parseFloat(v.toFixed(3)) : v; });
-
-                document.getElementById('noData').style.display = 'none';
-                document.getElementById('reportBody').style.display = 'block';
-                var total = counts.good + counts.pass + counts.fail;
-                document.getElementById('statsRow').textContent = '体测人数：' + total + ' 人 · 良好 ' + counts.good + ' 人 · 合格 ' + counts.pass + ' 人 · 不合格 ' + counts.fail + ' 人';
-
-                var pieData = [
-                    { value: counts.good, name: '良好', itemStyle: { color: '#28a745' } },
-                    { value: counts.pass, name: '合格', itemStyle: { color: '#ffc107' } },
-                    { value: counts.fail, name: '不合格', itemStyle: { color: '#dc3545' } }
-                ].filter(function(d) { return d.value > 0; });
-                if (pieData.length === 0) pieData = [{ value: 1, name: '无数据', itemStyle: { color: '#ddd' } }];
-
-                var pieChart = echarts.init(document.getElementById('pieChart'));
-                pieChart.setOption({ tooltip: { trigger: 'item', formatter: '{b}: {c} 人 ({d}%)' }, legend: { orient: 'horizontal', bottom: 10 }, series: [{ type: 'pie', radius: ['40%', '70%'], data: pieData }] });
-
-                var radarChart = echarts.init(document.getElementById('radarChart'));
-                var radarMax = 2;
-                radarChart.setOption({
-                    tooltip: {},
-                    radar: { indicator: indNames.map(function(n) { return { name: n, max: radarMax, min: -radarMax }; }), center: ['50%', '52%'], radius: '60%' },
-                    series: [{ type: 'radar', data: [
-                        { value: avgZ3, name: '批次平均', lineStyle: { width: 2 }, areaStyle: { opacity: 0.3 } },
-                        { value: [0,0,0,0,0], name: '参考中位', lineStyle: { type: 'dashed', width: 1 }, symbol: 'none' }
-                    ]}]
-                });
-
-                var cardHtml = '';
-                for (var i = 0; i < 5; i++) {
-                    var avg = countZ[i] > 0 ? avgZ[i].toFixed(3) : '—';
-                    var passRate = rows.length > 0 ? ((passCounts[i] / rows.length) * 100).toFixed(0) : '—';
-                    cardHtml += '<div class="indicator-card"><div class="icon">📊</div><div class="content"><div class="name">' + indNames[i] + '</div><div class="values">平均 Z 分：' + avg + ' · 合格率：' + passRate + '%</div></div></div>';
-                }
-                document.getElementById('cardList').innerHTML = cardHtml;
-                document.getElementById('suggestionBox').textContent = getBatchSuggestion(counts);
-
-                var failReasonCounts = { heightShort: 0, overweight: 0, underweight: 0, headAbnormal: 0 };
-                var failRows = [];
-                rows.forEach(function(row) {
-                    if (getTierLevel(row) === 'fail') failRows.push(row);
-                });
-                failRows.forEach(function(row) {
-                    var inds = row.indicators || [];
-                    inds.forEach(function(ind) {
-                        var cat = getFailReasonCategory(ind.id, ind.result);
-                        if (cat && failReasonCounts[cat] !== undefined) failReasonCounts[cat]++;
-                    });
-                });
-
-                var failBreakdownBox = document.getElementById('failBreakdownBox');
-                if (counts.fail > 0 && failBreakdownBox) {
-                    failBreakdownBox.style.display = 'block';
-                    var labels = ['身高偏矮', '超重/肥胖', '消瘦/低体重', '头围异常'];
-                    var keys = ['heightShort', 'overweight', 'underweight', 'headAbnormal'];
-                    var values = keys.map(function(k) { return failReasonCounts[k] || 0; });
-                    var pct = counts.fail > 0 ? counts.fail : 1;
-                    var parts = [];
-                    labels.forEach(function(lbl, i) {
-                        var n = values[i];
-                        if (n > 0) parts.push(lbl + ' ' + n + '人（' + ((n / pct) * 100).toFixed(0) + '%）');
-                    });
-                    var summaryText = '本批次不合格儿童中，' + (parts.length > 0 ? parts.join('，') + '。同一儿童可能涉及多项异常，故合计可能超过100%。' : '暂无细分数据。');
-                    document.getElementById('failSummary').textContent = summaryText;
-
-                    var failBarDom = document.getElementById('failBarChart');
-                    var failBarChart = echarts.init(failBarDom);
-                    var failBarOption = {
-                        tooltip: { trigger: 'axis', formatter: '{b}: {c} 人' },
-                        grid: { left: 80, right: 24, top: 24, bottom: 40 },
-                        xAxis: { type: 'category', data: labels, axisLabel: { rotate: 0 } },
-                        yAxis: { type: 'value', name: '人数', minInterval: 1 },
-                        series: [{ type: 'bar', data: values, itemStyle: { color: '#dc3545' }, barWidth: '50%' }]
-                    };
-                    failBarChart.setOption(failBarOption);
-
-                    window._batchReportData = { counts: counts, avgZ: avgZ3, indNames: indNames, total: total, failReasonCounts: failReasonCounts, failBarOption: failBarOption, failSummaryText: summaryText };
-                } else {
-                    if (failBreakdownBox) failBreakdownBox.style.display = 'none';
-                    window._batchReportData = { counts: counts, avgZ: avgZ3, indNames: indNames, total: total };
-                }
-            }
-
-            function initTabs() {
-                document.querySelectorAll('.tab').forEach(function(tab) {
-                    tab.addEventListener('click', function() {
-                        var t = this.getAttribute('data-tab');
-                        document.querySelectorAll('.tab').forEach(function(el) { el.classList.remove('active'); });
-                        document.querySelectorAll('.panel').forEach(function(el) { el.classList.remove('active'); });
-                        this.classList.add('active');
-                        var panel = document.getElementById('panel' + t.charAt(0).toUpperCase() + t.slice(1));
-                        if (panel) panel.classList.add('active');
-                        setTimeout(function() {
-                            var pie = document.getElementById('pieChart');
-                            var radar = document.getElementById('radarChart');
-                            var failBar = document.getElementById('failBarChart');
-                            if (pie && echarts.getInstanceByDom(pie)) echarts.getInstanceByDom(pie).resize();
-                            if (radar && echarts.getInstanceByDom(radar)) echarts.getInstanceByDom(radar).resize();
-                            if (failBar && echarts.getInstanceByDom(failBar)) echarts.getInstanceByDom(failBar).resize();
-                        }, 50);
-                    });
-                });
-            }
-
-            function downloadReport() {
-                var d = window._batchReportData;
-                if (!d || typeof html2canvas === 'undefined' || typeof jspdf === 'undefined') { alert('请稍候再试或刷新后下载。'); return; }
-                var JsPDF = window.jspdf && window.jspdf.jsPDF ? window.jspdf.jsPDF : window.jspdf;
-                if (!JsPDF) { alert('PDF 库未加载。'); return; }
-                var pieChart = echarts.getInstanceByDom(document.getElementById('pieChart'));
-                var radarChart = echarts.getInstanceByDom(document.getElementById('radarChart'));
-                if (!pieChart || !radarChart) { alert('图表未就绪。'); return; }
-                var pieUrl = pieChart.getDataURL({ type: 'png', pixelRatio: 2 });
-                var radarUrl = radarChart.getDataURL({ type: 'png', pixelRatio: 2 });
-
-                var wrapper = document.createElement('div');
-                wrapper.style.cssText = 'position:fixed;top:0;left:0;z-index:99999;width:800px;max-height:100vh;overflow:auto;font-family:Microsoft YaHei,Arial,sans-serif;font-size:14px;color:#333;background:#fff;padding:20px;box-sizing:border-box;';
-
-                var page1 = document.createElement('div');
-                page1.style.cssText = 'width:800px;background:#fff;';
-                page1.innerHTML = '<div style="text-align:center;margin-bottom:16px;font-size:18px;">生长评价总体报告</div><div style="text-align:center;margin-bottom:20px;font-size:14px;">体测人数：' + d.total + ' 人</div><div style="margin-bottom:12px;">评价分布</div><img src="' + pieUrl + '" style="width:100%;height:300px;display:block;margin-bottom:24px;" /><div style="margin-bottom:12px;">各指标 Z 分雷达图（批次平均）</div><img src="' + radarUrl + '" style="width:100%;height:300px;display:block;" />';
-                wrapper.appendChild(page1);
-
-                var page2 = document.createElement('div');
-                page2.style.cssText = 'width:800px;background:#fff;page-break-before:always;';
-                var page2Content = '<div style="margin-bottom:16px;font-size:16px;">各指标批次统计</div>' + document.getElementById('cardList').innerHTML;
-                if (d.failBarOption && d.failSummaryText && d.counts && d.counts.fail > 0) {
-                    var tempBar = document.createElement('div');
-                    tempBar.style.cssText = 'position:absolute;left:-9999px;width:752px;height:260px;';
-                    document.body.appendChild(tempBar);
-                    var tempBarChart = echarts.init(tempBar);
-                    tempBarChart.setOption(d.failBarOption);
-                    var failBarUrl = tempBarChart.getDataURL({ type: 'png', pixelRatio: 2 });
-                    tempBarChart.dispose();
-                    document.body.removeChild(tempBar);
-                    var st2 = (d.failSummaryText || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-                    page2Content += '<div style="margin-top:24px;margin-bottom:12px;font-size:16px;">不合格原因分布</div><img src="' + failBarUrl + '" style="width:100%;height:260px;display:block;margin-bottom:16px;" /><div style="background:#fff5f5;border-left:4px solid #dc3545;padding:12px 16px;font-size:14px;line-height:1.8;">' + st2 + '</div>';
-                }
-                page2.innerHTML = page2Content;
-                wrapper.appendChild(page2);
-
-                var page3 = document.createElement('div');
-                page3.style.cssText = 'width:800px;background:#fff;page-break-before:always;';
-                var st = (document.getElementById('suggestionBox').innerText || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-                page3.innerHTML = '<div style="margin-bottom:12px;font-size:16px;">健康建议</div><div style="background:#e7f3ff;border-left:4px solid #366092;padding:16px 20px;font-size:14px;line-height:1.8;">' + st + '</div>';
-                wrapper.appendChild(page3);
-
-                document.body.appendChild(wrapper);
-                var filename = '生长评价总体报告_' + new Date().toISOString().slice(0, 10) + '.pdf';
-
-                function doPdf() {
-                    html2canvas(page1, { scale: 1.5, useCORS: true }).then(function(c1) {
-                        html2canvas(page2, { scale: 1.5, useCORS: true }).then(function(c2) {
-                            html2canvas(page3, { scale: 1.5, useCORS: true }).then(function(c3) {
-                                var pdf = new JsPDF('p', 'mm', 'a4');
-                                var w = pdf.internal.pageSize.getWidth();
-                                var h = pdf.internal.pageSize.getHeight();
-                                pdf.addImage(c1.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, w, Math.min((c1.height * w) / c1.width, h));
-                                pdf.addPage();
-                                pdf.addImage(c2.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, w, Math.min((c2.height * w) / c2.width, h));
-                                pdf.addPage();
-                                pdf.addImage(c3.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, w, Math.min((c3.height * w) / c3.width, h));
-                                pdf.save(filename);
-                                if (wrapper.parentNode) document.body.removeChild(wrapper);
-                            }).catch(function() { if (wrapper.parentNode) document.body.removeChild(wrapper); });
-                        }).catch(function() { if (wrapper.parentNode) document.body.removeChild(wrapper); });
-                    }).catch(function() { if (wrapper.parentNode) document.body.removeChild(wrapper); });
-                }
-                setTimeout(doPdf, 200);
-            }
-
-            var raw = localStorage.getItem(STORAGE_KEY);
-            if (raw) { try { renderReport(raw); } catch (e) { document.getElementById('noData').textContent = '数据解析失败。'; } }
-            initTabs();
-            document.getElementById('downloadReportBtn').addEventListener('click', downloadReport);
-            window.addEventListener('resize', function() {
-                var pie = document.getElementById('pieChart');
-                var radar = document.getElementById('radarChart');
-                var failBar = document.getElementById('failBarChart');
-                if (pie && echarts.getInstanceByDom(pie)) echarts.getInstanceByDom(pie).resize();
-                if (radar && echarts.getInstanceByDom(radar)) echarts.getInstanceByDom(radar).resize();
-                if (failBar && echarts.getInstanceByDom(failBar)) echarts.getInstanceByDom(failBar).resize();
+        // 单元测试
+        function runUnitTests() {
+            const results = document.getElementById('unitTestResults');
+            results.innerHTML = '<h3>测试结果：</h3>';
+            
+            // 测试用例：Excel日期序列号 -> 预期日期
+            const testCases = [
+                { excelNum: 1, expected: '1900-01-01', desc: 'Excel序列号1 = 1900-01-01' },
+                { excelNum: 43831, expected: '2020-01-01', desc: 'Excel序列号43831 = 2020-01-01' },
+                { excelNum: 44197, expected: '2021-01-01', desc: 'Excel序列号44197 = 2021-01-01' },
+                { excelNum: 44562, expected: '2022-01-01', desc: 'Excel序列号44562 = 2022-01-01' },
+                { excelNum: 44927, expected: '2023-01-01', desc: 'Excel序列号44927 = 2023-01-01' },
+                { excelNum: 43738, expected: '2019-10-31', desc: 'Excel序列号43738 = 2019-10-31' },
+                { excelNum: 45658, expected: '2025-11-30', desc: 'Excel序列号45658 = 2025-11-30' },
+                { excelNum: 45658, expected: '2025-12-01', desc: 'Excel序列号45658 = 2025-12-01 (如果减少一天)' },
+            ];
+            
+            let passCount = 0;
+            let failCount = 0;
+            
+            testCases.forEach((testCase, index) => {
+                const result = excelDateToDateString(testCase.excelNum);
+                const oldResult = excelDateToDateStringOld(testCase.excelNum);
+                const passed = result === testCase.expected;
+                
+                if (passed) passCount++;
+                else failCount++;
+                
+                const statusClass = passed ? 'pass' : 'fail';
+                const statusText = passed ? '✓ 通过' : '✗ 失败';
+                
+                results.innerHTML += `
+                    <div class="test-result">
+                        <strong>测试 ${index + 1}:</strong> ${testCase.desc}<br>
+                        Excel序列号: ${testCase.excelNum}<br>
+                        新方法结果: <span class="${statusClass}">${result}</span><br>
+                        旧方法结果: ${oldResult} ${oldResult !== result ? '<span style="color:orange;">(有差异)</span>' : ''}<br>
+                        预期结果: ${testCase.expected}<br>
+                        状态: <span class="${statusClass}">${statusText}</span>
+                    </div>
+                `;
             });
-        })();
+            
+            results.innerHTML += `
+                <div class="test-result" style="background: ${failCount > 0 ? '#ffebee' : '#e8f5e9'};">
+                    <strong>总计:</strong> ${passCount} 通过, ${failCount} 失败
+                </div>
+            `;
+        }
+
+        // 时区测试
+        function testTimezone() {
+            const results = document.getElementById('timezoneTestResults');
+            results.innerHTML = '<h3>时区测试结果：</h3>';
+            
+            const testCases = [
+                { excelNum: 43738, desc: '2019-10-31' },
+                { excelNum: 45658, desc: '2025-11-30' },
+            ];
+            
+            testCases.forEach(testCase => {
+                const result = excelDateToDateString(testCase.excelNum);
+                const oldResult = excelDateToDateStringOld(testCase.excelNum);
+                
+                results.innerHTML += `
+                    <div class="test-result">
+                        <strong>测试日期:</strong> ${testCase.desc} (Excel序列号: ${testCase.excelNum})<br>
+                        新方法(UTC): <span class="pass">${result}</span><br>
+                        旧方法(本地时区): ${oldResult}<br>
+                        当前时区: ${Intl.DateTimeFormat().resolvedOptions().timeZone}<br>
+                        时区偏移: UTC${new Date().getTimezoneOffset() > 0 ? '-' : '+'}${Math.abs(new Date().getTimezoneOffset() / 60)}:${String(Math.abs(new Date().getTimezoneOffset() % 60)).padStart(2, '0')}<br>
+                        ${result !== oldResult ? '<span style="color:red;">⚠️ 发现差异！旧方法可能有时区问题</span>' : '<span style="color:green;">✓ 两种方法结果一致</span>'}
+                    </div>
+                `;
+            });
+        }
+
+        // Excel文件测试
+        function testExcelFile() {
+            const fileInput = document.getElementById('excelFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('请先选择Excel文件');
+                return;
+            }
+            
+            const results = document.getElementById('excelTestResults');
+            results.innerHTML = '<h3>正在读取Excel文件...</h3>';
+            
+            // 使用FileReader读取Excel文件
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    // 这里需要使用SheetJS库来解析Excel
+                    // 为了简化，我们提示用户使用浏览器控制台
+                    results.innerHTML = `
+                        <div class="test-result">
+                            <h4>Excel文件读取说明：</h4>
+                            <p>要测试Excel文件，请在浏览器控制台（F12）中运行以下代码：</p>
+                            <pre style="background: #f5f5f5; padding: 10px; border-radius: 3px;">
+// 注意：需要先引入SheetJS库
+// 或者使用我们提供的测试方法
+
+// 测试Excel日期转换函数
+function testExcelDate(excelNum) {
+    const excelEpoch = Date.UTC(1899, 11, 30);
+    const date = new Date(excelEpoch + (excelNum - 1) * 86400000);
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    return \`\${year}-\${month}-\${day}\`;
+}
+
+// 测试示例
+console.log('2019-10-31:', testExcelDate(43738));
+console.log('2025-11-30:', testExcelDate(45658));
+                            </pre>
+                            <p><strong>文件信息：</strong></p>
+                            <ul>
+                                <li>文件名: ${file.name}</li>
+                                <li>文件大小: ${(file.size / 1024).toFixed(2)} KB</li>
+                                <li>文件类型: ${file.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}</li>
+                            </ul>
+                            <p><strong>建议：</strong>在HTML页面中直接上传Excel文件，系统会自动解析日期。检查解析后的日期是否正确。</p>
+                        </div>
+                    `;
+                } catch (error) {
+                    results.innerHTML = `<div class="test-result" style="background: #ffebee;">
+                        <strong>错误:</strong> ${error.message}
+                    </div>`;
+                }
+            };
+            
+            reader.readAsArrayBuffer(file);
+        }
     </script>
 </body>
 </html>

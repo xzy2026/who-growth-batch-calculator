@@ -517,17 +517,23 @@
                     page0.innerHTML = coverHtml;
                     wrapper.appendChild(page0);
 
-                    var imgStyle = 'width:100%;max-width:800px;height:280px;object-fit:contain;display:block;margin:0 auto 12px auto;';
+                    var imgStyle = 'width:100%;max-width:800px;height:360px;object-fit:contain;display:block;margin:0 auto 20px auto;';
                     var page1 = document.createElement('div');
-                    page1.style.cssText = 'width:800px;background:#fff;';
-                    page1.innerHTML = '<div style="text-align:center;margin-bottom:16px;font-size:18px;">生长评价总体报告</div><div style="text-align:center;margin-bottom:16px;font-size:14px;">体测人数：' + (d.total || 0) + ' 人</div>' +
+                    page1.style.cssText = 'width:800px;background:#fff;padding:20px 0;';
+                    page1.innerHTML = '<div style="text-align:center;margin-bottom:20px;font-size:18px;">生长评价总体报告</div><div style="text-align:center;margin-bottom:24px;font-size:14px;">体测人数：' + (d.total || 0) + ' 人</div>' +
                         '<div style="margin-bottom:8px;font-size:15px;">全班性别分布</div><img src="' + genderUrl + '" style="' + imgStyle + '" />' +
-                        '<div style="margin-bottom:8px;font-size:15px;">全班生长指标评价结果分布（表1/表2）</div><img src="' + levelPieUrl + '" style="' + imgStyle + '" />' +
-                        '<div style="margin-bottom:8px;font-size:15px;">各生长指标评价等级分布</div><img src="' + levelBarUrl + '" style="' + imgStyle + '" />' +
-                        '<div style="margin-bottom:8px;font-size:15px;">儿童营养状况分布（表3）</div><img src="' + nutritionPieUrl + '" style="' + imgStyle + '" />' +
-                        '<div style="margin-bottom:8px;font-size:15px;">各指标营养状况分布</div><img src="' + nutritionBarUrl + '" style="' + imgStyle + '" />' +
-                        '<div style="margin-bottom:8px;font-size:15px;">身高与体重关系散点图</div><img src="' + scatterUrl + '" style="width:100%;max-width:800px;height:320px;object-fit:contain;display:block;margin:0 auto;" />';
+                        '<div style="margin-bottom:8px;font-size:15px;">全班生长指标评价结果分布（表1/表2）</div><img src="' + levelPieUrl + '" style="' + imgStyle + '" />';
                     wrapper.appendChild(page1);
+                    var page1b = document.createElement('div');
+                    page1b.style.cssText = 'width:800px;background:#fff;padding:20px 0;page-break-before:always;';
+                    page1b.innerHTML = '<div style="margin-bottom:8px;font-size:15px;">各生长指标评价等级分布</div><img src="' + levelBarUrl + '" style="' + imgStyle + '" />' +
+                        '<div style="margin-bottom:8px;font-size:15px;">儿童营养状况分布（表3）</div><img src="' + nutritionPieUrl + '" style="' + imgStyle + '" />';
+                    wrapper.appendChild(page1b);
+                    var page1c = document.createElement('div');
+                    page1c.style.cssText = 'width:800px;background:#fff;padding:20px 0;page-break-before:always;';
+                    page1c.innerHTML = '<div style="margin-bottom:8px;font-size:15px;">各指标营养状况分布</div><img src="' + nutritionBarUrl + '" style="' + imgStyle + '" />' +
+                        '<div style="margin-bottom:8px;font-size:15px;">身高与体重关系散点图</div><img src="' + scatterUrl + '" style="width:100%;max-width:800px;height:360px;object-fit:contain;display:block;margin:0 auto;" />';
+                    wrapper.appendChild(page1c);
 
                     var page2 = document.createElement('div');
                     page2.style.cssText = 'width:800px;background:#fff;page-break-before:always;';
@@ -557,27 +563,30 @@
                     function doPdf() {
                         html2canvas(page0, { scale: 1.5, useCORS: true, allowTaint: true }).then(function(c0) {
                             html2canvas(page1, { scale: 1.5, useCORS: true, allowTaint: true }).then(function(c1) {
-                                html2canvas(page2, { scale: 1.5, useCORS: true, allowTaint: true }).then(function(c2) {
-                                    html2canvas(page3, { scale: 1.5, useCORS: true, allowTaint: true }).then(function(c3) {
-                                        var pdf = new JsPDF('p', 'mm', 'a4');
-                                        var w = pdf.internal.pageSize.getWidth();
-                                        var h = pdf.internal.pageSize.getHeight();
-                                        function addPageFit(canvas) {
-                                            var r = canvas.width / canvas.height;
-                                            var pageR = w / h;
-                                            var imgW, imgH;
-                                            if (r > pageR) { imgW = w; imgH = w / r; } else { imgH = h; imgW = h * r; }
-                                            pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, imgW, imgH);
-                                        }
-                                        addPageFit(c0);
-                                        pdf.addPage();
-                                        addPageFit(c1);
-                                        pdf.addPage();
-                                        addPageFit(c2);
-                                        pdf.addPage();
-                                        addPageFit(c3);
-                                        pdf.save(filename);
-                                        if (wrapper.parentNode) document.body.removeChild(wrapper);
+                                html2canvas(page1b, { scale: 1.5, useCORS: true, allowTaint: true }).then(function(c1b) {
+                                    html2canvas(page1c, { scale: 1.5, useCORS: true, allowTaint: true }).then(function(c1c) {
+                                        html2canvas(page2, { scale: 1.5, useCORS: true, allowTaint: true }).then(function(c2) {
+                                            html2canvas(page3, { scale: 1.5, useCORS: true, allowTaint: true }).then(function(c3) {
+                                                var pdf = new JsPDF('p', 'mm', 'a4');
+                                                var w = pdf.internal.pageSize.getWidth();
+                                                var h = pdf.internal.pageSize.getHeight();
+                                                function addPageFit(canvas) {
+                                                    var r = canvas.width / canvas.height;
+                                                    var pageR = w / h;
+                                                    var imgW, imgH;
+                                                    if (r > pageR) { imgW = w; imgH = w / r; } else { imgH = h; imgW = h * r; }
+                                                    pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, imgW, imgH);
+                                                }
+                                                addPageFit(c0);
+                                                pdf.addPage(); addPageFit(c1);
+                                                pdf.addPage(); addPageFit(c1b);
+                                                pdf.addPage(); addPageFit(c1c);
+                                                pdf.addPage(); addPageFit(c2);
+                                                pdf.addPage(); addPageFit(c3);
+                                                pdf.save(filename);
+                                                if (wrapper.parentNode) document.body.removeChild(wrapper);
+                                            }).catch(function() { if (wrapper.parentNode) document.body.removeChild(wrapper); });
+                                        }).catch(function() { if (wrapper.parentNode) document.body.removeChild(wrapper); });
                                     }).catch(function() { if (wrapper.parentNode) document.body.removeChild(wrapper); });
                                 }).catch(function() { if (wrapper.parentNode) document.body.removeChild(wrapper); });
                             }).catch(function() { if (wrapper.parentNode) document.body.removeChild(wrapper); });

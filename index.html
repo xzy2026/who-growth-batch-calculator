@@ -456,9 +456,6 @@
                             <th style="width: 95px;">评价结果</th>
                             <th style="width: 120px;">年龄别BMI</th>
                             <th style="width: 95px;">评价结果</th>
-                            <th style="width: 90px;">头围(cm)</th>
-                            <th style="width: 120px;">年龄别头围</th>
-                            <th style="width: 95px;">评价结果</th>
                             <th style="width: 60px;">操作</th>
                         </tr>
                     </thead>
@@ -1659,9 +1656,6 @@
                 <td class="height-weight-eval-result-cell result-cell"></td>
                 <td class="age-bmi-cell result-cell"></td>
                 <td class="age-bmi-eval-result-cell result-cell"></td>
-                <td><input type="number" class="head-circ-input" step="0.1" placeholder="3岁以下"></td>
-                <td class="age-head-cell result-cell"></td>
-                <td class="age-head-eval-result-cell result-cell"></td>
                 <td><button class="delete-btn" onclick="deleteRow(${serialNum})">删除</button><button class="btn-report" onclick="openReport(this)">生成报告</button></td>
             `;
             if (rowData) {
@@ -1675,7 +1669,6 @@
                 if (rowData.checkDateStr) row.querySelector('.check-date-input').value = rowData.checkDateStr;
                 if (rowData.weight != null && !isNaN(rowData.weight) && rowData.weight > 0) row.querySelector('.weight-input').value = rowData.weight;
                 if (rowData.height != null && !isNaN(rowData.height) && rowData.height > 0) row.querySelector('.height-input').value = rowData.height;
-                if (rowData.headCirc != null && !isNaN(rowData.headCirc) && rowData.headCirc > 0) row.querySelector('.head-circ-input').value = rowData.headCirc;
             }
             return row;
         }
@@ -1727,14 +1720,12 @@
                 { id: 'ageWeight', name: '年龄别体重', valueCell: '.age-weight-cell', resultCell: '.age-weight-eval-result-cell' },
                 { id: 'ageHeight', name: '年龄别身高', valueCell: '.age-height-cell', resultCell: '.age-height-eval-result-cell' },
                 { id: 'heightWeight', name: '身高别体重', valueCell: '.height-weight-cell', resultCell: '.height-weight-eval-result-cell' },
-                { id: 'ageBmi', name: '年龄别BMI', valueCell: '.age-bmi-cell', resultCell: '.age-bmi-eval-result-cell' },
-                { id: 'ageHead', name: '年龄别头围', valueCell: '.age-head-cell', resultCell: '.age-head-eval-result-cell' }
+                { id: 'ageBmi', name: '年龄别BMI', valueCell: '.age-bmi-cell', resultCell: '.age-bmi-eval-result-cell' }
             ];
             const weight = parseFloat(getVal('.weight-input'));
             const height = parseFloat(getVal('.height-input'));
             const bmiText = getText('.bmi-cell');
             const bmi = (bmiText && bmiText !== '-') ? parseFloat(bmiText) : null;
-            const headCirc = parseFloat(getVal('.head-circ-input'));
             return {
                 mode: currentMode,
                 name: getVal('.name-input'),
@@ -1745,9 +1736,9 @@
                 weight: isNaN(weight) ? null : weight,
                 height: isNaN(height) ? null : height,
                 bmi: (bmi != null && !isNaN(bmi)) ? bmi : null,
-                headCirc: (headCirc != null && !isNaN(headCirc)) ? headCirc : null,
                 stdWeight: getText('.std-weight-cell'),
                 stdHeight: getText('.std-height-cell'),
+                stdBmi: (row.dataset && row.dataset.stdBmi !== undefined && row.dataset.stdBmi !== '') ? parseFloat(row.dataset.stdBmi) : null,
                 indicators: indicators.map(ind => ({
                     id: ind.id,
                     name: ind.name,
@@ -1769,17 +1760,69 @@
             return true;
         }
 
+        // 按性别计算全班平均身高、平均体重、平均BMI（男生与男生比，女生与女生比）
+        // BMI 用 weight/(height/100)^2 实时计算，避免误读单元格
+        function getClassAveragesByGender() {
+            const rows = document.querySelectorAll('#tableBody tr');
+            let sumHM = 0, sumWM = 0, sumBM = 0, countHM = 0, countWM = 0, countBM = 0;
+            let sumHF = 0, sumWF = 0, sumBF = 0, countHF = 0, countWF = 0, countBF = 0;
+            rows.forEach(row => {
+                const d = getRowReportData(row);
+                const isMale = (d.gender || '').trim() === '男';
+                const h = d.height != null && !isNaN(d.height) && d.height > 0 ? Number(d.height) : null;
+                const w = d.weight != null && !isNaN(d.weight) && d.weight > 0 ? Number(d.weight) : null;
+                let b = null;
+                if (h != null && w != null && h > 0) {
+                    b = Math.round((w / Math.pow(h / 100, 2)) * 10) / 10;
+                    if (b <= 0 || b > 50) b = null;
+                }
+                if (isMale) {
+                    if (h != null) { sumHM += h; countHM++; }
+                    if (w != null) { sumWM += w; countWM++; }
+                    if (b != null) { sumBM += b; countBM++; }
+                } else {
+                    if (h != null) { sumHF += h; countHF++; }
+                    if (w != null) { sumWF += w; countWF++; }
+                    if (b != null) { sumBF += b; countBF++; }
+                }
+            });
+            return {
+                classAvgHeightMale: countHM > 0 ? Math.round(sumHM / countHM * 10) / 10 : null,
+                classAvgWeightMale: countWM > 0 ? Math.round(sumWM / countWM * 10) / 10 : null,
+                classAvgBmiMale: countBM > 0 ? Math.round(sumBM / countBM * 10) / 10 : null,
+                classAvgHeightFemale: countHF > 0 ? Math.round(sumHF / countHF * 10) / 10 : null,
+                classAvgWeightFemale: countWF > 0 ? Math.round(sumWF / countWF * 10) / 10 : null,
+                classAvgBmiFemale: countBF > 0 ? Math.round(sumBF / countBF * 10) / 10 : null
+            };
+        }
+
         // 打开报告页：收集当前行数据写入 localStorage（新窗口无法读取 sessionStorage）并新窗口打开 report.html
         function openReport(buttonEl) {
             const row = buttonEl && buttonEl.closest ? buttonEl.closest('tr') : null;
             if (!row) return;
+            calculateRow(row);
             const data = getRowReportData(row);
             if (!isRowValidForReport(data)) {
                 alert('该行缺少性别、出生日期、体重或身高，无法生成报告。请填写完整后再试。');
                 return;
             }
+            const avgs = getClassAveragesByGender();
+            const isMale = (data.gender || '').trim() === '男';
+            if (isMale) {
+                if (avgs.classAvgHeightMale != null) data.classAvgHeight = avgs.classAvgHeightMale;
+                if (avgs.classAvgWeightMale != null) data.classAvgWeight = avgs.classAvgWeightMale;
+                if (avgs.classAvgBmiMale != null) data.classAvgBmi = avgs.classAvgBmiMale;
+            } else {
+                if (avgs.classAvgHeightFemale != null) data.classAvgHeight = avgs.classAvgHeightFemale;
+                if (avgs.classAvgWeightFemale != null) data.classAvgWeight = avgs.classAvgWeightFemale;
+                if (avgs.classAvgBmiFemale != null) data.classAvgBmi = avgs.classAvgBmiFemale;
+            }
             try {
                 localStorage.setItem('childGrowthReport', JSON.stringify(data));
+                var batch = getBatchReportData();
+                if (batch && batch.rows && batch.rows.length > 0) {
+                    localStorage.setItem('childGrowthBatchReport', JSON.stringify(batch));
+                }
                 window.open('report.html', '_blank', 'noopener');
             } catch (e) {
                 alert('无法打开报告页，请检查是否允许弹窗。');
@@ -2139,7 +2182,6 @@
             const checkDate = row.querySelector('.check-date-input').value;
             const weight = parseFloat(row.querySelector('.weight-input').value) || null;
             const height = parseFloat(row.querySelector('.height-input').value) || null;
-            const headCirc = parseFloat(row.querySelector('.head-circ-input').value) || null;
 
             if (!gender || !birthDate) {
                 return; // 跳过没有必需数据的行
@@ -2187,8 +2229,10 @@
             // 标准体重和身高（使用查表年龄，82+月使用81月标准截断）
             const stdWeight = getPercentileValue(weightTable, lookupAgeMonths, 'P50');
             const stdHeight = getPercentileValue(heightTable, lookupAgeMonths, 'P50');
+            const stdBmi = getPercentileValue(bmiTable, lookupAgeMonths, 'P50');
             row.querySelector('.std-weight-cell').textContent = stdWeight ? stdWeight.toFixed(1) : '-';
             row.querySelector('.std-height-cell').textContent = stdHeight ? stdHeight.toFixed(1) : '-';
+            row.dataset.stdBmi = (stdBmi != null && !isNaN(stdBmi)) ? stdBmi.toFixed(1) : '';
 
             // BMI（非空与除零保护：仅当体重、身高均有效且身高>0 时计算）
             let bmi = null;
@@ -2399,41 +2443,6 @@
                 }
             }
 
-            // 年龄别头围计算（仅3岁及以下，使用查表年龄）
-            if (headCirc) {
-                if (ageMonths <= 36) {
-                    const headTable = gender === '男' ? ageHeadBoy : ageHeadGirl;
-                    if (currentMode === 'percentile') {
-                        const percentile = calculatePercentile(headCirc, headTable, lookupAgeMonths);
-                        if (percentile) {
-                            row.querySelector('.age-head-cell').textContent = percentile;
-                            const eval = calculateEvaluationFromPercentile(percentile);
-                            row.querySelector('.age-head-eval-result-cell').textContent = (eval.result === '' || !eval.result) ? '-' : eval.result;
-                        } else {
-                            row.querySelector('.age-head-cell').textContent = '-';
-                            row.querySelector('.age-head-eval-result-cell').textContent = '-';
-                        }
-                    } else {
-                        const headStdTable = gender === '男' ? ageHeadBoyStd : ageHeadGirlStd;
-                        const std = calculateStdForValue(headCirc, headTable, lookupAgeMonths, headStdTable);
-                        if (std !== null) {
-                            row.querySelector('.age-head-cell').textContent = formatStdForDisplay(std);
-                            const eval = calculateEvaluationFromStd(std);
-                            row.querySelector('.age-head-eval-result-cell').textContent = (eval.result === '' || !eval.result) ? '-' : eval.result;
-                        } else {
-                            row.querySelector('.age-head-cell').textContent = '-';
-                            row.querySelector('.age-head-eval-result-cell').textContent = '-';
-                        }
-                    }
-                } else {
-                    // 头围标准仅适用于3岁及以下，超龄显示超出适用范围
-                    row.querySelector('.age-head-cell').textContent = '超出适用范围';
-                    row.querySelector('.age-head-eval-result-cell').textContent = '超出适用范围';
-                }
-            } else {
-                row.querySelector('.age-head-cell').textContent = '';
-                row.querySelector('.age-head-eval-result-cell').textContent = '';
-            }
         }
 
         // 批量计算
@@ -2534,7 +2543,6 @@
                             }
                             else if (hClean.includes('体重') && !hClean.includes('标准') && !hClean.includes('增值')) colMap.weight = index;
                             else if (hClean.includes('身高') && !hClean.includes('标准') && !hClean.includes('增值')) colMap.height = index;
-                            else if (hClean.includes('头围') && !hClean.includes('标准')) colMap.headCirc = index;
                         });
 
                         // 如果找到了必需的列，使用这一行作为表头
@@ -2884,7 +2892,7 @@
                                     if (!checkDateStr) checkDateStr = dateStr;
                                 }
                             }
-                            let weightVal, heightVal, headCircVal;
+                            let weightVal, heightVal;
                             if (colMap.weight !== undefined && row[colMap.weight] !== undefined && row[colMap.weight] !== '') {
                                 let weightStr = String(row[colMap.weight]).trim();
                                 if (weightStr.endsWith('.')) weightStr = weightStr.slice(0, -1);
@@ -2897,13 +2905,7 @@
                                 const h = parseFloat(heightStr);
                                 if (!isNaN(h) && h > 0) heightVal = h;
                             }
-                            if (colMap.headCirc !== undefined && row[colMap.headCirc] !== undefined && row[colMap.headCirc] !== '') {
-                                let headCircStr = String(row[colMap.headCirc]).trim();
-                                if (headCircStr.endsWith('.')) headCircStr = headCircStr.slice(0, -1);
-                                const hc = parseFloat(headCircStr);
-                                if (!isNaN(hc) && hc > 0) headCircVal = hc;
-                            }
-                            rowDataList.push({ name: nameValue, gender, birthDateStr, checkDateStr, weight: weightVal, height: heightVal, headCirc: headCircVal });
+                            rowDataList.push({ name: nameValue, gender, birthDateStr, checkDateStr, weight: weightVal, height: heightVal });
                             importedCount++;
                         }
 
@@ -2986,10 +2988,7 @@
                     getValue(row.querySelector('.height-weight-cell')),
                     getValue(row.querySelector('.height-weight-eval-result-cell')),
                     getValue(row.querySelector('.age-bmi-cell')),
-                    getValue(row.querySelector('.age-bmi-eval-result-cell')),
-                    getValue(row.querySelector('.head-circ-input'), true),
-                    getValue(row.querySelector('.age-head-cell')),
-                    getValue(row.querySelector('.age-head-eval-result-cell'))
+                    getValue(row.querySelector('.age-bmi-eval-result-cell'))
                 ];
                 wsData.push(rowData);
             });
@@ -3052,8 +3051,7 @@
             wsData.push([
                 '序号', '姓名', '性别', '出生日期', '实足年龄', '测查日期',
                 '体重(kg)', '评价结果', '身高(cm)', '评价结果', 'BMI', '评价结果',
-                '年龄别体重评价结果', '身高别体重评价结果', '年龄别BMI评价结果',
-                '头围(cm)', '年龄别头围评价结果'
+                '年龄别体重评价结果', '身高别体重评价结果', '年龄别BMI评价结果'
             ]);
 
             const getValue = (element, isInput = false) => {
@@ -3078,9 +3076,7 @@
                     getValue(row.querySelector('.bmi-eval-result-cell')),
                     getValue(row.querySelector('.age-weight-eval-result-cell')),
                     getValue(row.querySelector('.height-weight-eval-result-cell')),
-                    getValue(row.querySelector('.age-bmi-eval-result-cell')),
-                    getValue(row.querySelector('.head-circ-input'), true),
-                    getValue(row.querySelector('.age-head-eval-result-cell'))
+                    getValue(row.querySelector('.age-bmi-eval-result-cell'))
                 ];
                 wsData.push(rowData);
             });

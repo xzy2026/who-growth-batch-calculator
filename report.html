@@ -55,10 +55,11 @@
         .indicator-table { width: 100%; border-collapse: collapse; font-size: 14px; }
         .indicator-table th, .indicator-table td { border: 1px solid #ddd; padding: 10px 12px; }
         .indicator-table th { background: #e7f3ff; }
-        .eval-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 20px; }
+        .eval-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 20px; table-layout: fixed; }
         .eval-table th, .eval-table td { border: 1px solid #ddd; padding: 8px 10px; text-align: center; }
         .eval-table th { background: #366092; color: #fff; }
-        .eval-table td.first-col { text-align: left; background: #f9f9f9; font-weight: 500; min-width: 100px; }
+        .eval-table th:first-child { width: 160px; min-width: 160px; max-width: 160px; box-sizing: border-box; text-align: left; background: #366092; color: #fff; font-weight: 500; line-height: 1.4; word-break: keep-all; white-space: normal; }
+        .eval-table td.first-col { width: 160px; min-width: 160px; max-width: 160px; box-sizing: border-box; text-align: left; background: #f0f0f0; color: #333; font-weight: 500; line-height: 1.4; word-break: keep-all; white-space: normal; }
         .chart-values-summary { margin-top: 16px; font-size: 14px; }
         .chart-values-summary table { width: 100%; border-collapse: collapse; }
         .chart-values-summary th, .chart-values-summary td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
@@ -423,11 +424,11 @@
                 });
 
                 var table1Rows = [
-                    { label: '≥P97', level: '上' },
-                    { label: 'P75～<P97', level: '中上' },
-                    { label: 'P25～<P75', level: '中' },
-                    { label: 'P3～<P25', level: '中下' },
-                    { label: '<P3', level: '下' }
+                    { label: '≥P97', labelTitle: '≥P97', level: '上' },
+                    { label: 'P75～&lt;P97', labelTitle: 'P75～<P97', level: '中上' },
+                    { label: 'P25～&lt;P75', labelTitle: 'P25～<P75', level: '中' },
+                    { label: 'P3～&lt;P25', labelTitle: 'P3～<P25', level: '中下' },
+                    { label: '&lt;P3', labelTitle: '<P3', level: '下' }
                 ];
                 var table2Rows = [
                     { label: '≥+2 SD', level: '上' },
@@ -447,7 +448,8 @@
                 var normalLevel = '中';
                 var t1Html = '<thead><tr><th>百分位数法</th><th>年龄别体重</th><th>年龄别身长/身高</th><th>身长/身高体重</th><th>年龄别BMI</th></tr></thead><tbody>';
                 table1Rows.forEach(function(row) {
-                    t1Html += '<tr><td class="first-col">' + row.label + '</td>';
+                    var title = (row.labelTitle != null ? row.labelTitle : row.label).replace(/</g, '&lt;');
+                    t1Html += '<tr><td class="first-col" title="' + title + '">' + row.label + '</td>';
                     for (var c = 0; c < 4; c++) t1Html += '<td>' + cellForGrowthLevel(c, row.level, normalLevel) + '</td>';
                     t1Html += '</tr>';
                 });

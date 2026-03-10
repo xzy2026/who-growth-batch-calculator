@@ -521,6 +521,7 @@
                     var classAvgH = data.classAvgHeight != null && !isNaN(Number(data.classAvgHeight)) ? Number(data.classAvgHeight) : null;
                     var classAvgW = data.classAvgWeight != null && !isNaN(Number(data.classAvgWeight)) ? Number(data.classAvgWeight) : null;
                     var classAvgBmi = data.classAvgBmi != null && !isNaN(Number(data.classAvgBmi)) ? Number(data.classAvgBmi) : null;
+                    var stdBmiFromBatch = null;
                     if (classAvgH == null || classAvgW == null || classAvgBmi == null) {
                         try {
                             var batchRaw = localStorage.getItem('childGrowthBatchReport');
@@ -545,6 +546,25 @@
                             }
                         } catch (e) {}
                     }
+                    try {
+                        var batchRaw2 = localStorage.getItem('childGrowthBatchReport');
+                        if (batchRaw2 && (data.stdBmi == null || data.stdBmi === '' || isNaN(Number(data.stdBmi)))) {
+                            var batch2 = JSON.parse(batchRaw2);
+                            var rows2 = batch2.rows || [];
+                            for (var ri = 0; ri < rows2.length; ri++) {
+                                var r = rows2[ri];
+                                var nameMatch = (r.name || '').trim() === (data.name || '').trim();
+                                var birthMatch = (r.birthDate || '') === (data.birthDate || '');
+                                if (nameMatch && birthMatch) {
+                                    var sb = r.stdBmi;
+                                    if (sb != null && sb !== '' && !isNaN(Number(sb))) {
+                                        stdBmiFromBatch = Math.round(Number(sb) * 10) / 10;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    } catch (e2) {}
                     var actualH = data.height != null ? Number(data.height) : null;
                     var stdH = data.stdHeight != null && data.stdHeight !== '' && data.stdHeight !== '-' ? parseFloat(String(data.stdHeight).replace(/[^0-9.-]/g, '')) : null;
                     var classHeightLabel = isMale ? '全班男生平均身高' : '全班女生平均身高';
@@ -598,7 +618,7 @@
                         });
                     }
                     var actualBmi = data.bmi != null ? Number(data.bmi) : null;
-                    var stdBmi = data.stdBmi != null ? Number(data.stdBmi) : null;
+                    var stdBmi = (data.stdBmi != null && data.stdBmi !== '' && !isNaN(Number(data.stdBmi))) ? Math.round(Number(data.stdBmi) * 10) / 10 : (stdBmiFromBatch != null && !isNaN(stdBmiFromBatch) ? stdBmiFromBatch : null);
                     var classBmiLabel = isMale ? '全班男生平均BMI' : '全班女生平均BMI';
                     var bmiCompareDom = document.getElementById('bmiCompareChart');
                     if (bmiCompareDom && (actualBmi != null || stdBmi != null || classAvgBmi != null)) {

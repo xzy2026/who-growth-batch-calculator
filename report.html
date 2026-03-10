@@ -551,14 +551,31 @@
                         if (batchRaw2 && (data.stdBmi == null || data.stdBmi === '' || isNaN(Number(data.stdBmi)))) {
                             var batch2 = JSON.parse(batchRaw2);
                             var rows2 = batch2.rows || [];
+                            var dataName = (data.name || '').trim();
+                            var dataBirth = (data.birthDate || '').toString().trim();
+                            var dataH = data.height != null && !isNaN(Number(data.height)) ? Number(data.height) : null;
+                            var dataW = data.weight != null && !isNaN(Number(data.weight)) ? Number(data.weight) : null;
                             for (var ri = 0; ri < rows2.length; ri++) {
                                 var r = rows2[ri];
-                                var nameMatch = (r.name || '').trim() === (data.name || '').trim();
-                                var birthMatch = (r.birthDate || '') === (data.birthDate || '');
+                                var sb = r.stdBmi;
+                                if (sb == null || sb === '' || isNaN(Number(sb))) continue;
+                                var nameMatch = (r.name || '').trim() === dataName;
+                                var birthMatch = (r.birthDate || '').toString().trim() === dataBirth;
                                 if (nameMatch && birthMatch) {
-                                    var sb = r.stdBmi;
-                                    if (sb != null && sb !== '' && !isNaN(Number(sb))) {
-                                        stdBmiFromBatch = Math.round(Number(sb) * 10) / 10;
+                                    stdBmiFromBatch = Math.round(Number(sb) * 10) / 10;
+                                    break;
+                                }
+                            }
+                            if (stdBmiFromBatch == null && dataName && dataH != null && dataW != null) {
+                                for (var rj = 0; rj < rows2.length; rj++) {
+                                    var r2 = rows2[rj];
+                                    var sb2 = r2.stdBmi;
+                                    if (sb2 == null || sb2 === '' || isNaN(Number(sb2))) continue;
+                                    if ((r2.name || '').trim() !== dataName) continue;
+                                    var rh = r2.height != null && !isNaN(Number(r2.height)) ? Number(r2.height) : null;
+                                    var rw = r2.weight != null && !isNaN(Number(r2.weight)) ? Number(r2.weight) : null;
+                                    if (rh === dataH && rw === dataW) {
+                                        stdBmiFromBatch = Math.round(Number(sb2) * 10) / 10;
                                         break;
                                     }
                                 }

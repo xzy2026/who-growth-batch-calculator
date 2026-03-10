@@ -151,6 +151,14 @@
                         <div class="chart-title">各生长指标评价等级（表1/表2）</div>
                         <div id="levelBarChart" class="level-bar-chart"></div>
                     </div>
+                    <div class="chart-box">
+                        <div class="chart-title">儿童营养状况分布（表3 标准差法）</div>
+                        <div id="nutritionPieChartPersonal" class="level-pie-chart"></div>
+                    </div>
+                    <div class="chart-box">
+                        <div class="chart-title">各生长指标营养状况（表3 标准差法）</div>
+                        <div id="nutritionBarChartPersonal" class="level-bar-chart"></div>
+                    </div>
                     <div class="chart-box" id="scatterBox" style="display:none;">
                         <div class="chart-title">身高与体重关系散点图</div>
                         <div id="hwScatterChart" class="hw-scatter-chart" style="width:100%;height:360px;"></div>
@@ -700,6 +708,131 @@
                             series: [{ type: 'bar', data: levelBarData, barWidth: '50%', barMinHeight: 6 }]
                         });
                     }
+                    // 营养状况扇形图（表3 标准差法，使用表3已有结果）
+                    var nutritionPieDom = document.getElementById('nutritionPieChartPersonal');
+                    if (nutritionPieDom) {
+                        var nutritionItems = [];
+                        var nutritionIndicatorNames = ['年龄别体重', '年龄别身长/身高', '身长/身高体重', '年龄别BMI'];
+                        for (var nc = 0; nc < 4; nc++) {
+                            var nInd = indMap[nc];
+                            if (!nInd) continue;
+                            var nRes = (nInd.result || '').trim();
+                            if (!nRes || nRes === '-' || nRes === '—') continue;
+                            nutritionItems.push({ idx: nc, indicator: nutritionIndicatorNames[nc], result: nRes });
+                        }
+                        var nutritionCounts = {};
+                        var nutritionDetail = {};
+                        nutritionItems.forEach(function(item) {
+                            if (!nutritionCounts[item.result]) {
+                                nutritionCounts[item.result] = 0;
+                                nutritionDetail[item.result] = [];
+                            }
+                            nutritionCounts[item.result]++;
+                            nutritionDetail[item.result].push(item.indicator);
+                        });
+                        var nutritionPieData = Object.keys(nutritionCounts).map(function(k) {
+                            return { name: k, value: nutritionCounts[k] };
+                        });
+                        if (nutritionPieData.length === 0) {
+                            nutritionPieData = [{ name: '暂无可评价的营养结果', value: 1, itemStyle: { color: '#ddd' } }];
+                        }
+                        var nutritionPieChart = echarts.init(nutritionPieDom);
+                        nutritionPieChart.setOption({
+                            tooltip: {
+                                trigger: 'item',
+                                formatter: function(p) {
+                                    var name = p.name || '';
+                                    var list = nutritionDetail[name] || [];
+                                    var extra = list.length ? ('<br/>涉及指标：' + list.join('、')) : '';
+                                    return name + '：' + p.value + ' 项 (' + p.percent + '%)' + extra;
+                                }
+                            },
+                            legend: { orient: 'horizontal', bottom: 10, left: 'center' },
+                            series: [{
+                                type: 'pie',
+                                radius: ['40%', '70%'],
+                                data: nutritionPieData
+                            }]
+                        });
+                    }
+                    // 各指标营养状况柱状图（表3 标准差法，Y 轴对应表3 行）
+                    var nutritionBarDom = document.getElementById('nutritionBarChartPersonal');
+                    if (nutritionBarDom) {
+                        var nutritionBarCategories = ['年龄别体重', '年龄别身长/身高', '身长/身高体重', '年龄别BMI'];
+                        var nutritionBarData = [];
+                        var maxRow = table3Rows.length;
+                        for (var bc = 0; bc < 4; bc++) {
+                            var indB = indMap[bc];
+                            var resB = indB ? (indB.result || '').trim() : '';
+                            if (!indB || !resB || resB === '-' || resB === '—') {
+                                nutritionBarData.push({
+                                    value: 0.6,
+                                    itemStyle: { color: '#b0b0b0' },
+                                    rowLabel: '',
+                                    nutritionResult: ''
+                                });
+                            } else {
+                                var rowIndex = getNutritionRowIndex(bc, resB);
+                                var valB = rowIndex != null ? (rowIndex + 1) : 0.6;
+                                var rowLabel = rowIndex != null && table3Rows[rowIndex] ? table3Rows[rowIndex].label : '';
+                                nutritionBarData.push({
+                                    value: valB,
+                                    itemStyle: { color: '#4a7ba7' },
+                                    rowLabel: rowLabel,
+                                    nutritionResult: resB
+                                });
+                            }
+                        }
+                        var nutritionBarChart = echarts.init(nutritionBarDom);
+                        nutritionBarChart.setOption({
+                            tooltip: {
+                                trigger: 'axis',
+                                formatter: function(params) {
+                                    var p = params[0];
+                                    var d = p && p.data ? p.data : {};
+                                    if (!d.rowLabel && !d.nutritionResult) {
+                                        return (p.name || '') + '：暂无可评价结果';
+                                    }
+                                    var s = (p.name || '') + '<br/>标准差区间：' + (d.rowLabel || '—');
+                                    s += '<br/>营养状况：' + (d.nutritionResult || '—');
+                                    return s;
+                                }
+                            },
+                            grid: { left: '22%', right: '14%', top: '12%', bottom: '18%', containLabel: true },
+                            xAxis: {
+                                type: 'category',
+                                data: nutritionBarCategories,
+                                axisLabel: { interval: 0, rotate: 20, fontSize: 13, margin: 16, show: true },
+                                axisTick: { show: true },
+                                axisLine: { show: true }
+                            },
+                            yAxis: {
+                                type: 'value',
+                                name: '表3 行',
+                                min: 0,
+                                max: maxRow + 1,
+                                interval: 1,
+                                axisLabel: {
+                                    fontSize: 12,
+                                    margin: 12,
+                                    show: true,
+                                    formatter: function(v) {
+                                        if (v <= 0 || v > maxRow) return '';
+                                        var row = table3Rows[v - 1];
+                                        return row ? row.label : '';
+                                    }
+                                },
+                                nameTextStyle: { fontSize: 13 },
+                                nameGap: 32
+                            },
+                            series: [{
+                                type: 'bar',
+                                data: nutritionBarData,
+                                barWidth: '50%',
+                                barMinHeight: 6
+                            }]
+                        });
+                    }
                     var scatterBox = document.getElementById('scatterBox');
                     var scatterDom = document.getElementById('hwScatterChart');
                     if (scatterBox && scatterDom && data.height != null && data.weight != null && !isNaN(Number(data.height)) && !isNaN(Number(data.weight))) {
@@ -763,7 +896,7 @@
             }
 
             function resizeCharts() {
-                ['heightCompareChart', 'weightCompareChart', 'bmiCompareChart', 'levelPieChart', 'levelBarChart', 'hwScatterChart'].forEach(function(id) {
+                ['heightCompareChart', 'weightCompareChart', 'bmiCompareChart', 'levelPieChart', 'levelBarChart', 'nutritionPieChartPersonal', 'nutritionBarChartPersonal', 'hwScatterChart'].forEach(function(id) {
                     var el = document.getElementById(id);
                     if (el && typeof echarts !== 'undefined' && echarts.getInstanceByDom(el)) echarts.getInstanceByDom(el).resize();
                 });
@@ -812,18 +945,22 @@
                 var bmiChart = document.getElementById('bmiCompareChart') && echarts.getInstanceByDom(document.getElementById('bmiCompareChart'));
                 var levelPieChart = document.getElementById('levelPieChart') && echarts.getInstanceByDom(document.getElementById('levelPieChart'));
                 var levelBarChart = document.getElementById('levelBarChart') && echarts.getInstanceByDom(document.getElementById('levelBarChart'));
+                var nutritionPieChart = document.getElementById('nutritionPieChartPersonal') && echarts.getInstanceByDom(document.getElementById('nutritionPieChartPersonal'));
+                var nutritionBarChart = document.getElementById('nutritionBarChartPersonal') && echarts.getInstanceByDom(document.getElementById('nutritionBarChartPersonal'));
                 var scatterChart = document.getElementById('hwScatterChart') && echarts.getInstanceByDom(document.getElementById('hwScatterChart'));
                 if (!levelPieChart || !levelBarChart) { alert('图表未就绪，请稍候再试。'); return; }
                 var captureCharts = function() {
                     var wait = wasOverview ? 0 : 350;
                     setTimeout(function() {
-                        [heightChart, weightChart, bmiChart, levelPieChart, levelBarChart, scatterChart].forEach(function(ch) { if (ch && ch.resize) ch.resize(); });
+                        [heightChart, weightChart, bmiChart, levelPieChart, levelBarChart, nutritionPieChart, nutritionBarChart, scatterChart].forEach(function(ch) { if (ch && ch.resize) ch.resize(); });
                         setTimeout(function() {
                             var heightUrl = heightChart ? heightChart.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
                             var weightUrl = weightChart ? weightChart.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
                             var bmiUrl = bmiChart ? bmiChart.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
                             var pieUrl = levelPieChart.getDataURL({ type: 'png', pixelRatio: 2 });
                             var barUrl = levelBarChart.getDataURL({ type: 'png', pixelRatio: 2 });
+                            var nutritionPieUrl = nutritionPieChart ? nutritionPieChart.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
+                            var nutritionBarUrl = nutritionBarChart ? nutritionBarChart.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
                             var scatterUrl = scatterChart ? scatterChart.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
                             if (!wasOverview && activeTab) {
                                 document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
@@ -834,7 +971,7 @@
                                 if (panel) panel.classList.add('active');
                                 setTimeout(resizeCharts, 50);
                             }
-                            doBuildPdf({ heightUrl: heightUrl, weightUrl: weightUrl, bmiUrl: bmiUrl, pieUrl: pieUrl, barUrl: barUrl, scatterUrl: scatterUrl });
+                            doBuildPdf({ heightUrl: heightUrl, weightUrl: weightUrl, bmiUrl: bmiUrl, pieUrl: pieUrl, barUrl: barUrl, nutritionPieUrl: nutritionPieUrl, nutritionBarUrl: nutritionBarUrl, scatterUrl: scatterUrl });
                         }, 150);
                     }, wait);
                 };
@@ -848,11 +985,21 @@
                 if (!title || !suggestionBox) { alert('报告内容未加载完整。'); return; }
                 var basicHtml = basicInfo ? basicInfo.innerHTML : '';
                 var tablesClone = overviewTablesBlock ? overviewTablesBlock.cloneNode(true) : null;
+                var assessmentHtml = '';
+                var refTablesHtml = '';
                 if (tablesClone) {
                     tablesClone.querySelectorAll('.collapse-toggle').forEach(function(t) { t.classList.add('open'); });
                     tablesClone.querySelectorAll('.collapse-content').forEach(function(c) { c.classList.add('open'); });
+                    var assessmentDiv = document.createElement('div');
+                    if (tablesClone.children.length >= 2) {
+                        assessmentDiv.appendChild(tablesClone.children[0].cloneNode(true));
+                        assessmentDiv.appendChild(tablesClone.children[1].cloneNode(true));
+                        assessmentHtml = assessmentDiv.innerHTML;
+                    }
+                    var refTablesDiv = document.createElement('div');
+                    for (var i = 2; i < tablesClone.children.length; i++) refTablesDiv.appendChild(tablesClone.children[i].cloneNode(true));
+                    refTablesHtml = refTablesDiv.innerHTML;
                 }
-                var tablesHtml = tablesClone ? tablesClone.innerHTML : '';
 
                 var wrapper = document.createElement('div');
                 wrapper.style.cssText = 'position:fixed;top:0;left:0;z-index:99999;width:800px;max-height:100vh;overflow:auto;font-family:Microsoft YaHei,Arial,sans-serif;font-size:14px;color:#333;background:#fff;padding:20px;box-sizing:border-box;';
@@ -877,6 +1024,7 @@
 
                 var imgStyleCompare = 'width:100%;max-width:780px;height:240px;object-fit:contain;display:block;margin:0 auto 16px auto;';
                 var imgStyleLevel = 'width:100%;max-width:780px;height:300px;object-fit:contain;display:block;margin:0 auto 16px auto;';
+                var imgStyleScatter = 'width:100%;max-width:780px;height:300px;object-fit:contain;display:block;margin:0 auto 16px auto;';
                 var page1Parts = ['<div style="text-align:center;margin-bottom:20px;font-size:17px;color:#333;">' + (title.textContent || '生长评价报告') + '</div>'];
                 if (basicHtml) page1Parts.push('<div style="margin-bottom:20px;padding:14px 18px;background:#f8fafc;border-radius:8px;">' + basicHtml + '</div>');
                 var leg = function(c, n) { return '<span style="display:inline-block;margin-right:16px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:' + c + ';vertical-align:middle;margin-right:6px;"></span>' + n + '</span>'; };
@@ -891,38 +1039,46 @@
                 page1.innerHTML = page1Parts.join('');
                 wrapper.appendChild(page1);
 
-                var page2Parts = [];
-                page2Parts.push('<div style="margin-bottom:18px;font-size:15px;">各指标评价等级分布（表1/表2）</div><img src="' + chartUrls.pieUrl + '" style="' + imgStyleLevel + '" />');
-                page2Parts.push('<div style="margin-bottom:18px;font-size:15px;">各生长指标评价等级</div><img src="' + chartUrls.barUrl + '" style="' + imgStyleLevel + '" />');
+                var chartPageStyle = 'width:800px;background:#fff;page-break-before:always;padding:24px 0 40px 0;';
+                var chartBlocks = [];
+                chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">各指标评价等级分布（表1/表2）</div><img src="' + chartUrls.pieUrl + '" style="' + imgStyleLevel + '" />');
+                chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">各生长指标评价等级</div><img src="' + chartUrls.barUrl + '" style="' + imgStyleLevel + '" />');
+                if (chartUrls.nutritionPieUrl) chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">儿童营养状况分布（表3 标准差法）</div><img src="' + chartUrls.nutritionPieUrl + '" style="' + imgStyleLevel + '" />');
+                if (chartUrls.nutritionBarUrl) chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">各生长指标营养状况（表3 标准差法）</div><img src="' + chartUrls.nutritionBarUrl + '" style="' + imgStyleLevel + '" />');
                 if (chartUrls.scatterUrl) {
                     var scLeg = '<div style="margin-top:10px;font-size:13px;color:#555;">' + leg('#5b9bd5', '男') + leg('#70ad47', '女') + leg('#e74c3c', (childName || '当前儿童') + '（当前报告）') + '</div>';
-                    page2Parts.push('<div style="margin-bottom:18px;font-size:15px;">身高与体重关系散点图</div><img src="' + chartUrls.scatterUrl + '" style="width:100%;max-width:780px;height:320px;object-fit:contain;display:block;margin:0 auto 16px auto;" />' + scLeg);
+                    chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">身高与体重关系散点图</div><img src="' + chartUrls.scatterUrl + '" style="' + imgStyleScatter + '" />' + scLeg);
                 }
-                var page2 = document.createElement('div');
-                page2.className = 'pdf-page-break';
-                page2.style.width = '800px';
-                page2.style.background = '#fff';
-                page2.style.pageBreakBefore = 'always';
-                page2.style.paddingBottom = '40px';
-                page2.style.paddingTop = '8px';
-                page2.innerHTML = page2Parts.join('');
-                wrapper.appendChild(page2);
+                var chartPageDivs = [];
+                for (var i = 0; i < chartBlocks.length; i += 2) {
+                    var pageHtml = chartBlocks[i] + (chartBlocks[i + 1] ? chartBlocks[i + 1] : '');
+                    var div = document.createElement('div');
+                    div.className = 'pdf-page-break';
+                    div.style.cssText = chartPageStyle;
+                    div.innerHTML = pageHtml;
+                    wrapper.appendChild(div);
+                    chartPageDivs.push(div);
+                }
 
+                var pageTablesStyle = 'width:800px;background:#fff;page-break-before:always;padding:24px 0 40px 0;line-height:1.7;font-size:14px;';
                 var page2b = document.createElement('div');
                 page2b.className = 'pdf-page-break';
-                page2b.style.width = '800px';
-                page2b.style.background = '#fff';
-                page2b.style.pageBreakBefore = 'always';
-                page2b.style.paddingTop = '24px';
-                page2b.style.paddingBottom = '40px';
-                page2b.style.lineHeight = '1.7';
-                page2b.style.fontSize = '14px';
-                if (tablesHtml) {
-                    page2b.innerHTML = '<div style="padding:0 0 24px 0;">' + tablesHtml + '</div>';
+                page2b.style.cssText = pageTablesStyle;
+                if (assessmentHtml) {
+                    page2b.innerHTML = '<div style="padding:0 0 24px 0;">' + assessmentHtml + '</div>';
                 } else {
                     page2b.innerHTML = '<div style="padding:24px;">（无综合评估数据）</div>';
                 }
                 wrapper.appendChild(page2b);
+
+                var page2c = null;
+                if (refTablesHtml) {
+                    page2c = document.createElement('div');
+                    page2c.className = 'pdf-page-break';
+                    page2c.style.cssText = pageTablesStyle;
+                    page2c.innerHTML = '<div style="padding:0 0 24px 0;">' + refTablesHtml + '</div>';
+                    wrapper.appendChild(page2c);
+                }
 
                 var page3 = document.createElement('div');
                 page3.className = 'pdf-page-break';
@@ -952,35 +1108,32 @@
                     }
                     var JsPDF = window.jspdf && window.jspdf.jsPDF ? window.jspdf.jsPDF : (window.jspdf || window.JsPDF);
                     if (!JsPDF) { html2pdf().set({ margin: 12, filename: filename }).from(wrapper).save().then(removeWrapper).catch(removeWrapper); return; }
-                    html2canvas(page0, canvasOpt).then(function(c0) {
-                        html2canvas(page1, canvasOpt).then(function(c1) {
-                            html2canvas(page2, canvasOpt).then(function(c2) {
-                                html2canvas(page2b, canvasOpt).then(function(c2b) {
-                                    html2canvas(page3, canvasOpt).then(function(c3) {
-                                        var pdf = new JsPDF('p', 'mm', 'a4');
-                                        var w = pdf.internal.pageSize.getWidth();
-                                        var h = pdf.internal.pageSize.getHeight();
-                                        var imgW = w;
-                                        function addPageCanvas(canvas) {
-                                            var imgH = (canvas.height * w) / canvas.width;
-                                            pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, imgW, Math.min(imgH, h));
-                                        }
-                                        addPageCanvas(c0);
-                                        pdf.addPage();
-                                        addPageCanvas(c1);
-                                        pdf.addPage();
-                                        addPageCanvas(c2);
-                                        pdf.addPage();
-                                        addPageCanvas(c2b);
-                                        pdf.addPage();
-                                        addPageCanvas(c3);
-                                        pdf.save(filename);
-                                        removeWrapper();
-                                    }).catch(function() { removeWrapper(); });
-                                }).catch(function() { removeWrapper(); });
-                            }).catch(function() { removeWrapper(); });
+                    function renderAll() {
+                        var allDivs = [page0, page1].concat(chartPageDivs).concat([page2b]).concat(page2c ? [page2c] : []).concat([page3]);
+                        var p = Promise.resolve([]);
+                        allDivs.forEach(function(div) {
+                            p = p.then(function(cs) {
+                                return html2canvas(div, canvasOpt).then(function(c) { return cs.concat([c]); });
+                            });
+                        });
+                        p.then(function(canvases) {
+                            var pdf = new JsPDF('p', 'mm', 'a4');
+                            var w = pdf.internal.pageSize.getWidth();
+                            var h = pdf.internal.pageSize.getHeight();
+                            var imgW = w;
+                            function addPageCanvas(canvas) {
+                                var imgH = (canvas.height * w) / canvas.width;
+                                pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, imgW, Math.min(imgH, h));
+                            }
+                            canvases.forEach(function(c, i) {
+                                if (i > 0) pdf.addPage();
+                                addPageCanvas(c);
+                            });
+                            pdf.save(filename);
+                            removeWrapper();
                         }).catch(function() { removeWrapper(); });
-                    }).catch(function() { removeWrapper(); });
+                    }
+                    renderAll();
                 }
                 var imgs = wrapper.querySelectorAll('img');
                 var loaded = 0;

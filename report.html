@@ -1305,10 +1305,14 @@
                 wrapper.appendChild(page1);
 
                 var chartPageStyle = 'width:800px;background:#fff;page-break-before:always;padding:24px 0 40px 0;';
+                var levelBarLegendEl = document.getElementById('levelBarLegend');
+                var nutritionBarLegendEl = document.getElementById('nutritionBarLegend');
+                var levelBarLegendHtml = levelBarLegendEl && levelBarLegendEl.innerHTML ? '<div style="margin-top:10px;font-size:13px;color:#555;display:flex;flex-wrap:wrap;gap:16px 24px;justify-content:center;align-items:center;">' + levelBarLegendEl.innerHTML + '</div>' : '';
+                var nutritionBarLegendHtml = nutritionBarLegendEl && nutritionBarLegendEl.innerHTML ? '<div style="margin-top:10px;font-size:13px;color:#555;display:flex;flex-wrap:wrap;gap:16px 24px;justify-content:center;align-items:center;">' + nutritionBarLegendEl.innerHTML + '</div>' : '';
                 var chartBlocks = [];
                 chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">儿童生长水平评价分布（表1/表2）</div><img src="' + chartUrls.pieUrl + '" style="' + imgStyleLevel + '" />');
-                chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">儿童生长水平评价</div><img src="' + chartUrls.barUrl + '" style="' + imgStyleLevel + '" />');
-                if (chartUrls.nutritionBarUrl) chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">营养状况对比（表3 标准差法）</div><img src="' + chartUrls.nutritionBarUrl + '" style="' + imgStyleLevel + '" />');
+                chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">儿童生长水平评价</div><img src="' + chartUrls.barUrl + '" style="' + imgStyleLevel + '" />' + levelBarLegendHtml);
+                if (chartUrls.nutritionBarUrl) chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">营养状况对比（表3 标准差法）</div><img src="' + chartUrls.nutritionBarUrl + '" style="' + imgStyleLevel + '" />' + nutritionBarLegendHtml);
                 if (chartUrls.scatterUrl) {
                     var scLeg = '<div style="margin-top:10px;font-size:13px;color:#555;">' + leg('#5b9bd5', '男') + leg('#70ad47', '女') + leg('#e74c3c', (childName || '当前儿童') + '（当前报告）') + '</div>';
                     chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">身高与体重关系散点图</div><img src="' + chartUrls.scatterUrl + '" style="' + imgStyleScatter + '" />' + scLeg);

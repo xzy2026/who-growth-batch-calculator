@@ -959,7 +959,7 @@
                             var data2 = levelBarCategories.map(function(_, i) { return { value: vals2[i], itemStyle: { color: (lvl2[i] && levelColors[lvl2[i]]) ? levelColors[lvl2[i]] : '#b0b0b0' } }; });
                             var dateCurr = d2.checkDate || '—', datePrev = d1.checkDate || '—';
                             levelBarChart.setOption({
-                                title: { text: '左侧柱=本次（' + dateCurr + '）、右侧柱=上次（' + datePrev + '）', left: 'center', top: 4, textStyle: { fontSize: 11, color: '#888' } },
+                                title: { text: '左侧柱=本次（' + dateCurr + '）、右侧柱=上次（' + datePrev + '）', left: 'center', bottom: 4, top: 'auto', textStyle: { fontSize: 11, color: '#888' } },
                                 tooltip: { trigger: 'axis', formatter: function(params) {
                                     var i = params[0].dataIndex;
                                     return (levelBarCategories[i] || '') + '<br/>本次：' + (lvl2[i] || '—') + '<br/>上次：' + (lvl1[i] || '—');
@@ -1043,7 +1043,7 @@
                                 { name: '上次', type: 'bar', data: zPrevData, barWidth: '28%', label: { show: true, position: 'top', formatter: function(p) { var v = p.value; var val = (v && typeof v === 'object' && 'value' in v) ? v.value : v; var idx = p.dataIndex; if (val == null) return ''; return val + '\n' + (resPrev[idx] || '—'); } } }
                             ];
                             nutritionBarChart.setOption({
-                                title: { text: '左侧柱=本次（' + (d2.checkDate || '—') + '）、右侧柱=上次（' + (d1.checkDate || '—') + '）', left: 'center', top: 4, bottom: 'auto', textStyle: { fontSize: 11, color: '#666' } },
+                                title: { text: '左侧柱=本次（' + (d2.checkDate || '—') + '）、右侧柱=上次（' + (d1.checkDate || '—') + '）', left: 'center', bottom: 4, top: 'auto', textStyle: { fontSize: 11, color: '#666' } },
                                 tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' },
                                     formatter: function(params) {
                                         if (!params || params.length === 0) return '';

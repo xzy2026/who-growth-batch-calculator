@@ -542,8 +542,15 @@
 
                     var page3 = document.createElement('div');
                     page3.style.cssText = 'width:800px;background:#fff;page-break-before:always;';
-                    var st = (document.getElementById('suggestionBox').innerText || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-                    page3.innerHTML = '<div style="margin-bottom:12px;font-size:16px;">健康建议</div><div style="background:#e7f3ff;border-left:4px solid #366092;padding:16px 20px;font-size:14px;line-height:1.8;">' + st + '</div>';
+                    var panelSuggestion = document.getElementById('panelSuggestion');
+                    var suggestionChartBox = panelSuggestion ? panelSuggestion.querySelector('.chart-box') : null;
+                    var suggestionFullHtml = suggestionChartBox ? suggestionChartBox.innerHTML : '';
+                    if (suggestionFullHtml) {
+                        page3.innerHTML = '<div style="padding:0 24px 24px 24px;font-size:14px;line-height:1.7;">' + suggestionFullHtml + '</div>';
+                    } else {
+                        var st = (document.getElementById('suggestionBox').innerText || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                        page3.innerHTML = '<div style="margin-bottom:12px;font-size:16px;">健康建议</div><div style="background:#e7f3ff;border-left:4px solid #366092;padding:16px 20px;font-size:14px;line-height:1.8;">' + st + '</div>';
+                    }
                     wrapper.appendChild(page3);
 
                     document.body.appendChild(wrapper);

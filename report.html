@@ -1509,7 +1509,8 @@
                     if (responseEl) { responseEl.textContent = '正在请求AI，请稍候…'; responseEl.classList.add('show'); responseEl.classList.remove('ai-qa-error'); }
                     var body = JSON.stringify({ question: question, context: getReportContext() });
                     var url = AI_PROXY_URL;
-                    fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body })
+                    var headers = { 'Content-Type': 'application/json', 'Date': new Date().toUTCString() };
+                    fetch(url, { method: 'POST', headers: headers, body: body })
                         .then(function(res) {
                             return res.text().then(function(t) {
                                 var data = null;

@@ -102,7 +102,7 @@
                     </div>
                     <div class="chart-box">
                         <div class="chart-title">儿童营养状况分布（表3 标准差评价方法）</div>
-                        <p class="chart-subtitle">（基于年龄别体重、身高别体重、年龄别BMI）</p>
+                        <p class="chart-subtitle">（基于年龄别体重、年龄别身高、身高别体重、年龄别BMI）</p>
                         <div id="nutritionPieChart"></div>
                     </div>
                     <div class="chart-box">
@@ -248,10 +248,10 @@
                 var indIds = ['ageWeight', 'ageHeight', 'heightWeight', 'ageBmi'];
                 var levelOrder = ['上', '中上', '中', '中下', '下', '未知'];
                 var levelColors = { '上': '#6f42c1', '中上': '#17a2b8', '中': '#28a745', '中下': '#e69500', '下': '#dc3545', '未知': '#9e9e9e' };
-                var nutritionOrder = ['重度低体重', '低体重', '重度消瘦', '消瘦', '正常', '超重', '肥胖', '重度肥胖'];
-                var nutritionColors = { '重度低体重': '#721c24', '低体重': '#dc3545', '重度消瘦': '#a94442', '消瘦': '#e69500', '正常': '#28a745', '超重': '#17a2b8', '肥胖': '#6f42c1', '重度肥胖': '#4a148c' };
-                var nutritionIndIds = ['ageWeight', 'heightWeight', 'ageBmi'];
-                var nutritionIndNames = ['年龄别体重', '身高别体重', '年龄别BMI'];
+                var nutritionOrder = ['重度低体重', '低体重', '重度生长迟缓', '生长迟缓', '重度消瘦', '消瘦', '—', '超重', '肥胖', '重度肥胖'];
+                var nutritionColors = { '重度低体重': '#721c24', '低体重': '#dc3545', '重度生长迟缓': '#4472C4', '生长迟缓': '#5a8fd4', '重度消瘦': '#a94442', '消瘦': '#e69500', '—': '#28a745', '超重': '#17a2b8', '肥胖': '#6f42c1', '重度肥胖': '#4a148c' };
+                var nutritionIndIds = ['ageWeight', 'ageHeight', 'heightWeight', 'ageBmi'];
+                var nutritionIndNames = ['年龄别体重', '年龄别身高', '身高别体重', '年龄别BMI'];
 
                 // 性别统计
                 var genderMale = 0, genderFemale = 0;
@@ -260,8 +260,8 @@
                 // 各指标各等级人数 [indicatorIndex][levelIndex]
                 var indLevelCounts = [[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]];
                 // 表3 营养状况：全班合计及各指标分布
-                var nutritionPieCounts = { '重度低体重': 0, '低体重': 0, '重度消瘦': 0, '消瘦': 0, '正常': 0, '超重': 0, '肥胖': 0, '重度肥胖': 0 };
-                var nutritionIndCounts = [[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]];
+                var nutritionPieCounts = { '重度低体重': 0, '低体重': 0, '重度生长迟缓': 0, '生长迟缓': 0, '重度消瘦': 0, '消瘦': 0, '—': 0, '超重': 0, '肥胖': 0, '重度肥胖': 0 };
+                var nutritionIndCounts = [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0]];
                 var sumZ = [0,0,0,0], countZ = [0,0,0,0];
                 var counts = { good: 0, pass: 0, fail: 0 };
                 var scatterMale = [], scatterFemale = [];
@@ -295,10 +295,10 @@
                         var nutIdx = nutritionIndIds.indexOf(ind.id);
                         if (nutIdx >= 0) {
                             var res = (ind.result || '').trim();
-                            var nut = (res === '' || res === '-') ? '正常' : res;
-                            if (nutritionOrder.indexOf(nut) < 0) nut = '正常';
+                            var nut = (res === '' || res === '-') ? '—' : res;
+                            if (nutritionOrder.indexOf(nut) < 0) nut = '—';
                             var nutCol = nutritionOrder.indexOf(nut);
-                            if (nutCol < 0) nutCol = 4;
+                            if (nutCol < 0) nutCol = 6;
                             nutritionPieCounts[nut] = (nutritionPieCounts[nut] || 0) + 1;
                             nutritionIndCounts[nutIdx][nutCol]++;
                         }
@@ -351,7 +351,7 @@
                     tooltip: { trigger: 'axis' },
                     legend: { show: true, orient: 'horizontal', bottom: 6, left: 'center', data: levelBarLegend },
                     grid: { left: '14%', right: '10%', top: '12%', bottom: '22%', containLabel: true },
-                    xAxis: { type: 'category', data: indNames, axisLabel: { interval: 0, rotate: 20, fontSize: 12, margin: 10 } },
+                    xAxis: { type: 'category', data: indNames, axisLabel: { interval: 0, rotate: 0, fontSize: 12, margin: 10 } },
                     yAxis: { type: 'value', name: '人数', min: 0, axisLabel: { fontSize: 12 }, nameGap: 36 },
                     series: levelBarSeries
                 });
@@ -377,7 +377,7 @@
                     tooltip: { trigger: 'axis' },
                     legend: { show: true, orient: 'horizontal', bottom: 6, left: 'center', data: nutritionBarLegend },
                     grid: { left: '14%', right: '10%', top: '12%', bottom: '22%', containLabel: true },
-                    xAxis: { type: 'category', data: nutritionIndNames, axisLabel: { interval: 0, rotate: 20, fontSize: 12, margin: 10 } },
+                    xAxis: { type: 'category', data: nutritionIndNames, axisLabel: { interval: 0, rotate: 0, fontSize: 12, margin: 10 } },
                     yAxis: { type: 'value', name: '人数', min: 0, axisLabel: { fontSize: 12 }, nameGap: 36 },
                     series: nutritionBarSeries
                 });

@@ -86,6 +86,26 @@
         .checklist-item input { width: 20px; height: 20px; cursor: pointer; }
         .checklist-done { color: #28a745; font-size: 14px; margin-top: 12px; }
         .warm-msg { text-align: center; padding: 16px; font-size: 14px; color: #666; font-style: italic; margin-top: 24px; background: #fafbfc; border-radius: 8px; }
+        .ai-qa-entry { margin-top: 20px; padding: 16px 20px; background: linear-gradient(135deg, #e8f4fd 0%, #f0f7ff 100%); border: 1px solid #b8d4ee; border-radius: 12px; }
+        .ai-qa-entry .ai-qa-title { font-size: 15px; color: #333; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .ai-qa-entry .ai-qa-desc { font-size: 13px; color: #666; margin-bottom: 12px; }
+        .ai-qa-entry .ai-qa-btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; background: #366092; color: #fff; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+        .ai-qa-entry .ai-qa-btn:hover { background: #4a7ba7; }
+        .ai-qa-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 9998; align-items: center; justify-content: center; }
+        .ai-qa-modal-overlay.show { display: flex; }
+        .ai-qa-modal { width: 90%; max-width: 520px; max-height: 85vh; background: #fff; border-radius: 16px; box-shadow: 0 12px 40px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden; }
+        .ai-qa-modal .modal-head { padding: 16px 20px; border-bottom: 1px solid #eee; font-size: 16px; font-weight: 600; color: #333; display: flex; align-items: center; justify-content: space-between; }
+        .ai-qa-modal .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: #666; padding: 0 4px; }
+        .ai-qa-modal .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+        .ai-qa-modal .modal-body textarea { width: 100%; min-height: 100px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; resize: vertical; box-sizing: border-box; }
+        .ai-qa-modal .modal-body .ai-qa-response { margin-top: 16px; padding: 16px; background: #f8fafc; border-radius: 8px; font-size: 14px; line-height: 1.7; white-space: pre-wrap; display: none; }
+        .ai-qa-modal .modal-body .ai-qa-response.show { display: block; }
+        .ai-qa-modal .modal-body .ai-qa-error { color: #c62828; }
+        .ai-qa-modal .modal-footer { padding: 12px 20px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 10px; }
+        .ai-qa-modal .modal-footer button { padding: 10px 20px; border-radius: 8px; font-size: 14px; cursor: pointer; }
+        .ai-qa-modal .modal-footer .btn-send { background: #366092; color: #fff; border: none; }
+        .ai-qa-modal .modal-footer .btn-send:hover { background: #4a7ba7; }
+        .ai-qa-modal .modal-footer .btn-send:disabled { opacity: 0.6; cursor: not-allowed; }
         .back-row { text-align: center; margin-top: 24px; }
         .back-btn { display: inline-block; padding: 12px 28px; background: #366092; color: #fff; text-decoration: none; border-radius: 8px; font-size: 14px; transition: all 0.3s ease; min-height: 44px; line-height: 20px; }
         .back-btn:hover { background: #4a7ba7; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(54,96,146,0.35); }
@@ -198,6 +218,11 @@
                             <p class="checklist-done" id="checklistDone" style="display:none;">✅ 完成3项以上，给孩子一个拥抱吧！</p>
                         </div>
                         <p class="warm-msg">🌱 每个孩子都有自己的成长节奏，您的用心陪伴，就是最好的营养剂。</p>
+                        <div class="ai-qa-entry">
+                            <div class="ai-qa-title"><i class="fa-solid fa-robot"></i> AI营养师问答</div>
+                            <div class="ai-qa-desc">对报告有疑问？可向AI营养师提问，获取个性化建议（仅供参考，不作为诊断依据）。</div>
+                            <button type="button" class="ai-qa-btn" id="aiQaEntryBtn"><i class="fa-solid fa-comments"></i> 向AI提问</button>
+                        </div>
                     </div>
                 </div>
                 <div class="back-row">
@@ -209,10 +234,23 @@
         <div class="footer">
             <p>本报告参照 WS/T 423-2022，数据仅供参考，不作为诊断依据。如有疑问请咨询医疗机构。</p>
         </div>
+        <div class="ai-qa-modal-overlay" id="aiQaModalOverlay">
+            <div class="ai-qa-modal">
+                <div class="modal-head">💬 AI营养师问答 <button type="button" class="modal-close" id="aiQaModalClose" aria-label="关闭">&times;</button></div>
+                <div class="modal-body">
+                    <textarea id="aiQaInput" placeholder="请输入您的问题，例如：孩子偏瘦该怎么加餐？"></textarea>
+                    <div class="ai-qa-response" id="aiQaResponse"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-send" id="aiQaSendBtn">发送</button>
+                </div>
+            </div>
+        </div>
     </div>
     <script>
         (function() {
             var STORAGE_KEY = 'childGrowthReport';
+            var AI_PROXY_URL = 'https://nutrition-proxy-xyz.2743916370.workers.dev';
             var percentileToZMap = { 'P3': -1.88, 'P10': -1.28, 'P25': -0.67, 'P50': 0, 'P75': 0.67, 'P90': 1.28, 'P97': 1.88 };
 
             function isNotApplicable(valueStr) {
@@ -1434,6 +1472,57 @@
             var downloadBtn = document.getElementById('downloadReportBtn');
             if (downloadBtn) downloadBtn.addEventListener('click', downloadReport);
             window.addEventListener('resize', resizeCharts);
+
+            (function initAiQa() {
+                var overlay = document.getElementById('aiQaModalOverlay');
+                var entryBtn = document.getElementById('aiQaEntryBtn');
+                var closeBtn = document.getElementById('aiQaModalClose');
+                var inputEl = document.getElementById('aiQaInput');
+                var responseEl = document.getElementById('aiQaResponse');
+                var sendBtn = document.getElementById('aiQaSendBtn');
+                if (!overlay || !entryBtn || !sendBtn) return;
+                entryBtn.addEventListener('click', function() {
+                    if (responseEl) { responseEl.classList.remove('show'); responseEl.className = 'ai-qa-response'; responseEl.textContent = ''; }
+                    if (inputEl) inputEl.value = '';
+                    overlay.classList.add('show');
+                    if (inputEl) inputEl.focus();
+                });
+                if (closeBtn) closeBtn.addEventListener('click', function() { overlay.classList.remove('show'); });
+                overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.classList.remove('show'); });
+                function getReportContext() {
+                    try {
+                        var raw = localStorage.getItem(STORAGE_KEY);
+                        if (!raw) return '';
+                        var data = JSON.parse(raw);
+                        var name = (data.name || '').trim() || '儿童';
+                        var birth = (data.birthDate || '').trim();
+                        var check = (data.checkDate || '').trim();
+                        var tier = (data.tier && data.tier.level) ? data.tier.level : '';
+                        return '【报告简要】姓名：' + name + (birth ? '，出生日期：' + birth : '') + (check ? '，测查日期：' + check : '') + (tier ? '，整体等级：' + tier : '') + '。';
+                    } catch (e) { return ''; }
+                }
+                sendBtn.addEventListener('click', function() {
+                    var question = (inputEl && inputEl.value || '').trim();
+                    if (!question) { if (responseEl) { responseEl.textContent = '请输入您的问题。'; responseEl.classList.add('show', 'ai-qa-error'); } return; }
+                    sendBtn.disabled = true;
+                    if (responseEl) { responseEl.textContent = '正在请求AI，请稍候…'; responseEl.classList.add('show'); responseEl.classList.remove('ai-qa-error'); }
+                    var body = JSON.stringify({ question: question, context: getReportContext() });
+                    var url = AI_PROXY_URL + '?target=chat';
+                    fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body })
+                        .then(function(res) {
+                            if (!res.ok) throw new Error('请求失败：' + res.status + (res.status === 400 ? '（请确认代理已配置 target）' : ''));
+                            return res.json();
+                        })
+                        .then(function(data) {
+                            var text = (data && (data.answer || data.reply || data.text || data.content || (data.result && data.result.output && data.result.output.text))) || (typeof data === 'string' ? data : JSON.stringify(data));
+                            if (responseEl) { responseEl.textContent = text || '未获取到回复内容。'; responseEl.classList.add('show'); responseEl.classList.remove('ai-qa-error'); }
+                        })
+                        .catch(function(err) {
+                            if (responseEl) { responseEl.textContent = err.message || '网络或服务异常，请稍后重试。'; responseEl.classList.add('show', 'ai-qa-error'); }
+                        })
+                        .finally(function() { sendBtn.disabled = false; });
+                });
+            })();
         })();
     </script>
 </body>

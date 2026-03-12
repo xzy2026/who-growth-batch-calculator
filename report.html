@@ -1515,7 +1515,8 @@
                                 var data = null;
                                 try { data = t ? JSON.parse(t) : null; } catch (e) {}
                                 if (!res.ok) {
-                                    var msg = (data && (data.error || data.message)) || ('HTTP ' + res.status);
+                                    var msg = (data && (data.error || data.message || data.detail || data.msg)) || ('HTTP ' + res.status);
+                                    if (t && !data && typeof t === 'string' && t.length < 400) msg = msg + ' ' + t.slice(0, 300);
                                     throw new Error(msg);
                                 }
                                 return data !== null ? data : {};

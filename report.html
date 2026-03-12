@@ -250,7 +250,8 @@
     <script>
         (function() {
             var STORAGE_KEY = 'childGrowthReport';
-            var AI_PROXY_URL = 'https://nutrition-proxy-xyz.2743916370.workers.dev';
+            // 代理地址：阿里云函数计算 HTTP 触发器公网地址（匿名访问时浏览器可直接调用）
+            var AI_PROXY_URL = 'https://nutrition-chat-tbeopoofjz.cn-hangzhou.fcapp.run';
             var percentileToZMap = { 'P3': -1.88, 'P10': -1.28, 'P25': -0.67, 'P50': 0, 'P75': 0.67, 'P90': 1.28, 'P97': 1.88 };
 
             function isNotApplicable(valueStr) {
@@ -1510,15 +1511,24 @@
                     var url = AI_PROXY_URL + '?target=chat';
                     fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body })
                         .then(function(res) {
-                            if (!res.ok) throw new Error('请求失败：' + res.status + (res.status === 400 ? '（请确认代理已配置 target）' : ''));
-                            return res.json();
+                            return res.text().then(function(t) {
+                                var data = null;
+                                try { data = t ? JSON.parse(t) : null; } catch (e) {}
+                                if (!res.ok) {
+                                    var msg = (data && (data.error || data.message)) || ('HTTP ' + res.status);
+                                    throw new Error(msg);
+                                }
+                                return data !== null ? data : {};
+                            });
                         })
                         .then(function(data) {
                             var text = (data && (data.answer || data.reply || data.text || data.content || (data.result && data.result.output && data.result.output.text))) || (typeof data === 'string' ? data : JSON.stringify(data));
                             if (responseEl) { responseEl.textContent = text || '未获取到回复内容。'; responseEl.classList.add('show'); responseEl.classList.remove('ai-qa-error'); }
                         })
                         .catch(function(err) {
-                            if (responseEl) { responseEl.textContent = err.message || '网络或服务异常，请稍后重试。'; responseEl.classList.add('show', 'ai-qa-error'); }
+                            var msg = err.message || '网络或服务异常，请稍后重试。';
+                            if (msg === 'Failed to fetch') msg = '无法连接到代理（请确认：1. 从 GitHub Pages 打开本页 2. Worker 已部署 3. 网络正常）';
+                            if (responseEl) { responseEl.textContent = msg; responseEl.classList.add('show', 'ai-qa-error'); }
                         })
                         .finally(function() { sendBtn.disabled = false; });
                 });

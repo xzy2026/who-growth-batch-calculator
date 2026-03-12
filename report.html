@@ -91,6 +91,15 @@
         .back-btn:hover { background: #4a7ba7; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(54,96,146,0.35); }
         .no-data { text-align: center; padding: 40px 20px; color: #999; }
         .footer { padding: 16px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #eee; }
+        .compare-select-wrap { margin-bottom: 20px; }
+        .compare-select-wrap label { margin-right: 10px; font-size: 14px; color: #666; }
+        .compare-select-wrap select { padding: 8px 12px; font-size: 14px; border: 1px solid #ddd; border-radius: 6px; min-width: 200px; }
+        .compare-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 20px; }
+        .compare-table th, .compare-table td { border: 1px solid #ddd; padding: 10px 12px; text-align: center; }
+        .compare-table th { background: #366092; color: #fff; }
+        .compare-table th:first-child { text-align: left; width: 140px; }
+        .compare-table .change-up { color: #28a745; }
+        .compare-table .change-down { color: #dc3545; }
         @media (max-width: 480px) { .container { border-radius: 0; } .content { padding: 16px; } .chart-box, .advice-card { padding: 15px; } .back-btn { padding: 12px 20px; } }
     </style>
 </head>
@@ -106,6 +115,10 @@
         <div class="content" id="reportContent">
             <div class="no-data" id="noData">暂无报告数据，请从计算器页面点击「生成报告」。</div>
             <div id="reportBody" style="display: none;">
+                <div id="compareChildWrap" class="compare-select-wrap" style="display:none;margin-bottom:16px;">
+                    <label>选择儿童：</label>
+                    <select id="compareChildSelect"></select>
+                </div>
                 <div class="report-title" id="reportTitle">—— 生长评价报告 ——</div>
                 <div class="basic-info" id="basicInfo"></div>
                 <div class="tabs">
@@ -117,47 +130,30 @@
                         <div class="chart-title">身高对比</div>
                         <div id="heightCompareChart" class="compare-chart"></div>
                         <p style="margin-top:8px;font-size:12px;color:#666;">身高 (cm)</p>
-                        <div class="chart-legend">
-                            <span class="legend-item"><span class="legend-dot" style="background:#5b9bd5;"></span> 实际身高</span>
-                            <span class="legend-item"><span class="legend-dot" style="background:#9bc4e2;"></span> 标准身高</span>
-                            <span class="legend-item"><span class="legend-dot" style="background:#8fb4d4;"></span> 全班同性别平均身高</span>
-                        </div>
                     </div>
                     <div class="chart-box">
                         <div class="chart-title">体重对比</div>
                         <div id="weightCompareChart" class="compare-chart"></div>
                         <p style="margin-top:8px;font-size:12px;color:#666;">体重 (kg)</p>
-                        <div class="chart-legend">
-                            <span class="legend-item"><span class="legend-dot" style="background:#ed7d31;"></span> 实际体重</span>
-                            <span class="legend-item"><span class="legend-dot" style="background:#f5b07a;"></span> 标准体重</span>
-                            <span class="legend-item"><span class="legend-dot" style="background:#d4a574;"></span> 全班同性别平均体重</span>
-                        </div>
                     </div>
                     <div class="chart-box">
                         <div class="chart-title">BMI 对比</div>
                         <div id="bmiCompareChart" class="compare-chart"></div>
                         <p style="margin-top:8px;font-size:12px;color:#666;">BMI (kg/m²)</p>
-                        <div class="chart-legend">
-                            <span class="legend-item"><span class="legend-dot" style="background:#70ad47;"></span> 实际BMI</span>
-                            <span class="legend-item"><span class="legend-dot" style="background:#a8d08d;"></span> 标准BMI</span>
-                            <span class="legend-item"><span class="legend-dot" style="background:#8fbc8f;"></span> 全班同性别平均BMI</span>
-                        </div>
                     </div>
                     <div class="chart-box">
-                        <div class="chart-title">各指标评价等级分布（表1/表2 上、中上、中、中下、下）</div>
+                        <div class="chart-title">儿童生长水平评价分布（表1/表2 上、中上、中、中下、下）</div>
                         <div id="levelPieChart" class="level-pie-chart"></div>
                     </div>
                     <div class="chart-box">
-                        <div class="chart-title">各生长指标评价等级（表1/表2）</div>
+                        <div class="chart-title">儿童生长水平评价（表1/表2）</div>
                         <div id="levelBarChart" class="level-bar-chart"></div>
+                        <div id="levelBarLegend" class="chart-legend" style="margin-top:10px;justify-content:center;"></div>
                     </div>
                     <div class="chart-box">
-                        <div class="chart-title">儿童营养状况分布（表3 标准差法）</div>
-                        <div id="nutritionPieChartPersonal" class="level-pie-chart"></div>
-                    </div>
-                    <div class="chart-box">
-                        <div class="chart-title">各生长指标营养状况（表3 标准差法）</div>
+                        <div class="chart-title">营养状况对比（表3 标准差法）</div>
                         <div id="nutritionBarChartPersonal" class="level-bar-chart"></div>
+                        <div id="nutritionBarLegend" class="chart-legend" style="margin-top:10px;justify-content:center;"></div>
                     </div>
                     <div class="chart-box" id="scatterBox" style="display:none;">
                         <div class="chart-title">身高与体重关系散点图</div>
@@ -165,7 +161,7 @@
                         <div class="chart-legend" id="scatterLegend"></div>
                     </div>
                     <div class="chart-box" id="overviewTablesBlock">
-                        <div class="chart-title">综合评估</div>
+                        <div class="chart-title" id="comprehensiveTableTitle">综合评估</div>
                         <table class="eval-table" id="comprehensiveTable"></table>
                         <div class="collapse-toggle" id="toggleTable1">表1 儿童生长水平的百分位数评价方法</div>
                         <div class="collapse-content" id="collapseTable1">
@@ -179,6 +175,13 @@
                         <div class="collapse-content" id="collapseTable3">
                             <table class="eval-table" id="table3StdNutrition"></table>
                         </div>
+                    </div>
+                    <div class="chart-box" id="compareTableBox" style="display:none;">
+                        <div class="chart-title">两次测查对比</div>
+                        <table class="compare-table" id="compareTable">
+                            <thead><tr><th>指标</th><th>本次</th><th>上次</th><th>变化</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
                 </div>
                 <div id="panelSuggestion" class="panel">
@@ -317,6 +320,9 @@
 
             function renderReport(raw) {
                 var data = typeof raw === 'string' ? JSON.parse(raw) : raw;
+                var d1 = data.comparisonFirst || null;
+                var d2 = data;
+                var isComparison = !!d1;
                 var mode = data.mode || 'percentile';
                 var allIndicators = data.indicators || [];
                 var indicators = allIndicators.filter(function(ind) { return ind.id !== 'ageHead' && ind.name !== '年龄别头围'; });
@@ -332,17 +338,125 @@
                 var tier = getTierLevel(data);
                 document.getElementById('noData').style.display = 'none';
                 document.getElementById('reportBody').style.display = 'block';
-                document.getElementById('reportTitle').textContent = (data.name ? data.name + ' · ' : '') + '生长评价报告';
+                document.getElementById('reportTitle').textContent = (data.name ? data.name + ' · ' : '') + (isComparison ? '两次测查对比报告' : '生长评价报告');
                 var basicInfoEl = document.getElementById('basicInfo');
                 if (basicInfoEl) {
-                    basicInfoEl.innerHTML = '<div class="item"><span class="label">姓名</span><span class="value">' + (data.name || '—') + '</span></div>' +
+                    var baseItems = '<div class="item"><span class="label">姓名</span><span class="value">' + (data.name || '—') + '</span></div>' +
                         '<div class="item"><span class="label">性别</span><span class="value">' + (data.gender || '—') + '</span></div>' +
-                        '<div class="item"><span class="label">出生日期</span><span class="value">' + (data.birthDate || '—') + '</span></div>' +
-                        '<div class="item"><span class="label">测查日期</span><span class="value">' + (data.checkDate || '—') + '</span></div>' +
-                        '<div class="item"><span class="label">实足年龄</span><span class="value">' + (data.ageText || '—') + '</span></div>' +
-                        '<div class="item"><span class="label">身高</span><span class="value">' + (data.height != null ? data.height : '—') + ' cm</span></div>' +
+                        '<div class="item"><span class="label">出生日期</span><span class="value">' + (data.birthDate || '—') + '</span></div>';
+                    if (isComparison && d1) {
+                        baseItems += '<div class="item"><span class="label">本次测查</span><span class="value">' + (data.checkDate || '—') + '（' + (data.ageText || '—') + '）</span></div>';
+                        baseItems += '<div class="item"><span class="label">上次测查</span><span class="value">' + (d1.checkDate || '—') + '（' + (d1.ageText || '—') + '）</span></div>';
+                    } else {
+                        baseItems += '<div class="item"><span class="label">测查日期</span><span class="value">' + (data.checkDate || '—') + '</span></div>' +
+                            '<div class="item"><span class="label">实足年龄</span><span class="value">' + (data.ageText || '—') + '</span></div>';
+                    }
+                    baseItems += '<div class="item"><span class="label">身高</span><span class="value">' + (data.height != null ? data.height : '—') + ' cm</span></div>' +
                         '<div class="item"><span class="label">体重</span><span class="value">' + (data.weight != null ? data.weight : '—') + ' kg</span></div>' +
                         '<div class="item"><span class="label">BMI</span><span class="value">' + (data.bmi != null ? data.bmi : '—') + '</span></div>';
+                    basicInfoEl.innerHTML = baseItems;
+                }
+                var compareChildWrap = document.getElementById('compareChildWrap');
+                var compareTableBox = document.getElementById('compareTableBox');
+                if (compareChildWrap) compareChildWrap.style.display = 'none';
+                if (compareTableBox) compareTableBox.style.display = isComparison ? 'block' : 'none';
+                if (isComparison && d1) {
+                    function fmt(v) { return (v != null && v !== '' && v !== '-') ? v : '—'; }
+                    function diffNum(a, b) { var x = parseFloat(a); var y = parseFloat(b); return (isNaN(x) || isNaN(y)) ? null : y - x; }
+                    function findInd(id, arr) { if (!arr) return null; for (var j = 0; j < arr.length; j++) if (arr[j].id === id) return arr[j]; return null; }
+                    var rows = [];
+                    function parseValToNum(val) {
+                        if (val == null || val === '' || val === '-' || val === '—') return null;
+                        var s = String(val).trim();
+                        if (s === '>3SD') return 3;
+                        if (s === '<-3SD') return -3;
+                        var m = s.match(/^(-?[\d.]+)SD$/);
+                        if (m) return parseFloat(m[1]);
+                        var p = parseValueToZ(s, 'percentile');
+                        return p;
+                    }
+                    var indRowsResult = [], indRowsVal = [];
+                    ['ageWeight', 'ageHeight', 'heightWeight', 'ageBmi'].forEach(function(id) {
+                        var i1 = findInd(id, d1.indicators), i2 = findInd(id, d2.indicators);
+                        var iname = (i1 && i1.name) || (i2 && i2.name) || id;
+                        var v1 = i1 ? i1.value : '—', v2 = i2 ? i2.value : '—';
+                        var r1 = i1 ? i1.result : '—', r2 = i2 ? i2.result : '—';
+                        var changeVal = null;
+                        var n1 = parseValToNum(v1), n2 = parseValToNum(v2);
+                        if (n1 != null && n2 != null && !isNaN(n1) && !isNaN(n2)) changeVal = n2 - n1;
+                        var changeResult = (r1 === r2 || (fmt(r1) === fmt(r2))) ? '无变化' : (fmt(r1) + ' → ' + fmt(r2));
+                        indRowsResult.push([iname + ' 评价结果', fmt(r1), fmt(r2), changeResult]);
+                        indRowsVal.push([iname + ' 评价值', fmt(v1), fmt(v2), changeVal]);
+                    });
+                    rows = indRowsResult.concat([
+                        ['身高 (cm)', fmt(d1.height), fmt(d2.height), diffNum(d1.height, d2.height)],
+                        ['体重 (kg)', fmt(d1.weight), fmt(d2.weight), diffNum(d1.weight, d2.weight)],
+                        ['BMI', fmt(d1.bmi), fmt(d2.bmi), diffNum(d1.bmi, d2.bmi)]
+                    ]).concat(indRowsVal);
+                    var th1 = document.querySelector('#compareTable thead th:nth-child(2)');
+                    var th2 = document.querySelector('#compareTable thead th:nth-child(3)');
+                    if (th1) th1.textContent = '本次' + (d2.checkDate ? ' (' + d2.checkDate + ')' : '');
+                    if (th2) th2.textContent = '上次' + (d1.checkDate ? ' (' + d1.checkDate + ')' : '');
+                    var tbody = document.querySelector('#compareTable tbody');
+                    if (tbody) {
+                        tbody.innerHTML = '';
+                        rows.forEach(function(r) {
+                            var tr = document.createElement('tr');
+                            var change = r[3];
+                            var changeHtml = '—';
+                            if (change != null && typeof change === 'number' && !isNaN(change)) {
+                                var chStr = Number(change).toFixed(2);
+                                changeHtml = '<span class="' + (change > 0 ? 'change-up' : 'change-down') + '">' + (change > 0 ? '+' : '') + chStr + '</span>';
+                            } else if (typeof change === 'string' && change !== '') {
+                                changeHtml = change;
+                            }
+                            tr.innerHTML = '<td>' + r[0] + '</td><td>' + r[2] + '</td><td>' + r[1] + '</td><td>' + changeHtml + '</td>';
+                            tbody.appendChild(tr);
+                        });
+                    }
+                    try {
+                        var compRaw = localStorage.getItem('childGrowthComparisonReport');
+                        if (compRaw) {
+                            var compData = JSON.parse(compRaw);
+                            var pairs = compData.pairs || [];
+                            if (pairs.length > 1 && compareChildWrap) {
+                                compareChildWrap.style.display = 'block';
+                                var sel = document.getElementById('compareChildSelect');
+                                sel.innerHTML = '';
+                                pairs.forEach(function(p, i) {
+                                    var opt = document.createElement('option');
+                                    opt.value = i;
+                                    opt.textContent = (p.name || '—') + ' · ' + (p.birthDate || '—');
+                                    sel.appendChild(opt);
+                                });
+                                var currentIdx = 0;
+                                pairs.forEach(function(p, i) {
+                                    if ((p.name || '') === (data.name || '') && (p.birthDate || '') === (data.birthDate || '')) currentIdx = i;
+                                });
+                                sel.value = currentIdx;
+                                sel.onchange = function() {
+                                    var idx = parseInt(sel.value, 10);
+                                    var p = pairs[idx];
+                                    if (!p) return;
+                                    var nd = Object.assign({}, p.second, { comparisonFirst: p.first });
+                                    try {
+                                        var curRaw = localStorage.getItem(STORAGE_KEY);
+                                        if (curRaw) {
+                                            var cur = JSON.parse(curRaw);
+                                            if (cur.classAvgHeight != null) nd.classAvgHeight = cur.classAvgHeight;
+                                            if (cur.classAvgHeightPrev != null) nd.classAvgHeightPrev = cur.classAvgHeightPrev;
+                                            if (cur.classAvgWeight != null) nd.classAvgWeight = cur.classAvgWeight;
+                                            if (cur.classAvgWeightPrev != null) nd.classAvgWeightPrev = cur.classAvgWeightPrev;
+                                            if (cur.classAvgBmi != null) nd.classAvgBmi = cur.classAvgBmi;
+                                            if (cur.classAvgBmiPrev != null) nd.classAvgBmiPrev = cur.classAvgBmiPrev;
+                                        }
+                                    } catch (e) {}
+                                    localStorage.setItem(STORAGE_KEY, JSON.stringify(nd));
+                                    renderReport(JSON.stringify(nd));
+                                };
+                            }
+                        }
+                    } catch (e) {}
                 }
                 document.getElementById('suggestionBox').textContent = getSuggestionText(tier, data);
                 var extras = document.getElementById('suggestionExtras');
@@ -394,6 +508,11 @@
                 }
                 compHtml += '</tbody>';
                 document.getElementById('comprehensiveTable').innerHTML = compHtml;
+                var compTitleEl = document.getElementById('comprehensiveTableTitle');
+                if (compTitleEl) {
+                    var compDateText = '综合评估（测查日期：' + (data.checkDate || '—') + '）';
+                    compTitleEl.textContent = compDateText;
+                }
 
                 function getZFromValue(valueStr, mode) {
                     var z = parseValueToZ(valueStr, mode);
@@ -473,13 +592,14 @@
                 t2Html += '</tbody>';
                 document.getElementById('table2StdLevel').innerHTML = t2Html;
 
+                // 表3 儿童营养状况的标准差评价方法：仅使用表内标注，未标注区间为 -（不捏造「正常」等）
                 var table3Rows = [
                     { label: '≥+3 SD', r: { ageW: '', ageH: '', hw: '重度肥胖', bmi: '重度肥胖' } },
                     { label: '+2 SD～<+3 SD', r: { ageW: '', ageH: '', hw: '肥胖', bmi: '肥胖' } },
                     { label: '+1 SD～<+2 SD', r: { ageW: '', ageH: '', hw: '超重', bmi: '超重' } },
                     { label: '-1 SD～<+1 SD', r: { ageW: '', ageH: '', hw: '', bmi: '' } },
-                    { label: '-2 SD～<-1 SD', r: { ageW: '', ageH: '', hw: '消瘦', bmi: '消瘦' } },
-                    { label: '-3 SD～<-2 SD', r: { ageW: '低体重', ageH: '生长迟缓', hw: '', bmi: '' } },
+                    { label: '-2 SD～<-1 SD', r: { ageW: '', ageH: '', hw: '', bmi: '' } },
+                    { label: '-3 SD～<-2 SD', r: { ageW: '低体重', ageH: '生长迟缓', hw: '消瘦', bmi: '消瘦' } },
                     { label: '<-3 SD', r: { ageW: '重度低体重', ageH: '重度生长迟缓', hw: '重度消瘦', bmi: '重度消瘦' } }
                 ];
                 var nutritionKeys = ['ageW', 'ageH', 'hw', 'bmi'];
@@ -499,7 +619,7 @@
                     if (r === '重度肥胖') return 0;
                     if (r === '肥胖') return 1;
                     if (r === '超重') return 2;
-                    if (r === '消瘦') return 4;
+                    if (r === '消瘦') return 5;
                     if (r === '重度消瘦') return 6;
                     return 3;
                 }
@@ -531,6 +651,9 @@
                     var classAvgH = data.classAvgHeight != null && !isNaN(Number(data.classAvgHeight)) ? Number(data.classAvgHeight) : null;
                     var classAvgW = data.classAvgWeight != null && !isNaN(Number(data.classAvgWeight)) ? Number(data.classAvgWeight) : null;
                     var classAvgBmi = data.classAvgBmi != null && !isNaN(Number(data.classAvgBmi)) ? Number(data.classAvgBmi) : null;
+                    var classAvgHPrev = data.classAvgHeightPrev != null && !isNaN(Number(data.classAvgHeightPrev)) ? Number(data.classAvgHeightPrev) : null;
+                    var classAvgWPrev = data.classAvgWeightPrev != null && !isNaN(Number(data.classAvgWeightPrev)) ? Number(data.classAvgWeightPrev) : null;
+                    var classAvgBmiPrev = data.classAvgBmiPrev != null && !isNaN(Number(data.classAvgBmiPrev)) ? Number(data.classAvgBmiPrev) : null;
                     var stdBmiFromBatch = null;
                     if (classAvgH == null || classAvgW == null || classAvgBmi == null) {
                         try {
@@ -596,242 +719,381 @@
                     var stdH = data.stdHeight != null && data.stdHeight !== '' && data.stdHeight !== '-' ? parseFloat(String(data.stdHeight).replace(/[^0-9.-]/g, '')) : null;
                     var classHeightLabel = isMale ? '全班男生平均身高' : '全班女生平均身高';
                     var heightCompareDom = document.getElementById('heightCompareChart');
-                    if (heightCompareDom && (actualH != null || stdH != null || classAvgH != null)) {
+                    if (heightCompareDom) {
                         var heightChart = echarts.init(heightCompareDom);
-                        var hActual = actualH != null ? actualH : 0;
-                        var hStd = stdH != null ? stdH : 0;
-                        var hClass = classAvgH != null ? classAvgH : 0;
-                        var hCategories = ['实际身高', '标准身高'];
-                        var hValues = [hActual, hStd];
-                        var hColors = ['#5b9bd5', '#9bc4e2'];
-                        if (classAvgH != null) {
-                            hCategories.push(classHeightLabel);
-                            hValues.push(hClass);
-                            hColors.push('#8fb4d4');
+                        if (isComparison && d1) {
+                            var ah1 = d1.height != null ? Number(d1.height) : null;
+                            var ah2 = actualH;
+                            var std1 = d1.stdHeight && d1.stdHeight !== '-' ? parseFloat(String(d1.stdHeight).replace(/[^0-9.-]/g, '')) : null;
+                            var hClassVal = classAvgH != null ? classAvgH : null;
+                            var hClassValPrev = (classAvgHPrev != null ? classAvgHPrev : classAvgH);
+                            var hCats = hClassVal != null ? ['本次', '本次', '上次', '上次'] : ['本次', '上次'];
+                            var hActual1 = ah1 != null ? ah1 : 0, hActual2 = ah2 != null ? ah2 : 0;
+                            var hStd1 = std1 != null ? std1 : 0, hStd2 = stdH != null ? stdH : 0;
+                            var hDataStd = hClassVal != null ? [hStd2, null, hStd1, null] : [hStd2, hStd1];
+                            var hDataActual = hClassVal != null ? [hActual2, null, hActual1, null] : [hActual2, hActual1];
+                            var hDataAvg = hClassVal != null ? [null, hClassVal, null, hClassValPrev] : null;
+                            var hSeries = [
+                                { name: '实际身高', type: 'bar', data: hDataActual, itemStyle: { color: '#5b9bd5' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, distance: 4, formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } },
+                                { name: '标准身高', type: 'bar', data: hDataStd, itemStyle: { color: 'transparent', borderColor: '#e74c3c', borderWidth: 2, borderType: 'dashed' }, barWidth: '28%', label: { show: true, position: 'inside', fontSize: 11, verticalAlign: 'top', formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } }
+                            ];
+                            if (hClassVal != null && hDataAvg) hSeries.push({ name: classHeightLabel, type: 'bar', data: hDataAvg, itemStyle: { color: '#8fb4d4' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, formatter: function(p) { return p.value != null ? Number(p.value).toFixed(1) : ''; } } });
+                            heightChart.setOption({
+                                barGap: '-100%',
+                                tooltip: { trigger: 'axis', formatter: function(params) { var s = (params[0].axisValue || '') + '<br/>'; params.forEach(function(p) { if (p.value != null && p.value !== '') s += (p.marker || '') + (p.seriesName || '') + '：' + Number(p.value).toFixed(1) + '<br/>'; }); return s || (params[0].axisValue || ''); } },
+                                legend: { data: hSeries.map(function(s) { return s.name; }), bottom: 10, top: 'auto' },
+                                grid: { left: '22%', right: '14%', top: '14%', bottom: '22%', containLabel: true },
+                                xAxis: { type: 'category', name: '测量次数', data: hCats, axisLabel: { fontSize: 13, margin: 10, formatter: function(v, i) { return (hClassVal != null && (i === 1 || i === 3)) ? '' : v; } }, axisTick: { show: true }, axisLine: { show: true } },
+                                yAxis: { type: 'value', name: '身高 (cm)', min: 0, axisLabel: { fontSize: 13, margin: 14 }, nameTextStyle: { fontSize: 13 }, nameGap: 36 },
+                                series: hSeries
+                            });
+                        } else if (actualH != null || stdH != null || classAvgH != null) {
+                            var hClassVal = classAvgH != null ? classAvgH : null;
+                            var hCats = hClassVal != null ? ['本次', '本次'] : ['本次'];
+                            var hActual = actualH != null ? actualH : 0;
+                            var hStd = stdH != null ? stdH : 0;
+                            var hDataStd = hClassVal != null ? [hStd, null] : [hStd];
+                            var hDataActual = hClassVal != null ? [hActual, null] : [hActual];
+                            var hDataAvg = hClassVal != null ? [null, hClassVal] : null;
+                            var hSeries = [
+                                { name: '实际身高', type: 'bar', data: hDataActual, itemStyle: { color: '#5b9bd5' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, distance: 4, formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } },
+                                { name: '标准身高', type: 'bar', data: hDataStd, itemStyle: { color: 'transparent', borderColor: '#e74c3c', borderWidth: 2, borderType: 'dashed' }, barWidth: '28%', label: { show: true, position: 'inside', fontSize: 11, verticalAlign: 'top', formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } }
+                            ];
+                            if (hClassVal != null && hDataAvg) hSeries.push({ name: classHeightLabel, type: 'bar', data: hDataAvg, itemStyle: { color: '#8fb4d4' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, formatter: function(p) { return p.value != null ? Number(p.value).toFixed(1) : ''; } } });
+                            heightChart.setOption({
+                                title: { text: '测查日期：' + (data.checkDate || '—'), left: 'center', bottom: 4, top: 'auto', textStyle: { fontSize: 12, fontWeight: 'normal', color: '#666' } },
+                                barGap: '-100%',
+                                tooltip: { trigger: 'axis', formatter: function(params) { var s = (params[0].axisValue || '') + '<br/>'; params.forEach(function(p) { if (p.value != null && p.value !== '') s += (p.marker || '') + (p.seriesName || '') + '：' + Number(p.value).toFixed(1) + '<br/>'; }); return s || (params[0].axisValue || ''); } },
+                                legend: { data: hSeries.map(function(s) { return s.name; }), bottom: 26, top: 'auto' },
+                                grid: { left: '22%', right: '14%', top: '14%', bottom: '22%', containLabel: true },
+                                xAxis: { type: 'category', name: '测量次数', data: hCats, axisLabel: { fontSize: 13, margin: 10, formatter: function(v, i) { return (hClassVal != null && i === 1) ? '' : v; } }, axisTick: { show: true }, axisLine: { show: true } },
+                                yAxis: { type: 'value', name: '身高 (cm)', min: 0, axisLabel: { fontSize: 13, margin: 14 }, nameTextStyle: { fontSize: 13 }, nameGap: 36 },
+                                series: hSeries
+                            });
                         }
-                        var hData = hValues.map(function(v, i) { return { value: v, itemStyle: { color: hColors[i] } }; });
-                        heightChart.setOption({
-                            tooltip: { trigger: 'axis' },
-                            grid: { left: '22%', right: '14%', top: '14%', bottom: '18%', containLabel: true },
-                            xAxis: { type: 'category', data: hCategories, axisLabel: { fontSize: 13, margin: 10, show: true }, axisTick: { show: true }, axisLine: { show: true } },
-                            yAxis: { type: 'value', name: 'cm', min: 0, axisLabel: { fontSize: 13, margin: 14, show: true }, nameTextStyle: { fontSize: 13 }, nameGap: 36 },
-                            series: [{ type: 'bar', data: hData, barWidth: hCategories.length === 3 ? '35%' : '45%', label: { show: true, position: 'top', fontSize: 12, formatter: function(p) { var v = p.value; return (v != null && !isNaN(v)) ? Number(v).toFixed(1) : ''; } } }]
-                        });
                     }
                     var actualW = data.weight != null ? Number(data.weight) : null;
                     var stdW = data.stdWeight != null && data.stdWeight !== '' && data.stdWeight !== '-' ? parseFloat(String(data.stdWeight).replace(/[^0-9.-]/g, '')) : null;
                     var classWeightLabel = isMale ? '全班男生平均体重' : '全班女生平均体重';
                     var weightCompareDom = document.getElementById('weightCompareChart');
-                    if (weightCompareDom && (actualW != null || stdW != null || classAvgW != null)) {
+                    if (weightCompareDom) {
                         var weightChart = echarts.init(weightCompareDom);
-                        var wActual = actualW != null ? actualW : 0;
-                        var wStd = stdW != null ? stdW : 0;
-                        var wClass = classAvgW != null ? classAvgW : 0;
-                        var wCategories = ['实际体重', '标准体重'];
-                        var wValues = [wActual, wStd];
-                        var wColors = ['#ed7d31', '#f5b07a'];
-                        if (classAvgW != null) {
-                            wCategories.push(classWeightLabel);
-                            wValues.push(wClass);
-                            wColors.push('#d4a574');
+                        if (isComparison && d1) {
+                            var aw1 = d1.weight != null ? Number(d1.weight) : null;
+                            var aw2 = actualW;
+                            var sw1 = d1.stdWeight && d1.stdWeight !== '-' ? parseFloat(String(d1.stdWeight).replace(/[^0-9.-]/g, '')) : null;
+                            var wClassVal = classAvgW != null ? classAvgW : null;
+                            var wClassValPrev = (classAvgWPrev != null ? classAvgWPrev : classAvgW);
+                            var wCats = wClassVal != null ? ['本次', '本次', '上次', '上次'] : ['本次', '上次'];
+                            var wActual1 = aw1 != null ? aw1 : 0, wActual2 = aw2 != null ? aw2 : 0;
+                            var wStd1 = sw1 != null ? sw1 : 0, wStd2 = stdW != null ? stdW : 0;
+                            var wDataStd = wClassVal != null ? [wStd2, null, wStd1, null] : [wStd2, wStd1];
+                            var wDataActual = wClassVal != null ? [wActual2, null, wActual1, null] : [wActual2, wActual1];
+                            var wDataAvg = wClassVal != null ? [null, wClassVal, null, wClassValPrev] : null;
+                            var wSeries = [
+                                { name: '实际体重', type: 'bar', data: wDataActual, itemStyle: { color: '#ed7d31' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, distance: 4, formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } },
+                                { name: '标准体重', type: 'bar', data: wDataStd, itemStyle: { color: 'transparent', borderColor: '#e74c3c', borderWidth: 2, borderType: 'dashed' }, barWidth: '28%', label: { show: true, position: 'inside', fontSize: 11, verticalAlign: 'top', formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } }
+                            ];
+                            if (wClassVal != null && wDataAvg) wSeries.push({ name: classWeightLabel, type: 'bar', data: wDataAvg, itemStyle: { color: '#d4a574' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, formatter: function(p) { return p.value != null ? Number(p.value).toFixed(1) : ''; } } });
+                            weightChart.setOption({
+                                barGap: '-100%',
+                                tooltip: { trigger: 'axis', formatter: function(params) { var s = (params[0].axisValue || '') + '<br/>'; params.forEach(function(p) { if (p.value != null && p.value !== '') s += (p.marker || '') + (p.seriesName || '') + '：' + Number(p.value).toFixed(1) + '<br/>'; }); return s || (params[0].axisValue || ''); } },
+                                legend: { data: wSeries.map(function(s) { return s.name; }), bottom: 10, top: 'auto' },
+                                grid: { left: '22%', right: '14%', top: '14%', bottom: '22%', containLabel: true },
+                                xAxis: { type: 'category', name: '测量次数', data: wCats, axisLabel: { fontSize: 13, margin: 10, formatter: function(v, i) { return (wClassVal != null && (i === 1 || i === 3)) ? '' : v; } }, axisTick: { show: true }, axisLine: { show: true } },
+                                yAxis: { type: 'value', name: '体重 (kg)', min: 0, axisLabel: { fontSize: 13, margin: 14 }, nameTextStyle: { fontSize: 13 }, nameGap: 36 },
+                                series: wSeries
+                            });
+                        } else if (actualW != null || stdW != null || classAvgW != null) {
+                            var wClassVal = classAvgW != null ? classAvgW : null;
+                            var wCats = wClassVal != null ? ['本次', '本次'] : ['本次'];
+                            var wActual = actualW != null ? actualW : 0;
+                            var wStd = stdW != null ? stdW : 0;
+                            var wDataStd = wClassVal != null ? [wStd, null] : [wStd];
+                            var wDataActual = wClassVal != null ? [wActual, null] : [wActual];
+                            var wDataAvg = wClassVal != null ? [null, wClassVal] : null;
+                            var wSeries = [
+                                { name: '实际体重', type: 'bar', data: wDataActual, itemStyle: { color: '#ed7d31' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, distance: 4, formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } },
+                                { name: '标准体重', type: 'bar', data: wDataStd, itemStyle: { color: 'transparent', borderColor: '#e74c3c', borderWidth: 2, borderType: 'dashed' }, barWidth: '28%', label: { show: true, position: 'inside', fontSize: 11, verticalAlign: 'top', formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } }
+                            ];
+                            if (wClassVal != null && wDataAvg) wSeries.push({ name: classWeightLabel, type: 'bar', data: wDataAvg, itemStyle: { color: '#d4a574' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, formatter: function(p) { return p.value != null ? Number(p.value).toFixed(1) : ''; } } });
+                            weightChart.setOption({
+                                title: { text: '测查日期：' + (data.checkDate || '—'), left: 'center', bottom: 4, top: 'auto', textStyle: { fontSize: 12, fontWeight: 'normal', color: '#666' } },
+                                barGap: '-100%',
+                                tooltip: { trigger: 'axis', formatter: function(params) { var s = (params[0].axisValue || '') + '<br/>'; params.forEach(function(p) { if (p.value != null && p.value !== '') s += (p.marker || '') + (p.seriesName || '') + '：' + Number(p.value).toFixed(1) + '<br/>'; }); return s || (params[0].axisValue || ''); } },
+                                legend: { data: wSeries.map(function(s) { return s.name; }), bottom: 26, top: 'auto' },
+                                grid: { left: '22%', right: '14%', top: '14%', bottom: '22%', containLabel: true },
+                                xAxis: { type: 'category', name: '测量次数', data: wCats, axisLabel: { fontSize: 13, margin: 10, formatter: function(v, i) { return (wClassVal != null && i === 1) ? '' : v; } }, axisTick: { show: true }, axisLine: { show: true } },
+                                yAxis: { type: 'value', name: '体重 (kg)', min: 0, axisLabel: { fontSize: 13, margin: 14 }, nameTextStyle: { fontSize: 13 }, nameGap: 36 },
+                                series: wSeries
+                            });
                         }
-                        var wData = wValues.map(function(v, i) { return { value: v, itemStyle: { color: wColors[i] } }; });
-                        weightChart.setOption({
-                            tooltip: { trigger: 'axis' },
-                            grid: { left: '22%', right: '14%', top: '14%', bottom: '18%', containLabel: true },
-                            xAxis: { type: 'category', data: wCategories, axisLabel: { fontSize: 13, margin: 10, show: true }, axisTick: { show: true }, axisLine: { show: true } },
-                            yAxis: { type: 'value', name: 'kg', min: 0, axisLabel: { fontSize: 13, margin: 14, show: true }, nameTextStyle: { fontSize: 13 }, nameGap: 36 },
-                            series: [{ type: 'bar', data: wData, barWidth: wCategories.length === 3 ? '35%' : '45%', label: { show: true, position: 'top', fontSize: 12, formatter: function(p) { var v = p.value; return (v != null && !isNaN(v)) ? Number(v).toFixed(1) : ''; } } }]
-                        });
                     }
                     var actualBmi = data.bmi != null ? Number(data.bmi) : null;
                     var stdBmi = (data.stdBmi != null && data.stdBmi !== '' && !isNaN(Number(data.stdBmi))) ? Math.round(Number(data.stdBmi) * 10) / 10 : (stdBmiFromBatch != null && !isNaN(stdBmiFromBatch) ? stdBmiFromBatch : null);
                     var classBmiLabel = isMale ? '全班男生平均BMI' : '全班女生平均BMI';
                     var bmiCompareDom = document.getElementById('bmiCompareChart');
-                    if (bmiCompareDom && (actualBmi != null || stdBmi != null || classAvgBmi != null)) {
+                    if (bmiCompareDom) {
                         var bmiChart = echarts.init(bmiCompareDom);
-                        var bmiCategories = [];
-                        var bmiValues = [];
-                        if (actualBmi != null) { bmiCategories.push('实际BMI'); bmiValues.push(actualBmi); }
-                        if (stdBmi != null) { bmiCategories.push('标准BMI'); bmiValues.push(stdBmi); }
-                        if (classAvgBmi != null) { bmiCategories.push(classBmiLabel); bmiValues.push(classAvgBmi); }
-                        var bmiColors = ['#70ad47', '#a8d08d', '#8fbc8f'];
-                        var bmiData = bmiValues.map(function(v, i) { return { value: v, itemStyle: { color: bmiColors[i] } }; });
-                        if (bmiData.length > 0) {
+                        if (isComparison && d1) {
+                            var b1 = d1.bmi != null ? Number(d1.bmi) : null;
+                            var sb1 = (d1.stdBmi != null && d1.stdBmi !== '' && !isNaN(Number(d1.stdBmi))) ? Math.round(Number(d1.stdBmi) * 10) / 10 : null;
+                            var bClassVal = classAvgBmi != null ? classAvgBmi : null;
+                            var bClassValPrev = (classAvgBmiPrev != null ? classAvgBmiPrev : classAvgBmi);
+                            var bCats = bClassVal != null ? ['本次', '本次', '上次', '上次'] : ['本次', '上次'];
+                            var bActual1 = b1 != null ? b1 : 0, bActual2 = actualBmi != null ? actualBmi : 0;
+                            var bStd1 = sb1 != null ? sb1 : 0, bStd2 = stdBmi != null ? stdBmi : 0;
+                            var bDataStd = bClassVal != null ? [bStd2, null, bStd1, null] : [bStd2, bStd1];
+                            var bDataActual = bClassVal != null ? [bActual2, null, bActual1, null] : [bActual2, bActual1];
+                            var bDataAvg = bClassVal != null ? [null, bClassVal, null, bClassValPrev] : null;
+                            var bSeries = [
+                                { name: '实际BMI', type: 'bar', data: bDataActual, itemStyle: { color: '#70ad47' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, distance: 4, formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } },
+                                { name: '标准BMI', type: 'bar', data: bDataStd, itemStyle: { color: 'transparent', borderColor: '#e74c3c', borderWidth: 2, borderType: 'dashed' }, barWidth: '28%', label: { show: true, position: 'inside', fontSize: 11, verticalAlign: 'top', formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } }
+                            ];
+                            if (bClassVal != null && bDataAvg) bSeries.push({ name: classBmiLabel, type: 'bar', data: bDataAvg, itemStyle: { color: '#8fbc8f' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, formatter: function(p) { return p.value != null ? Number(p.value).toFixed(1) : ''; } } });
                             bmiChart.setOption({
-                                tooltip: { trigger: 'axis' },
-                                grid: { left: '22%', right: '14%', top: '14%', bottom: '18%', containLabel: true },
-                                xAxis: { type: 'category', data: bmiCategories, axisLabel: { fontSize: 13, margin: 10, show: true }, axisTick: { show: true }, axisLine: { show: true } },
-                                yAxis: { type: 'value', name: 'kg/m²', min: 0, axisLabel: { fontSize: 13, margin: 14, show: true }, nameTextStyle: { fontSize: 13 }, nameGap: 36 },
-                                series: [{ type: 'bar', data: bmiData, barWidth: bmiCategories.length === 3 ? '35%' : (bmiCategories.length === 2 ? '45%' : '30%'), label: { show: true, position: 'top', fontSize: 12, formatter: function(p) { var v = p.value; return (v != null && !isNaN(v)) ? Number(v).toFixed(1) : ''; } } }]
+                                barGap: '-100%',
+                                tooltip: { trigger: 'axis', formatter: function(params) { var s = (params[0].axisValue || '') + '<br/>'; params.forEach(function(p) { if (p.value != null && p.value !== '') s += (p.marker || '') + (p.seriesName || '') + '：' + Number(p.value).toFixed(1) + '<br/>'; }); return s || (params[0].axisValue || ''); } },
+                                legend: { data: bSeries.map(function(s) { return s.name; }), bottom: 10, top: 'auto' },
+                                grid: { left: '22%', right: '14%', top: '14%', bottom: '22%', containLabel: true },
+                                xAxis: { type: 'category', name: '测量次数', data: bCats, axisLabel: { fontSize: 13, margin: 10, formatter: function(v, i) { return (bClassVal != null && (i === 1 || i === 3)) ? '' : v; } }, axisTick: { show: true }, axisLine: { show: true } },
+                                yAxis: { type: 'value', name: 'BMI (kg/m²)', min: 0, axisLabel: { fontSize: 13, margin: 14 }, nameTextStyle: { fontSize: 13 }, nameGap: 36 },
+                                series: bSeries
+                            });
+                        } else if (actualBmi != null || stdBmi != null || classAvgBmi != null) {
+                            var bClassVal = classAvgBmi != null ? classAvgBmi : null;
+                            var bCats = bClassVal != null ? ['本次', '本次'] : ['本次'];
+                            var bActual = actualBmi != null ? actualBmi : 0;
+                            var bStd = stdBmi != null ? stdBmi : 0;
+                            var bDataStd = bClassVal != null ? [bStd, null] : [bStd];
+                            var bDataActual = bClassVal != null ? [bActual, null] : [bActual];
+                            var bDataAvg = bClassVal != null ? [null, bClassVal] : null;
+                            var bSeries = [
+                                { name: '实际BMI', type: 'bar', data: bDataActual, itemStyle: { color: '#70ad47' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, distance: 4, formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } },
+                                { name: '标准BMI', type: 'bar', data: bDataStd, itemStyle: { color: 'transparent', borderColor: '#e74c3c', borderWidth: 2, borderType: 'dashed' }, barWidth: '28%', label: { show: true, position: 'inside', fontSize: 11, verticalAlign: 'top', formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } }
+                            ];
+                            if (bClassVal != null && bDataAvg) bSeries.push({ name: classBmiLabel, type: 'bar', data: bDataAvg, itemStyle: { color: '#8fbc8f' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, formatter: function(p) { return p.value != null ? Number(p.value).toFixed(1) : ''; } } });
+                            bmiChart.setOption({
+                                title: { text: '测查日期：' + (data.checkDate || '—'), left: 'center', bottom: 4, top: 'auto', textStyle: { fontSize: 12, fontWeight: 'normal', color: '#666' } },
+                                barGap: '-100%',
+                                tooltip: { trigger: 'axis', formatter: function(params) { var s = (params[0].axisValue || '') + '<br/>'; params.forEach(function(p) { if (p.value != null && p.value !== '') s += (p.marker || '') + (p.seriesName || '') + '：' + Number(p.value).toFixed(1) + '<br/>'; }); return s || (params[0].axisValue || ''); } },
+                                legend: { data: bSeries.map(function(s) { return s.name; }), bottom: 26, top: 'auto' },
+                                grid: { left: '22%', right: '14%', top: '14%', bottom: '22%', containLabel: true },
+                                xAxis: { type: 'category', name: '测量次数', data: bCats, axisLabel: { fontSize: 13, margin: 10, formatter: function(v, i) { return (bClassVal != null && i === 1) ? '' : v; } }, axisTick: { show: true }, axisLine: { show: true } },
+                                yAxis: { type: 'value', name: 'BMI (kg/m²)', min: 0, axisLabel: { fontSize: 13, margin: 14 }, nameTextStyle: { fontSize: 13 }, nameGap: 36 },
+                                series: bSeries
                             });
                         }
                     }
                     var levelOrder = ['下', '中下', '中', '中上', '上'];
                     var levelColors = { '下': '#dc3545', '中下': '#e69500', '中': '#28a745', '中上': '#17a2b8', '上': '#6f42c1' };
+                    function buildLevelNames(d, m) {
+                        var inds = (d.indicators || []).filter(function(i) { return i.id !== 'ageHead' && i.name !== '年龄别头围'; });
+                        var names = [];
+                        inds.forEach(function(ind) {
+                            var z = parseValueToZ(ind.value, m);
+                            names.push(z != null ? getGrowthLevelFromZ(z) : null);
+                        });
+                        return names;
+                    }
+                    function buildPieData(ln) {
+                        var counts = { '上': 0, '中上': 0, '中': 0, '中下': 0, '下': 0 };
+                        ln.forEach(function(l) { if (l && counts[l] !== undefined) counts[l]++; });
+                        var pd = levelOrder.map(function(l) { return counts[l] > 0 ? { value: counts[l], name: l, itemStyle: { color: levelColors[l] } } : null; }).filter(Boolean);
+                        return pd.length > 0 ? pd : [{ value: 1, name: '暂无数据', itemStyle: { color: '#ddd' } }];
+                    }
                     var pieCounts = { '上': 0, '中上': 0, '中': 0, '中下': 0, '下': 0 };
                     levelNames.forEach(function(l) { if (l && pieCounts[l] !== undefined) pieCounts[l]++; });
-                    var pieData = levelOrder.map(function(l) { return pieCounts[l] > 0 ? { value: pieCounts[l], name: l, itemStyle: { color: levelColors[l] } } : null; }).filter(Boolean);
-                    if (pieData.length === 0) pieData = [{ value: 1, name: '暂无数据', itemStyle: { color: '#ddd' } }];
+                    var pieData = buildPieData(levelNames);
                     var levelPieDom = document.getElementById('levelPieChart');
                     if (levelPieDom) {
                         var levelPieChart = echarts.init(levelPieDom);
-                        levelPieChart.setOption({
-                            tooltip: { trigger: 'item', formatter: '{b}: {c} 项 ({d}%)' },
-                            legend: { orient: 'horizontal', bottom: 10, left: 'center', selectedMode: 'multiple' },
-                            series: [{ type: 'pie', radius: ['40%', '70%'], data: pieData }]
-                        });
+                        if (isComparison && d1) {
+                            var ln1 = buildLevelNames(d1, mode);
+                            var pieData1 = buildPieData(ln1);
+                            var pieData2 = pieData;
+                            var pieLeg1 = '本次' + (d2.checkDate ? ' (' + d2.checkDate + ')' : '');
+                            var pieLeg2 = '上次' + (d1.checkDate ? ' (' + d1.checkDate + ')' : '');
+                            levelPieChart.setOption({
+                                title: [
+                                    { text: pieLeg1, left: '25%', bottom: 8, top: 'auto', textAlign: 'center', textStyle: { fontSize: 14, fontWeight: 'normal' } },
+                                    { text: pieLeg2, left: '75%', bottom: 8, top: 'auto', textAlign: 'center', textStyle: { fontSize: 14, fontWeight: 'normal' } }
+                                ],
+                                tooltip: { trigger: 'item', formatter: '{b}: {c} 项 ({d}%)' },
+                                legend: { orient: 'horizontal', bottom: 30, left: 'center', data: levelOrder },
+                                series: [
+                                    { name: pieLeg1, type: 'pie', radius: ['40%', '60%'], center: ['25%', '50%'], data: pieData2 },
+                                    { name: pieLeg2, type: 'pie', radius: ['40%', '60%'], center: ['75%', '50%'], data: pieData1 }
+                                ]
+                            });
+                        } else {
+                            levelPieChart.setOption({
+                                title: { text: '测查日期：' + (data.checkDate || '—'), left: 'center', bottom: 6, top: 'auto', textStyle: { fontSize: 12, fontWeight: 'normal', color: '#666' } },
+                                tooltip: { trigger: 'item', formatter: '{b}: {c} 项 ({d}%)' },
+                                legend: { orient: 'horizontal', bottom: 58, left: 'center', selectedMode: 'multiple', itemGap: 16 },
+                                series: [{ type: 'pie', radius: ['40%', '58%'], center: ['50%', '38%'], data: pieData }]
+                            });
+                        }
                     }
                     var levelBarDom = document.getElementById('levelBarChart');
                     if (levelBarDom) {
                         var levelToNum = { '下': 1, '中下': 2, '中': 3, '中上': 4, '上': 5 };
-                        var levelBarCategories = ['年龄别体重', '年龄别身长/身高', '身长/身高体重', '年龄别BMI'];
-                        var levelBarLevelNames = [];
-                        for (var c = 0; c < 4; c++) {
-                            var ind = indMap[c];
-                            levelBarLevelNames.push(ind ? getGrowthLevel(ind.value, mode) : null);
+                        var levelBarCategories = ['年龄别体重', '年龄别身高', '身高别体重', '年龄别 BMI'];
+                        function getLevelBarLevels(d, m) {
+                            var indByCol = { '年龄别体重': 0, '年龄别身长/身高': 1, '年龄别身高': 1, '身长/身高体重': 2, '身高别体重': 2, '年龄别BMI': 3 };
+                            var im = {};
+                            (d.indicators || []).forEach(function(ind) { if (indByCol[ind.name] !== undefined) im[indByCol[ind.name]] = ind; });
+                            var arr = [];
+                            for (var c = 0; c < 4; c++) { var ind = im[c]; arr.push(ind ? getGrowthLevel(ind.value, m) : null); }
+                            return arr;
                         }
+                        var levelBarLevelNames = getLevelBarLevels(d2, mode);
                         var levelBarValues = levelBarLevelNames.map(function(l) { return l ? levelToNum[l] || 0 : 0; });
                         var levelBarChart = echarts.init(levelBarDom);
-                        var levelBarData = levelBarCategories.map(function(_, i) {
-                            var val = levelBarValues[i];
-                            var lv = levelBarLevelNames[i];
-                            var barVal = val > 0 ? val : 0.6;
-                            var color = lv && levelColors[lv] ? levelColors[lv] : '#b0b0b0';
-                            return { value: barVal, itemStyle: { color: color } };
-                        });
-                        levelBarChart.setOption({
-                            tooltip: { trigger: 'axis', formatter: function(params) { var i = params[0].dataIndex; return (levelBarCategories[i] || '') + '：' + (levelBarLevelNames[i] || '—'); } },
-                            grid: { left: '26%', right: '14%', top: '12%', bottom: '18%', containLabel: true },
-                            xAxis: { type: 'category', data: levelBarCategories, axisLabel: { interval: 0, rotate: 20, fontSize: 13, margin: 16, show: true }, axisTick: { show: true }, axisLine: { show: true } },
-                            yAxis: { type: 'value', name: '等级', min: 0, max: 6, interval: 1, axisLabel: { fontSize: 14, margin: 16, show: true, formatter: function(v) { var m = { 0.6: '—', 1: '下', 2: '中下', 3: '中', 4: '中上', 5: '上' }; return m[v] !== undefined ? m[v] : ''; } }, nameTextStyle: { fontSize: 14 }, nameGap: 40 },
-                            series: [{ type: 'bar', data: levelBarData, barWidth: '50%', barMinHeight: 6 }]
-                        });
-                    }
-                    // 营养状况扇形图（表3 标准差法，使用表3已有结果）
-                    var nutritionPieDom = document.getElementById('nutritionPieChartPersonal');
-                    if (nutritionPieDom) {
-                        var nutritionItems = [];
-                        var nutritionIndicatorNames = ['年龄别体重', '年龄别身长/身高', '身长/身高体重', '年龄别BMI'];
-                        for (var nc = 0; nc < 4; nc++) {
-                            var nInd = indMap[nc];
-                            if (!nInd) continue;
-                            var nRes = (nInd.result || '').trim();
-                            if (!nRes || nRes === '-' || nRes === '—') continue;
-                            nutritionItems.push({ idx: nc, indicator: nutritionIndicatorNames[nc], result: nRes });
+                        if (isComparison && d1) {
+                            var lvl1 = getLevelBarLevels(d1, mode);
+                            var lvl2 = levelBarLevelNames;
+                            var vals1 = lvl1.map(function(l) { return l ? levelToNum[l] || 0.6 : 0.6; });
+                            var vals2 = lvl2.map(function(l) { return l ? levelToNum[l] || 0.6 : 0.6; });
+                            var data1 = levelBarCategories.map(function(_, i) { return { value: vals1[i], itemStyle: { color: (lvl1[i] && levelColors[lvl1[i]]) ? levelColors[lvl1[i]] : '#b0b0b0' } }; });
+                            var data2 = levelBarCategories.map(function(_, i) { return { value: vals2[i], itemStyle: { color: (lvl2[i] && levelColors[lvl2[i]]) ? levelColors[lvl2[i]] : '#b0b0b0' } }; });
+                            var dateCurr = d2.checkDate || '—', datePrev = d1.checkDate || '—';
+                            levelBarChart.setOption({
+                                title: { text: '左侧柱=本次（' + dateCurr + '）、右侧柱=上次（' + datePrev + '）', left: 'center', top: 4, textStyle: { fontSize: 11, color: '#888' } },
+                                tooltip: { trigger: 'axis', formatter: function(params) {
+                                    var i = params[0].dataIndex;
+                                    return (levelBarCategories[i] || '') + '<br/>本次：' + (lvl2[i] || '—') + '<br/>上次：' + (lvl1[i] || '—');
+                                }},
+                                legend: { show: false },
+                                grid: { left: '26%', right: '14%', top: '16%', bottom: '16%', containLabel: true },
+                                xAxis: { type: 'category', data: levelBarCategories, axisLabel: { interval: 0, rotate: 0, fontSize: 13, margin: 16 }, axisTick: { show: true }, axisLine: { show: true } },
+                                yAxis: { type: 'value', name: '等级', min: 0, max: 6, interval: 1, axisLabel: { fontSize: 14, margin: 16, formatter: function(v) { var m = { 0.6: '—', 1: '下', 2: '中下', 3: '中', 4: '中上', 5: '上' }; return m[v] !== undefined ? m[v] : ''; } }, nameTextStyle: { fontSize: 14 }, nameGap: 40 },
+                                series: [
+                                    { name: '本次', type: 'bar', data: data2, barWidth: '35%' },
+                                    { name: '上次', type: 'bar', data: data1, barWidth: '35%' }
+                                ]
+                            });
+                            var levelBarLegEl = document.getElementById('levelBarLegend');
+                            if (levelBarLegEl) levelBarLegEl.innerHTML = ['上','中上','中','中下','下'].map(function(n) { return '<div class="legend-item"><span class="legend-dot" style="background:' + (levelColors[n]||'#999') + ';"></span>' + n + '</div>'; }).join('');
+                        } else {
+                            var levelBarLegEl2 = document.getElementById('levelBarLegend');
+                            if (levelBarLegEl2) levelBarLegEl2.innerHTML = ['上','中上','中','中下','下'].map(function(n) { return '<div class="legend-item"><span class="legend-dot" style="background:' + (levelColors[n]||'#999') + ';"></span>' + n + '</div>'; }).join('');
+                            var levelBarData = levelBarCategories.map(function(_, i) {
+                                var val = levelBarValues[i];
+                                var lv = levelBarLevelNames[i];
+                                var barVal = val > 0 ? val : 0.6;
+                                var color = lv && levelColors[lv] ? levelColors[lv] : '#b0b0b0';
+                                return { value: barVal, itemStyle: { color: color } };
+                            });
+                            levelBarChart.setOption({
+                                title: { text: '测查日期：' + (data.checkDate || '—'), left: 'center', bottom: 4, top: 'auto', textStyle: { fontSize: 12, fontWeight: 'normal', color: '#666' } },
+                                tooltip: { trigger: 'axis', formatter: function(params) { var i = params[0].dataIndex; return (levelBarCategories[i] || '') + '：' + (levelBarLevelNames[i] || '—'); } },
+                                grid: { left: '26%', right: '14%', top: '12%', bottom: '22%', containLabel: true },
+                                xAxis: { type: 'category', data: levelBarCategories, axisLabel: { interval: 0, rotate: 0, fontSize: 13, margin: 16, show: true }, axisTick: { show: true }, axisLine: { show: true } },
+                                yAxis: { type: 'value', name: '等级', min: 0, max: 6, interval: 1, axisLabel: { fontSize: 14, margin: 16, show: true, formatter: function(v) { var m = { 0.6: '—', 1: '下', 2: '中下', 3: '中', 4: '中上', 5: '上' }; return m[v] !== undefined ? m[v] : ''; } }, nameTextStyle: { fontSize: 14 }, nameGap: 40 },
+                                series: [{ type: 'bar', data: levelBarData, barWidth: '50%', barMinHeight: 6 }]
+                            });
                         }
-                        var nutritionCounts = {};
-                        var nutritionDetail = {};
-                        nutritionItems.forEach(function(item) {
-                            if (!nutritionCounts[item.result]) {
-                                nutritionCounts[item.result] = 0;
-                                nutritionDetail[item.result] = [];
-                            }
-                            nutritionCounts[item.result]++;
-                            nutritionDetail[item.result].push(item.indicator);
-                        });
-                        var nutritionPieData = Object.keys(nutritionCounts).map(function(k) {
-                            return { name: k, value: nutritionCounts[k] };
-                        });
-                        if (nutritionPieData.length === 0) {
-                            nutritionPieData = [{ name: '暂无可评价的营养结果', value: 1, itemStyle: { color: '#ddd' } }];
-                        }
-                        var nutritionPieChart = echarts.init(nutritionPieDom);
-                        nutritionPieChart.setOption({
-                            tooltip: {
-                                trigger: 'item',
-                                formatter: function(p) {
-                                    var name = p.name || '';
-                                    var list = nutritionDetail[name] || [];
-                                    var extra = list.length ? ('<br/>涉及指标：' + list.join('、')) : '';
-                                    return name + '：' + p.value + ' 项 (' + p.percent + '%)' + extra;
-                                }
-                            },
-                            legend: { orient: 'horizontal', bottom: 10, left: 'center' },
-                            series: [{
-                                type: 'pie',
-                                radius: ['40%', '70%'],
-                                data: nutritionPieData
-                            }]
-                        });
                     }
-                    // 各指标营养状况柱状图（表3 标准差法，Y 轴对应表3 行）
+                    var nutritionBarCategories = ['年龄别体重', '年龄别身高', '身高别体重', '年龄别 BMI'];
+                    var nutritionBarColors = { '重度低体重': '#721c24', '低体重': '#dc3545', '重度生长迟缓': '#4472C4', '生长迟缓': '#5a8fd4', '重度消瘦': '#a94442', '消瘦': '#e69500', '—': '#28a745', '超重': '#17a2b8', '肥胖': '#6f42c1', '重度肥胖': '#4a148c' };
+                    var nutritionBarOrder = ['低体重', '重度生长迟缓', '生长迟缓', '消瘦', '—', '超重', '肥胖', '重度肥胖'];
+                    var indByCol = { '年龄别体重': 0, '年龄别身长/身高': 1, '年龄别身高': 1, '身长/身高体重': 2, '身高别体重': 2, '年龄别BMI': 3 };
+                    function getZValueForIndicator(d, colIdx, m) {
+                        var im = {};
+                        (d.indicators || []).forEach(function(ind) { if (indByCol[ind.name] !== undefined) im[indByCol[ind.name]] = ind; });
+                        var ind = im[colIdx];
+                        return ind ? parseValueToZ(ind.value, m) : null;
+                    }
+                    function getNutritionResultForIndicator(d, colIdx) {
+                        var im = {};
+                        (d.indicators || []).forEach(function(ind) { if (indByCol[ind.name] !== undefined) im[indByCol[ind.name]] = ind; });
+                        var ind = im[colIdx];
+                        var r = ind ? (ind.result || '').trim() : '';
+                        return (!r || r === '-' || r === '—') ? '—' : r;
+                    }
+                    function buildNutritionZBarData(d1, d2, m) {
+                        var zCurr = [], zPrev = [];
+                        for (var i = 0; i < 4; i++) {
+                            zCurr.push(getZValueForIndicator(d2, i, m));
+                            zPrev.push(getZValueForIndicator(d1, i, m));
+                        }
+                        var allZ = zCurr.concat(zPrev).filter(function(z) { return z != null && !isNaN(z); });
+                        var yMin = -3.5, yMax = 3.5;
+                        if (allZ.length > 0) {
+                            var lo = Math.min.apply(null, allZ), hi = Math.max.apply(null, allZ);
+                            yMin = Math.max(-3.5, Math.floor(lo * 2) / 2 - 0.5);
+                            yMax = Math.min(3.5, Math.ceil(hi * 2) / 2 + 0.5);
+                            if (yMin > 0) yMin = -0.5;
+                            if (yMax < 0) yMax = 0.5;
+                        }
+                        return { xAxisData: nutritionBarCategories.slice(), zCurr: zCurr, zPrev: zPrev, leg1: '本次' + (d2.checkDate ? ' (' + d2.checkDate + ')' : ''), leg2: '上次' + (d1.checkDate ? ' (' + d1.checkDate + ')' : ''), yMin: yMin, yMax: yMax };
+                    }
                     var nutritionBarDom = document.getElementById('nutritionBarChartPersonal');
                     if (nutritionBarDom) {
-                        var nutritionBarCategories = ['年龄别体重', '年龄别身长/身高', '身长/身高体重', '年龄别BMI'];
-                        var nutritionBarData = [];
-                        var maxRow = table3Rows.length;
-                        for (var bc = 0; bc < 4; bc++) {
-                            var indB = indMap[bc];
-                            var resB = indB ? (indB.result || '').trim() : '';
-                            if (!indB || !resB || resB === '-' || resB === '—') {
-                                nutritionBarData.push({
-                                    value: 0.6,
-                                    itemStyle: { color: '#b0b0b0' },
-                                    rowLabel: '',
-                                    nutritionResult: ''
-                                });
-                            } else {
-                                var rowIndex = getNutritionRowIndex(bc, resB);
-                                var valB = rowIndex != null ? (rowIndex + 1) : 0.6;
-                                var rowLabel = rowIndex != null && table3Rows[rowIndex] ? table3Rows[rowIndex].label : '';
-                                nutritionBarData.push({
-                                    value: valB,
-                                    itemStyle: { color: '#4a7ba7' },
-                                    rowLabel: rowLabel,
-                                    nutritionResult: resB
-                                });
-                            }
-                        }
                         var nutritionBarChart = echarts.init(nutritionBarDom);
-                        nutritionBarChart.setOption({
-                            tooltip: {
-                                trigger: 'axis',
-                                formatter: function(params) {
-                                    var p = params[0];
-                                    var d = p && p.data ? p.data : {};
-                                    if (!d.rowLabel && !d.nutritionResult) {
-                                        return (p.name || '') + '：暂无可评价结果';
-                                    }
-                                    var s = (p.name || '') + '<br/>标准差区间：' + (d.rowLabel || '—');
-                                    s += '<br/>营养状况：' + (d.nutritionResult || '—');
-                                    return s;
-                                }
-                            },
-                            grid: { left: '22%', right: '14%', top: '12%', bottom: '18%', containLabel: true },
-                            xAxis: {
-                                type: 'category',
-                                data: nutritionBarCategories,
-                                axisLabel: { interval: 0, rotate: 20, fontSize: 13, margin: 16, show: true },
-                                axisTick: { show: true },
-                                axisLine: { show: true }
-                            },
-                            yAxis: {
-                                type: 'value',
-                                name: '表3 行',
-                                min: 0,
-                                max: maxRow + 1,
-                                interval: 1,
-                                axisLabel: {
-                                    fontSize: 12,
-                                    margin: 12,
-                                    show: true,
-                                    formatter: function(v) {
-                                        if (v <= 0 || v > maxRow) return '';
-                                        var row = table3Rows[v - 1];
-                                        return row ? row.label : '';
-                                    }
-                                },
-                                nameTextStyle: { fontSize: 13 },
-                                nameGap: 32
-                            },
-                            series: [{
-                                type: 'bar',
-                                data: nutritionBarData,
-                                barWidth: '50%',
-                                barMinHeight: 6
-                            }]
-                        });
+                        if (isComparison && d1) {
+                            var zData = buildNutritionZBarData(d1, d2, mode);
+                            var resCurr = [], resPrev = [];
+                            for (var ri = 0; ri < 4; ri++) { resCurr.push(getNutritionResultForIndicator(d2, ri)); resPrev.push(getNutritionResultForIndicator(d1, ri)); }
+                            var zCurrData = zData.zCurr.map(function(z, i) { var v = z != null && !isNaN(z) ? Math.round(z * 100) / 100 : null; var r = resCurr[i] || '—'; var c = nutritionBarColors[r] || '#b0b0b0'; return v != null ? { value: v, itemStyle: { color: c } } : null; });
+                            var zPrevData = zData.zPrev.map(function(z, i) { var v = z != null && !isNaN(z) ? Math.round(z * 100) / 100 : null; var r = resPrev[i] || '—'; var c = nutritionBarColors[r] || '#b0b0b0'; return v != null ? { value: v, itemStyle: { color: c } } : null; });
+                            var seriesZ = [
+                                { name: '本次', type: 'bar', data: zCurrData, barWidth: '28%', label: { show: true, position: 'top', formatter: function(p) { var v = p.value; var val = (v && typeof v === 'object' && 'value' in v) ? v.value : v; var idx = p.dataIndex; if (val == null) return ''; return val + '\n' + (resCurr[idx] || '—'); } } },
+                                { name: '上次', type: 'bar', data: zPrevData, barWidth: '28%', label: { show: true, position: 'top', formatter: function(p) { var v = p.value; var val = (v && typeof v === 'object' && 'value' in v) ? v.value : v; var idx = p.dataIndex; if (val == null) return ''; return val + '\n' + (resPrev[idx] || '—'); } } }
+                            ];
+                            nutritionBarChart.setOption({
+                                title: { text: '左侧柱=本次（' + (d2.checkDate || '—') + '）、右侧柱=上次（' + (d1.checkDate || '—') + '）', left: 'center', top: 4, bottom: 'auto', textStyle: { fontSize: 11, color: '#666' } },
+                                tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' },
+                                    formatter: function(params) {
+                                        if (!params || params.length === 0) return '';
+                                        var idx = params[0].dataIndex;
+                                        var indName = nutritionBarCategories[idx] || '';
+                                        var z1 = zData.zCurr[idx], z2 = zData.zPrev[idx];
+                                        var s1 = z1 != null && !isNaN(z1) ? (z1 >= 0 ? '+' : '') + z1.toFixed(2) + ' SD (' + (resCurr[idx] || '—') + ')' : '—';
+                                        var s2 = z2 != null && !isNaN(z2) ? (z2 >= 0 ? '+' : '') + z2.toFixed(2) + ' SD (' + (resPrev[idx] || '—') + ')' : '—';
+                                        return indName + '<br/>本次：' + s1 + '<br/>上次：' + s2;
+                                    }},
+                                legend: { show: false },
+                                grid: { left: '12%', right: '12%', top: '14%', bottom: '16%', containLabel: true },
+                                xAxis: { type: 'category', data: zData.xAxisData, axisLabel: { interval: 0, rotate: 0, fontSize: 12, margin: 12 }, axisTick: { show: true }, axisLine: { show: true } },
+                                yAxis: { type: 'value', name: 'Z 值 (SD)', min: zData.yMin, max: zData.yMax, interval: 0.5, axisLabel: { fontSize: 12, formatter: function(v) { return v >= 0 ? '+' + v : v; } }, splitLine: { lineStyle: { type: 'dashed', color: '#ddd' } }, nameTextStyle: { fontSize: 12 }, nameGap: 36 },
+                                series: seriesZ
+                            });
+                            var nutritionLegEl = document.getElementById('nutritionBarLegend');
+                            if (nutritionLegEl) nutritionLegEl.innerHTML = nutritionBarOrder.map(function(n) { return '<div class="legend-item"><span class="legend-dot" style="background:' + (nutritionBarColors[n]||'#999') + ';"></span>' + n + '</div>'; }).join('');
+                        } else {
+                            var zSingle = [], resSingle = [];
+                            for (var i = 0; i < 4; i++) { zSingle.push(getZValueForIndicator(d2, i, mode)); resSingle.push(getNutritionResultForIndicator(d2, i)); }
+                            var zSingleData = zSingle.map(function(z, i) { var v = z != null && !isNaN(z) ? Math.round(z * 100) / 100 : null; var r = resSingle[i] || '—'; var c = nutritionBarColors[r] || '#b0b0b0'; return v != null ? { value: v, itemStyle: { color: c } } : null; });
+                            var allZ = zSingle.filter(function(z) { return z != null && !isNaN(z); });
+                            var yMin = -3.5, yMax = 3.5;
+                            if (allZ.length > 0) {
+                                var lo = Math.min.apply(null, allZ), hi = Math.max.apply(null, allZ);
+                                yMin = Math.max(-3.5, Math.floor(lo * 2) / 2 - 0.5);
+                                yMax = Math.min(3.5, Math.ceil(hi * 2) / 2 + 0.5);
+                                if (yMin > 0) yMin = -0.5;
+                                if (yMax < 0) yMax = 0.5;
+                            }
+                            nutritionBarChart.setOption({
+                                title: { text: '测查日期：' + (data.checkDate || '—'), left: 'center', bottom: 4, top: 'auto', textStyle: { fontSize: 12, fontWeight: 'normal', color: '#666' } },
+                                tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' },
+                                    formatter: function(params) {
+                                        if (!params || params.length === 0) return '';
+                                        var idx = params[0].dataIndex;
+                                        var z = zSingle[idx], r = resSingle[idx] || '—';
+                                        var s = z != null && !isNaN(z) ? (z >= 0 ? '+' : '') + z.toFixed(2) + ' SD (' + r + ')' : '—';
+                                        return (nutritionBarCategories[idx] || '') + '：' + s;
+                                    }},
+                                legend: { show: false },
+                                grid: { left: '12%', right: '12%', top: '12%', bottom: '16%', containLabel: true },
+                                xAxis: { type: 'category', data: nutritionBarCategories, axisLabel: { interval: 0, rotate: 0, fontSize: 13, margin: 16 }, axisTick: { show: true }, axisLine: { show: true } },
+                                yAxis: { type: 'value', name: 'Z 值 (SD)', min: yMin, max: yMax, interval: 0.5, axisLabel: { fontSize: 12, formatter: function(v) { return v >= 0 ? '+' + v : v; } }, splitLine: { lineStyle: { type: 'dashed', color: '#ddd' } }, nameTextStyle: { fontSize: 12 }, nameGap: 36 },
+                                series: [{ type: 'bar', data: zSingleData, barWidth: '50%', label: { show: true, position: 'top', formatter: function(p) { var v = p.value; var val = (v && typeof v === 'object' && 'value' in v) ? v.value : v; var idx = p.dataIndex; if (val == null) return ''; return val + '\n' + (resSingle[idx] || '—'); } } }]
+                            });
+                            var nutritionLegEl2 = document.getElementById('nutritionBarLegend');
+                            if (nutritionLegEl2) nutritionLegEl2.innerHTML = nutritionBarOrder.map(function(n) { return '<div class="legend-item"><span class="legend-dot" style="background:' + (nutritionBarColors[n]||'#999') + ';"></span>' + n + '</div>'; }).join('');
+                        }
                     }
                     var scatterBox = document.getElementById('scatterBox');
                     var scatterDom = document.getElementById('hwScatterChart');
@@ -877,9 +1139,14 @@
                                 emphasis: { scale: 1.2 },
                                 tooltip: { formatter: function() { return '姓名：' + (data.name || '—') + '<br/>性别：' + (data.gender || '—') + '<br/>身高：' + hCur + ' cm<br/>体重：' + wCur + ' kg'; } }
                             });
+                            var scatterDateText = '测查日期：' + (data.checkDate || '—');
                             scatterChart.setOption({
+                                title: [
+                                    { text: '身高与体重关系散点图', left: 'center', top: 8, textStyle: { fontSize: 14 } },
+                                    { text: scatterDateText, left: 'center', bottom: 4, top: 'auto', textStyle: { fontSize: 12, color: '#666' } }
+                                ],
                                 tooltip: { trigger: 'item' },
-                                legend: { orient: 'horizontal', bottom: 8, left: 'center', data: series.map(function(s) { return s.name; }) },
+                                legend: { orient: 'horizontal', bottom: 26, left: 'center', data: series.map(function(s) { return s.name; }) },
                                 grid: { left: '14%', right: '10%', top: '12%', bottom: '22%', containLabel: true },
                                 xAxis: { type: 'value', name: '身高 (cm)', min: 60, max: 160, interval: 5, nameGap: 36, axisLabel: { fontSize: 12 } },
                                 yAxis: { type: 'value', name: '体重 (kg)', nameGap: 36, axisLabel: { fontSize: 12 } },
@@ -896,7 +1163,7 @@
             }
 
             function resizeCharts() {
-                ['heightCompareChart', 'weightCompareChart', 'bmiCompareChart', 'levelPieChart', 'levelBarChart', 'nutritionPieChartPersonal', 'nutritionBarChartPersonal', 'hwScatterChart'].forEach(function(id) {
+                ['heightCompareChart', 'weightCompareChart', 'bmiCompareChart', 'levelPieChart', 'levelBarChart', 'nutritionBarChartPersonal', 'hwScatterChart'].forEach(function(id) {
                     var el = document.getElementById(id);
                     if (el && typeof echarts !== 'undefined' && echarts.getInstanceByDom(el)) echarts.getInstanceByDom(el).resize();
                 });
@@ -945,21 +1212,19 @@
                 var bmiChart = document.getElementById('bmiCompareChart') && echarts.getInstanceByDom(document.getElementById('bmiCompareChart'));
                 var levelPieChart = document.getElementById('levelPieChart') && echarts.getInstanceByDom(document.getElementById('levelPieChart'));
                 var levelBarChart = document.getElementById('levelBarChart') && echarts.getInstanceByDom(document.getElementById('levelBarChart'));
-                var nutritionPieChart = document.getElementById('nutritionPieChartPersonal') && echarts.getInstanceByDom(document.getElementById('nutritionPieChartPersonal'));
                 var nutritionBarChart = document.getElementById('nutritionBarChartPersonal') && echarts.getInstanceByDom(document.getElementById('nutritionBarChartPersonal'));
                 var scatterChart = document.getElementById('hwScatterChart') && echarts.getInstanceByDom(document.getElementById('hwScatterChart'));
                 if (!levelPieChart || !levelBarChart) { alert('图表未就绪，请稍候再试。'); return; }
                 var captureCharts = function() {
                     var wait = wasOverview ? 0 : 350;
                     setTimeout(function() {
-                        [heightChart, weightChart, bmiChart, levelPieChart, levelBarChart, nutritionPieChart, nutritionBarChart, scatterChart].forEach(function(ch) { if (ch && ch.resize) ch.resize(); });
+                        [heightChart, weightChart, bmiChart, levelPieChart, levelBarChart, nutritionBarChart, scatterChart].forEach(function(ch) { if (ch && ch.resize) ch.resize(); });
                         setTimeout(function() {
                             var heightUrl = heightChart ? heightChart.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
                             var weightUrl = weightChart ? weightChart.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
                             var bmiUrl = bmiChart ? bmiChart.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
                             var pieUrl = levelPieChart.getDataURL({ type: 'png', pixelRatio: 2 });
                             var barUrl = levelBarChart.getDataURL({ type: 'png', pixelRatio: 2 });
-                            var nutritionPieUrl = nutritionPieChart ? nutritionPieChart.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
                             var nutritionBarUrl = nutritionBarChart ? nutritionBarChart.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
                             var scatterUrl = scatterChart ? scatterChart.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
                             if (!wasOverview && activeTab) {
@@ -971,7 +1236,7 @@
                                 if (panel) panel.classList.add('active');
                                 setTimeout(resizeCharts, 50);
                             }
-                            doBuildPdf({ heightUrl: heightUrl, weightUrl: weightUrl, bmiUrl: bmiUrl, pieUrl: pieUrl, barUrl: barUrl, nutritionPieUrl: nutritionPieUrl, nutritionBarUrl: nutritionBarUrl, scatterUrl: scatterUrl });
+                            doBuildPdf({ heightUrl: heightUrl, weightUrl: weightUrl, bmiUrl: bmiUrl, pieUrl: pieUrl, barUrl: barUrl, nutritionBarUrl: nutritionBarUrl, scatterUrl: scatterUrl });
                         }, 150);
                     }, wait);
                 };
@@ -1041,10 +1306,9 @@
 
                 var chartPageStyle = 'width:800px;background:#fff;page-break-before:always;padding:24px 0 40px 0;';
                 var chartBlocks = [];
-                chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">各指标评价等级分布（表1/表2）</div><img src="' + chartUrls.pieUrl + '" style="' + imgStyleLevel + '" />');
-                chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">各生长指标评价等级</div><img src="' + chartUrls.barUrl + '" style="' + imgStyleLevel + '" />');
-                if (chartUrls.nutritionPieUrl) chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">儿童营养状况分布（表3 标准差法）</div><img src="' + chartUrls.nutritionPieUrl + '" style="' + imgStyleLevel + '" />');
-                if (chartUrls.nutritionBarUrl) chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">各生长指标营养状况（表3 标准差法）</div><img src="' + chartUrls.nutritionBarUrl + '" style="' + imgStyleLevel + '" />');
+                chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">儿童生长水平评价分布（表1/表2）</div><img src="' + chartUrls.pieUrl + '" style="' + imgStyleLevel + '" />');
+                chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">儿童生长水平评价</div><img src="' + chartUrls.barUrl + '" style="' + imgStyleLevel + '" />');
+                if (chartUrls.nutritionBarUrl) chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">营养状况对比（表3 标准差法）</div><img src="' + chartUrls.nutritionBarUrl + '" style="' + imgStyleLevel + '" />');
                 if (chartUrls.scatterUrl) {
                     var scLeg = '<div style="margin-top:10px;font-size:13px;color:#555;">' + leg('#5b9bd5', '男') + leg('#70ad47', '女') + leg('#e74c3c', (childName || '当前儿童') + '（当前报告）') + '</div>';
                     chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">身高与体重关系散点图</div><img src="' + chartUrls.scatterUrl + '" style="' + imgStyleScatter + '" />' + scLeg);

@@ -425,6 +425,9 @@
                 <button class="btn btn-secondary" onclick="exportEvaluationExcel()">导出评价表格</button>
                 <button class="btn btn-warning" onclick="exportExcel()">导出完整Excel</button>
                 <button class="btn btn-info" onclick="openBatchReport()" style="background:#6f42c1;">生成总体报告</button>
+                <input type="file" id="compareFile1" accept=".xlsx,.xls" style="display:none" onchange="onCompareFile1(event)">
+                <input type="file" id="compareFile2" accept=".xlsx,.xls" style="display:none" onchange="onCompareFile2(event)">
+                <button class="btn btn-info" onclick="startComparison()" style="background:#0d9488;">两次对比</button>
                 <button class="btn btn-danger" onclick="clearAll()">清空所有</button>
             </div>
 
@@ -1764,13 +1767,22 @@
         // BMI 用 weight/(height/100)^2 实时计算，避免误读单元格
         function getClassAveragesByGender() {
             const rows = document.querySelectorAll('#tableBody tr');
+            const list = [];
+            rows.forEach(row => { list.push(getRowReportData(row)); });
+            return getClassAveragesByGenderFromRows(list);
+        }
+
+        // 从给定的行数据数组（每项含 gender/height/weight）按性别计算全班平均，用于两次测查时分别算「上次」「本次」平均
+        function getClassAveragesByGenderFromRows(rows) {
+            if (!rows || !Array.isArray(rows)) return { classAvgHeightMale: null, classAvgWeightMale: null, classAvgBmiMale: null, classAvgHeightFemale: null, classAvgWeightFemale: null, classAvgBmiFemale: null };
             let sumHM = 0, sumWM = 0, sumBM = 0, countHM = 0, countWM = 0, countBM = 0;
             let sumHF = 0, sumWF = 0, sumBF = 0, countHF = 0, countWF = 0, countBF = 0;
-            rows.forEach(row => {
-                const d = getRowReportData(row);
+            rows.forEach(d => {
                 const isMale = (d.gender || '').trim() === '男';
-                const h = d.height != null && !isNaN(d.height) && d.height > 0 ? Number(d.height) : null;
-                const w = d.weight != null && !isNaN(d.weight) && d.weight > 0 ? Number(d.weight) : null;
+                const hNum = d.height != null ? Number(d.height) : NaN;
+                const wNum = d.weight != null ? Number(d.weight) : NaN;
+                const h = (!isNaN(hNum) && hNum > 0) ? hNum : null;
+                const w = (!isNaN(wNum) && wNum > 0) ? wNum : null;
                 let b = null;
                 if (h != null && w != null && h > 0) {
                     b = Math.round((w / Math.pow(h / 100, 2)) * 10) / 10;
@@ -2483,10 +2495,12 @@
             }
         }
 
-        // 导入Excel
-        function importExcel(event) {
-            const file = event.target.files[0];
+        // 导入Excel。options: { forComparison: true, file: File, callback: function(batch) } 用于两次对比
+        function importExcel(event, options) {
+            const file = (options && options.forComparison && options.file) ? options.file : (event && event.target && event.target.files && event.target.files[0]);
             if (!file) return;
+            const forComparison = !!(options && options.forComparison);
+            const onBatchReady = options && options.callback;
 
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -2561,11 +2575,12 @@
                     if (colMap.gender === undefined || colMap.birthDate === undefined) {
                         const foundHeaders = headers.filter(h => h).join('、');
                         alert(`Excel文件必须包含"性别"和"出生日期"列！\n\n检测到的列名：${foundHeaders || '未找到任何列名'}\n\n请确保Excel文件的第一行包含表头，且包含"性别"和"出生日期"列。`);
+                        if (forComparison && onBatchReady) onBatchReady(null);
                         return;
                     }
 
                     // 清空现有数据
-                    if (confirm('导入数据将覆盖现有数据，是否继续？')) {
+                    const doImport = function() {
                         document.getElementById('tableBody').innerHTML = '';
                         rowCount = 0;
 
@@ -2919,20 +2934,127 @@
                         rowCount = rowDataList.length;
                         updateStatus();
 
-                        // 分块计算，避免主线程长时间阻塞导致卡顿
+                        // 分块计算
                         calculateAllInChunks((total) => {
-                            alert(`成功导入 ${importedCount} 条数据并完成计算！`);
+                            if (forComparison && onBatchReady) onBatchReady(getBatchReportData());
+                            else alert(`成功导入 ${importedCount} 条数据并完成计算！`);
                         });
-
-                        // 清空文件输入，以便可以再次选择同一文件
-                        event.target.value = '';
-                    }
+                    };
+                    if (forComparison) doImport();
+                    else if (confirm('导入数据将覆盖现有数据，是否继续？')) doImport();
+                    if (!forComparison && event && event.target) event.target.value = '';
                 } catch (error) {
                     console.error('导入Excel错误:', error);
                     alert('导入Excel文件失败：' + error.message);
+                    if (forComparison && onBatchReady) onBatchReady(null);
                 }
             };
             reader.readAsArrayBuffer(file);
+        }
+
+        // 两次对比：处理两个文件并生成对比报告
+        let compareFile1Ref = null;
+        let compareFile2Ref = null;
+        function startComparison() {
+            compareFile1Ref = null;
+            compareFile2Ref = null;
+            document.getElementById('compareFile1').value = '';
+            document.getElementById('compareFile2').value = '';
+            document.getElementById('compareFile1').click();
+        }
+        function onCompareFile1(event) {
+            const f = event.target.files[0];
+            if (!f) return;
+            compareFile1Ref = f;
+            document.getElementById('compareFile2').click();
+        }
+        function onCompareFile2(event) {
+            const f = event.target.files[0];
+            if (!f) return;
+            compareFile2Ref = f;
+            if (!compareFile1Ref || !compareFile2Ref) {
+                alert('请先选择第一次测查文件，再选择第二次测查文件。');
+                return;
+            }
+            processComparison();
+        }
+        function processComparison() {
+            const savedHtml = document.getElementById('tableBody').innerHTML;
+            const f1 = compareFile1Ref;
+            const f2 = compareFile2Ref;
+            compareFile1Ref = null;
+            compareFile2Ref = null;
+            importExcel(null, { forComparison: true, file: f1, callback: function(batch1) {
+                if (!batch1 || !batch1.rows || batch1.rows.length === 0) {
+                    alert('第一次测查文件解析失败或没有有效数据，请检查文件格式（需含姓名、性别、出生日期、测查日期、体重、身高等列）。');
+                    document.getElementById('tableBody').innerHTML = savedHtml;
+                    rowCount = document.querySelectorAll('#tableBody tr').length;
+                    updateStatus();
+                    return;
+                }
+                importExcel(null, { forComparison: true, file: f2, callback: function(batch2) {
+                    document.getElementById('tableBody').innerHTML = savedHtml;
+                    rowCount = document.querySelectorAll('#tableBody tr').length;
+                    updateStatus();
+                    if (!batch2 || !batch2.rows || batch2.rows.length === 0) {
+                        alert('第二次测查文件解析失败或没有有效数据。');
+                        return;
+                    }
+                    const pairs = [];
+                    const key = function(d) { return ((d.name||'').trim() + '|' + (d.birthDate||'').toString().trim()); };
+                    const byKey1 = {};
+                    batch1.rows.forEach(function(r) { byKey1[key(r)] = r; });
+                    batch2.rows.forEach(function(r2) {
+                        const k = key(r2);
+                        const r1 = byKey1[k];
+                        if (!r1) return;
+                        const d1 = (r1.checkDate||'').toString().trim();
+                        const d2 = (r2.checkDate||'').toString().trim();
+                        const first = (!d1 || !d2 || d1 <= d2) ? r1 : r2;
+                        const second = (first === r1) ? r2 : r1;
+                        pairs.push({ name: r1.name, birthDate: r1.birthDate, first: first, second: second });
+                    });
+                    if (pairs.length === 0) {
+                        alert('两次测查数据中未找到匹配的儿童（按姓名+出生日期匹配），或测查日期无法区分先后。');
+                        return;
+                    }
+                    try {
+                        const p = pairs[0];
+                        const avgsSecond = getClassAveragesByGenderFromRows(pairs.map(x => x.second));
+                        const avgsFirst = getClassAveragesByGenderFromRows(pairs.map(x => x.first));
+                        const isMale = ((p.second.gender || '').trim() === '男');
+                        const reportData = Object.assign({}, p.second, { comparisonFirst: p.first });
+                        if (isMale) {
+                            if (avgsSecond.classAvgHeightMale != null) reportData.classAvgHeight = avgsSecond.classAvgHeightMale;
+                            if (avgsSecond.classAvgWeightMale != null) reportData.classAvgWeight = avgsSecond.classAvgWeightMale;
+                            if (avgsSecond.classAvgBmiMale != null) reportData.classAvgBmi = avgsSecond.classAvgBmiMale;
+                            if (avgsFirst.classAvgHeightMale != null) reportData.classAvgHeightPrev = avgsFirst.classAvgHeightMale;
+                            if (avgsFirst.classAvgWeightMale != null) reportData.classAvgWeightPrev = avgsFirst.classAvgWeightMale;
+                            if (avgsFirst.classAvgBmiMale != null) reportData.classAvgBmiPrev = avgsFirst.classAvgBmiMale;
+                        } else {
+                            if (avgsSecond.classAvgHeightFemale != null) reportData.classAvgHeight = avgsSecond.classAvgHeightFemale;
+                            if (avgsSecond.classAvgWeightFemale != null) reportData.classAvgWeight = avgsSecond.classAvgWeightFemale;
+                            if (avgsSecond.classAvgBmiFemale != null) reportData.classAvgBmi = avgsSecond.classAvgBmiFemale;
+                            if (avgsFirst.classAvgHeightFemale != null) reportData.classAvgHeightPrev = avgsFirst.classAvgHeightFemale;
+                            if (avgsFirst.classAvgWeightFemale != null) reportData.classAvgWeightPrev = avgsFirst.classAvgWeightFemale;
+                            if (avgsFirst.classAvgBmiFemale != null) reportData.classAvgBmiPrev = avgsFirst.classAvgBmiFemale;
+                        }
+                        localStorage.setItem('childGrowthReport', JSON.stringify(reportData));
+                        if (pairs.length > 1) {
+                            localStorage.setItem('childGrowthComparisonReport', JSON.stringify({ mode: batch1.mode || currentMode, pairs: pairs }));
+                        } else {
+                            localStorage.removeItem('childGrowthComparisonReport');
+                        }
+                        const combinedBatch = { mode: batch1.mode || currentMode, rows: (batch1.rows || []).concat(batch2.rows || []) };
+                        if (combinedBatch.rows.length > 0) {
+                            localStorage.setItem('childGrowthBatchReport', JSON.stringify(combinedBatch));
+                        }
+                        window.open('report.html', '_blank', 'noopener');
+                    } catch (e) {
+                        alert('无法打开报告页，请检查是否允许弹窗。');
+                    }
+                }});
+            }});
         }
 
         // 导出完整Excel：除序号列外居中对齐，列宽与表头换行与评价表一致

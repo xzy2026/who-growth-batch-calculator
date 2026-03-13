@@ -6,14 +6,20 @@ const ALLOWED_ORIGINS = [
   "https://xzy2026.github.io",
   "https://who-growth-batch-calculator.vercel.app",
   "http://localhost:8080",
+  "http://localhost:5500",
+  "http://127.0.0.1:8080",
   "http://127.0.0.1:5500",
+  "http://127.0.0.1:3000",
+  "null",
 ];
 
 const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
 
 function getOrigin(req) {
   const origin = (req.headers && req.headers.origin) || "";
-  return ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  if (ALLOWED_ORIGINS.includes(origin)) return origin;
+  // 未在白名单时用 *，便于本地 file:// 或任意端口访问（本接口不携带凭证）
+  return "*";
 }
 
 function setCors(res, origin) {

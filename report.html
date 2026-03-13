@@ -1493,12 +1493,51 @@
                     try {
                         var raw = localStorage.getItem(STORAGE_KEY);
                         if (!raw) return '';
-                        var data = JSON.parse(raw);
+                        var data = typeof raw === 'string' ? JSON.parse(raw) : raw;
+                        var tier = getTierLevel(data);
+                        var tierLabel = (tier && tier.level) ? tier.level : '';
                         var name = (data.name || '').trim() || '儿童';
                         var birth = (data.birthDate || '').trim();
                         var check = (data.checkDate || '').trim();
-                        var tier = (data.tier && data.tier.level) ? data.tier.level : '';
-                        return '【报告简要】姓名：' + name + (birth ? '，出生日期：' + birth : '') + (check ? '，测查日期：' + check : '') + (tier ? '，整体等级：' + tier : '') + '。';
+                        var ageText = (data.ageText || '').trim();
+                        var gender = (data.gender || '').trim();
+                        var parts = [];
+                        var birthDes = birth ? (birth.length >= 4 ? '出生年份：' + birth.slice(0, 4) + '年' : '') : '';
+                        parts.push('【基本信息】' + (gender ? '性别：' + gender + '，' : '') + (birthDes || '') + (ageText ? '实足年龄：' + ageText + '。' : '。（已脱敏：不包含姓名与具体日期）'));
+                        parts.push('【体格数据】身高：' + (data.height != null ? data.height + ' cm' : '—') + '，体重：' + (data.weight != null ? data.weight + ' kg' : '—') + '，BMI：' + (data.bmi != null ? data.bmi : '—') + '。');
+                        parts.push('【整体评价】' + (tierLabel ? '等级：' + tierLabel + '。' : ''));
+                        var indicators = data.indicators || [];
+                        var indFiltered = indicators.filter(function(ind) { return ind.id !== 'ageHead' && ind.name !== '年龄别头围'; });
+                        if (indFiltered.length) {
+                            var indLines = indFiltered.map(function(ind) {
+                                var val = (ind.value != null && ind.value !== '-') ? ind.value : '—';
+                                var res = (ind.result != null && ind.result !== '-') ? ind.result : '—';
+                                return (ind.name || '') + ' 评价值 ' + val + '，评价结果 ' + res;
+                            });
+                            parts.push('【指标明细】' + indLines.join('；') + '。');
+                        }
+                        var stdH = data.stdHeight != null && data.stdHeight !== '' && data.stdHeight !== '-' ? String(data.stdHeight).replace(/[^0-9.-]/g, '') : '';
+                        var stdW = data.stdWeight != null && data.stdWeight !== '' && data.stdWeight !== '-' ? String(data.stdWeight).replace(/[^0-9.-]/g, '') : '';
+                        var stdBmi = (data.stdBmi != null && data.stdBmi !== '' && data.stdBmi !== '-') ? String(data.stdBmi).replace(/[^0-9.-]/g, '') : '';
+                        if (stdH || stdW || stdBmi) {
+                            var chartLine = '【图表数据】本次测查：实际身高 ' + (data.height != null ? data.height + ' cm' : '—') + '，标准身高 ' + (stdH || '—') + ' cm';
+                            chartLine += '；实际体重 ' + (data.weight != null ? data.weight + ' kg' : '—') + '，标准体重 ' + (stdW || '—') + ' kg';
+                            chartLine += '；实际BMI ' + (data.bmi != null ? data.bmi : '—') + '，标准BMI ' + (stdBmi || '—') + '。';
+                            if (data.classAvgHeight != null || data.classAvgWeight != null || data.classAvgBmi != null) {
+                                chartLine += ' 全班同性别平均：身高 ' + (data.classAvgHeight != null ? data.classAvgHeight + ' cm' : '—') + '，体重 ' + (data.classAvgWeight != null ? data.classAvgWeight + ' kg' : '—') + '，BMI ' + (data.classAvgBmi != null ? data.classAvgBmi : '—') + '。';
+                            }
+                            parts.push(chartLine);
+                        }
+                        var d1 = data.comparisonFirst || null;
+                        if (d1) {
+                            parts.push('【上次测查】年龄：' + (d1.ageText || '—') + '，身高：' + (d1.height != null ? d1.height + ' cm' : '—') + '，体重：' + (d1.weight != null ? d1.weight + ' kg' : '—') + '，BMI：' + (d1.bmi != null ? d1.bmi : '—') + '。（不包含具体日期）');
+                        }
+                        var suggestionText = getSuggestionText(tier, data);
+                        if (name && name !== '儿童') {
+                            try { suggestionText = suggestionText.replace(new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '该儿童'); } catch (e2) {}
+                        }
+                        parts.push('【报告健康建议】' + suggestionText);
+                        return parts.join('\n\n');
                     } catch (e) { return ''; }
                 }
                 sendBtn.addEventListener('click', function() {

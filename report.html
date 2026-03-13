@@ -1507,10 +1507,13 @@
                     sendBtn.disabled = true;
                     if (responseEl) { responseEl.textContent = '正在请求AI，请稍候…'; responseEl.classList.add('show'); responseEl.classList.remove('ai-qa-error'); }
                     var body = JSON.stringify({ question: question, context: getReportContext() });
+                    var ctrl = new AbortController();
+                    var timeoutId = setTimeout(function() { ctrl.abort(); }, 50000);
                     fetch(AI_PROXY_URL, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: body
+                        body: body,
+                        signal: ctrl.signal
                     }).then(function(res) {
                         return res.text().then(function(t) {
                             var data = null;
@@ -1522,8 +1525,9 @@
                         var text = (data && (data.answer || data.reply || data.text || data.content)) || '';
                         if (responseEl) { responseEl.textContent = text || '未获取到回复。'; responseEl.classList.add('show'); responseEl.classList.remove('ai-qa-error'); }
                     }).catch(function(err) {
-                        if (responseEl) { responseEl.textContent = err.message || '网络异常，请稍后重试。'; responseEl.classList.add('show', 'ai-qa-error'); }
-                    }).finally(function() { sendBtn.disabled = false; });
+                        var msg = err.name === 'AbortError' ? '请求超时，请检查网络或稍后重试。' : (err.message || '网络异常，请稍后重试。');
+                        if (responseEl) { responseEl.textContent = msg; responseEl.classList.add('show', 'ai-qa-error'); }
+                    }).finally(function() { clearTimeout(timeoutId); sendBtn.disabled = false; });
                 });
             })();
         })();

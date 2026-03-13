@@ -2,27 +2,18 @@
 // 部署后地址：https://你的项目.vercel.app/api/chat
 // 环境变量：AI_API_KEY（必填，DeepSeek API Key）
 
-// 延长超时时间（DeepSeek 可能较慢；Hobby 计划上限约 10s，Pro 可更大）
-export const config = { maxDuration: 30 };
-
 const ALLOWED_ORIGINS = [
   "https://xzy2026.github.io",
   "https://who-growth-batch-calculator.vercel.app",
   "http://localhost:8080",
-  "http://localhost:5500",
-  "http://127.0.0.1:8080",
   "http://127.0.0.1:5500",
-  "http://127.0.0.1:3000",
-  "null",
 ];
 
 const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
 
 function getOrigin(req) {
   const origin = (req.headers && req.headers.origin) || "";
-  if (ALLOWED_ORIGINS.includes(origin)) return origin;
-  // 未在白名单时用 *，便于本地 file:// 或任意端口访问（本接口不携带凭证）
-  return "*";
+  return ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
 }
 
 function setCors(res, origin) {
@@ -70,7 +61,7 @@ export default async function handler(req, res) {
       {
         role: "system",
         content:
-          "你是一名儿童营养与生长方面的助手。用户会附带当前儿童的生长报告摘要，包括基本信息、体格数据（身高/体重/BMI）、各指标评价值与评价结果、图表中的实际值与标准值对比、以及报告给出的健康建议。请结合这些报告内容分析用户的问题，引用具体指标或数据作答，给出简短、温和、可操作的建议。回答控制在 200 字以内，并提醒仅供参考、不作为诊断依据。",
+          "你是一名儿童营养与生长方面的助手，根据用户提供的报告简要和问题，给出简短、温和、可操作的建议。回答控制在 200 字以内，并提醒仅供参考、不作为诊断依据。",
       },
       { role: "user", content: userContent || "你好" },
     ],

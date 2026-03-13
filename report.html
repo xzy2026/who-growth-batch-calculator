@@ -243,6 +243,13 @@
                 <div class="modal-footer">
                     <button type="button" class="btn-send" id="aiQaSendBtn">发送</button>
                 </div>
+                <div class="modal-proxy-wrap" style="padding:0 20px 12px;border-top:1px solid #eee;">
+                    <button type="button" class="proxy-toggle" id="aiQaProxyToggle" style="background:none;border:none;color:#666;font-size:12px;cursor:pointer;padding:4px 0;">无法连接？设置代理地址</button>
+                    <div id="aiQaProxyBox" style="display:none;margin-top:8px;">
+                        <input type="text" id="aiQaProxyInput" placeholder="留空使用默认，或填写备用 API 地址" style="width:100%;padding:8px 10px;font-size:13px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box;" />
+                        <button type="button" id="aiQaProxySave" style="margin-top:6px;padding:6px 12px;font-size:12px;background:#366092;color:#fff;border:none;border-radius:6px;cursor:pointer;">保存</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -250,6 +257,11 @@
         (function() {
             var STORAGE_KEY = 'childGrowthReport';
             var AI_PROXY_URL = 'https://who-growth-batch-calculator.vercel.app/api/chat';
+            var AI_PROXY_STORAGE_KEY = 'aiProxyUrl';
+            function getProxyUrl() {
+                var u = localStorage.getItem(AI_PROXY_STORAGE_KEY);
+                return (u && (u = u.trim())) ? u : AI_PROXY_URL;
+            }
             var percentileToZMap = { 'P3': -1.88, 'P10': -1.28, 'P25': -0.67, 'P50': 0, 'P75': 0.67, 'P90': 1.28, 'P97': 1.88 };
 
             function isNotApplicable(valueStr) {
@@ -1479,7 +1491,23 @@
                 var inputEl = document.getElementById('aiQaInput');
                 var responseEl = document.getElementById('aiQaResponse');
                 var sendBtn = document.getElementById('aiQaSendBtn');
+                var proxyToggle = document.getElementById('aiQaProxyToggle');
+                var proxyBox = document.getElementById('aiQaProxyBox');
+                var proxyInput = document.getElementById('aiQaProxyInput');
+                var proxySaveBtn = document.getElementById('aiQaProxySave');
                 if (!overlay || !entryBtn || !sendBtn) return;
+                if (proxyToggle && proxyBox && proxyInput && proxySaveBtn) {
+                    var saved = localStorage.getItem(AI_PROXY_STORAGE_KEY);
+                    if (saved) proxyInput.value = saved;
+                    proxyToggle.addEventListener('click', function() {
+                        proxyBox.style.display = proxyBox.style.display === 'none' ? 'block' : 'none';
+                    });
+                    proxySaveBtn.addEventListener('click', function() {
+                        var v = (proxyInput.value || '').trim();
+                        if (v) { localStorage.setItem(AI_PROXY_STORAGE_KEY, v); if (responseEl) { responseEl.textContent = '已保存代理地址，请重试发送。'; responseEl.classList.add('show'); responseEl.classList.remove('ai-qa-error'); } }
+                        else { localStorage.removeItem(AI_PROXY_STORAGE_KEY); if (responseEl) { responseEl.textContent = '已恢复默认地址。'; responseEl.classList.add('show'); } }
+                    });
+                }
                 entryBtn.addEventListener('click', function() {
                     if (responseEl) { responseEl.classList.remove('show'); responseEl.className = 'ai-qa-response'; responseEl.textContent = ''; }
                     if (inputEl) inputEl.value = '';
@@ -1506,10 +1534,14 @@
                     sendBtn.disabled = true;
                     if (responseEl) { responseEl.textContent = '正在请求AI，请稍候…'; responseEl.classList.add('show'); responseEl.classList.remove('ai-qa-error'); }
                     var body = JSON.stringify({ question: question, context: getReportContext() });
-                    fetch(AI_PROXY_URL, {
+                    var url = getProxyUrl();
+                    var ctrl = new AbortController();
+                    var to = setTimeout(function() { ctrl.abort(); }, 25000);
+                    fetch(url, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: body
+                        body: body,
+                        signal: ctrl.signal
                     }).then(function(res) {
                         return res.text().then(function(t) {
                             var data = null;
@@ -1521,8 +1553,10 @@
                         var text = (data && (data.answer || data.reply || data.text || data.content)) || '';
                         if (responseEl) { responseEl.textContent = text || '未获取到回复。'; responseEl.classList.add('show'); responseEl.classList.remove('ai-qa-error'); }
                     }).catch(function(err) {
-                        if (responseEl) { responseEl.textContent = err.message || '网络异常，请稍后重试。'; responseEl.classList.add('show', 'ai-qa-error'); }
-                    }).finally(function() { sendBtn.disabled = false; });
+                        var msg = err.message || '网络异常，请稍后重试。';
+                        if (err.name === 'AbortError' || (typeof msg === 'string' && (msg.indexOf('fetch') !== -1 || msg.indexOf('timed out') !== -1 || msg.indexOf('Failed') !== -1))) msg = '连接失败或超时。请点击下方「设置代理地址」填写备用 API 地址（如自建代理）后重试。';
+                        if (responseEl) { responseEl.textContent = msg; responseEl.classList.add('show', 'ai-qa-error'); }
+                    }).finally(function() { clearTimeout(to); sendBtn.disabled = false; });
                 });
             })();
         })();

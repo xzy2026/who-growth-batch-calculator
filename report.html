@@ -784,7 +784,7 @@
                             var hDataAvg = hClassVal != null ? [null, hClassVal, null, hClassValPrev] : null;
                             var hSeries = [
                                 { name: '实际身高', type: 'bar', data: hDataActual, itemStyle: { color: '#5b9bd5' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, distance: 4, formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } },
-                                { name: '标准身高', type: 'bar', data: hDataStd, itemStyle: { color: 'transparent', borderColor: '#e74c3c', borderWidth: 2, borderType: 'dashed' }, barWidth: '28%', label: { show: true, position: 'inside', fontSize: 11, verticalAlign: 'top', color: '#c0392b', fontWeight: 'bold', formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } }
+                                { name: '标准身高', type: 'bar', data: hDataStd, itemStyle: { color: 'transparent', borderColor: '#333', borderWidth: 2, borderType: 'dashed' }, barWidth: '28%', label: { show: true, position: 'inside', fontSize: 11, verticalAlign: 'top', color: '#333', fontWeight: 'bold', formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } }
                             ];
                             if (hClassVal != null && hDataAvg) hSeries.push({ name: classHeightLabel, type: 'bar', data: hDataAvg, itemStyle: { color: '#8fb4d4' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, formatter: function(p) { return p.value != null ? Number(p.value).toFixed(1) : ''; } } });
                             heightChart.setOption({
@@ -793,7 +793,7 @@
                                 legend: { data: hSeries.map(function(s) { return s.name; }), bottom: 10, top: 'auto' },
                                 grid: { left: '22%', right: '14%', top: '14%', bottom: '22%', containLabel: true },
                                 xAxis: { type: 'category', name: '测量次数', data: hCats, axisLabel: { fontSize: 13, margin: 10, formatter: function(v, i) { return (hClassVal != null && (i === 1 || i === 3)) ? '' : v; } }, axisTick: { show: true }, axisLine: { show: true } },
-                                yAxis: { type: 'value', name: '身高 (cm)', min: 0, axisLabel: { fontSize: 13, margin: 14 }, nameTextStyle: { fontSize: 13 }, nameGap: 36 },
+                                yAxis: { type: 'value', name: '身高 (cm)', min: 80, interval: 5, axisLabel: { fontSize: 13, margin: 14 }, nameTextStyle: { fontSize: 13 }, nameGap: 36 },
                                 series: hSeries
                             });
                         } else if (actualH != null || stdH != null || classAvgH != null) {
@@ -806,7 +806,7 @@
                             var hDataAvg = hClassVal != null ? [null, hClassVal] : null;
                             var hSeries = [
                                 { name: '实际身高', type: 'bar', data: hDataActual, itemStyle: { color: '#5b9bd5' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, distance: 4, formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } },
-                                { name: '标准身高', type: 'bar', data: hDataStd, itemStyle: { color: 'transparent', borderColor: '#e74c3c', borderWidth: 2, borderType: 'dashed' }, barWidth: '28%', label: { show: true, position: 'inside', fontSize: 11, verticalAlign: 'top', color: '#c0392b', fontWeight: 'bold', formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } }
+                                { name: '标准身高', type: 'bar', data: hDataStd, itemStyle: { color: 'transparent', borderColor: '#333', borderWidth: 2, borderType: 'dashed' }, barWidth: '28%', label: { show: true, position: 'inside', fontSize: 11, verticalAlign: 'top', color: '#333', fontWeight: 'bold', formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } }
                             ];
                             if (hClassVal != null && hDataAvg) hSeries.push({ name: classHeightLabel, type: 'bar', data: hDataAvg, itemStyle: { color: '#8fb4d4' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, formatter: function(p) { return p.value != null ? Number(p.value).toFixed(1) : ''; } } });
                             heightChart.setOption({
@@ -816,7 +816,7 @@
                                 legend: { data: hSeries.map(function(s) { return s.name; }), bottom: 26, top: 'auto' },
                                 grid: { left: '22%', right: '14%', top: '14%', bottom: '22%', containLabel: true },
                                 xAxis: { type: 'category', name: '测量次数', data: hCats, axisLabel: { fontSize: 13, margin: 10, formatter: function(v, i) { return (hClassVal != null && i === 1) ? '' : v; } }, axisTick: { show: true }, axisLine: { show: true } },
-                                yAxis: { type: 'value', name: '身高 (cm)', min: 0, axisLabel: { fontSize: 13, margin: 14 }, nameTextStyle: { fontSize: 13 }, nameGap: 36 },
+                                yAxis: { type: 'value', name: '身高 (cm)', min: 80, interval: 5, axisLabel: { fontSize: 13, margin: 14 }, nameTextStyle: { fontSize: 13 }, nameGap: 36 },
                                 series: hSeries
                             });
                         }
@@ -841,7 +841,7 @@
                             var wDataAvg = wClassVal != null ? [null, wClassVal, null, wClassValPrev] : null;
                             var wSeries = [
                                 { name: '实际体重', type: 'bar', data: wDataActual, itemStyle: { color: '#ed7d31' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, distance: 4, formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } },
-                                { name: '标准体重', type: 'bar', data: wDataStd, itemStyle: { color: 'transparent', borderColor: '#e74c3c', borderWidth: 2, borderType: 'dashed' }, barWidth: '28%', label: { show: true, position: 'inside', fontSize: 11, verticalAlign: 'top', color: '#c0392b', fontWeight: 'bold', formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } }
+                                { name: '标准体重', type: 'bar', data: wDataStd, itemStyle: { color: 'transparent', borderColor: '#333', borderWidth: 2, borderType: 'dashed' }, barWidth: '28%', label: { show: true, position: 'inside', fontSize: 11, verticalAlign: 'top', color: '#333', fontWeight: 'bold', formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } }
                             ];
                             if (wClassVal != null && wDataAvg) wSeries.push({ name: classWeightLabel, type: 'bar', data: wDataAvg, itemStyle: { color: '#d4a574' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, formatter: function(p) { return p.value != null ? Number(p.value).toFixed(1) : ''; } } });
                             weightChart.setOption({
@@ -850,7 +850,7 @@
                                 legend: { data: wSeries.map(function(s) { return s.name; }), bottom: 10, top: 'auto' },
                                 grid: { left: '22%', right: '14%', top: '14%', bottom: '22%', containLabel: true },
                                 xAxis: { type: 'category', name: '测量次数', data: wCats, axisLabel: { fontSize: 13, margin: 10, formatter: function(v, i) { return (wClassVal != null && (i === 1 || i === 3)) ? '' : v; } }, axisTick: { show: true }, axisLine: { show: true } },
-                                yAxis: { type: 'value', name: '体重 (kg)', min: 0, axisLabel: { fontSize: 13, margin: 14 }, nameTextStyle: { fontSize: 13 }, nameGap: 36 },
+                                yAxis: { type: 'value', name: '体重 (kg)', min: 15, axisLabel: { fontSize: 13, margin: 14 }, nameTextStyle: { fontSize: 13 }, nameGap: 36 },
                                 series: wSeries
                             });
                         } else if (actualW != null || stdW != null || classAvgW != null) {
@@ -863,7 +863,7 @@
                             var wDataAvg = wClassVal != null ? [null, wClassVal] : null;
                             var wSeries = [
                                 { name: '实际体重', type: 'bar', data: wDataActual, itemStyle: { color: '#ed7d31' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, distance: 4, formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } },
-                                { name: '标准体重', type: 'bar', data: wDataStd, itemStyle: { color: 'transparent', borderColor: '#e74c3c', borderWidth: 2, borderType: 'dashed' }, barWidth: '28%', label: { show: true, position: 'inside', fontSize: 11, verticalAlign: 'top', color: '#c0392b', fontWeight: 'bold', formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } }
+                                { name: '标准体重', type: 'bar', data: wDataStd, itemStyle: { color: 'transparent', borderColor: '#333', borderWidth: 2, borderType: 'dashed' }, barWidth: '28%', label: { show: true, position: 'inside', fontSize: 11, verticalAlign: 'top', color: '#333', fontWeight: 'bold', formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } }
                             ];
                             if (wClassVal != null && wDataAvg) wSeries.push({ name: classWeightLabel, type: 'bar', data: wDataAvg, itemStyle: { color: '#d4a574' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, formatter: function(p) { return p.value != null ? Number(p.value).toFixed(1) : ''; } } });
                             weightChart.setOption({
@@ -873,7 +873,7 @@
                                 legend: { data: wSeries.map(function(s) { return s.name; }), bottom: 26, top: 'auto' },
                                 grid: { left: '22%', right: '14%', top: '14%', bottom: '22%', containLabel: true },
                                 xAxis: { type: 'category', name: '测量次数', data: wCats, axisLabel: { fontSize: 13, margin: 10, formatter: function(v, i) { return (wClassVal != null && i === 1) ? '' : v; } }, axisTick: { show: true }, axisLine: { show: true } },
-                                yAxis: { type: 'value', name: '体重 (kg)', min: 0, axisLabel: { fontSize: 13, margin: 14 }, nameTextStyle: { fontSize: 13 }, nameGap: 36 },
+                                yAxis: { type: 'value', name: '体重 (kg)', min: 15, axisLabel: { fontSize: 13, margin: 14 }, nameTextStyle: { fontSize: 13 }, nameGap: 36 },
                                 series: wSeries
                             });
                         }
@@ -897,7 +897,7 @@
                             var bDataAvg = bClassVal != null ? [null, bClassVal, null, bClassValPrev] : null;
                             var bSeries = [
                                 { name: '实际BMI', type: 'bar', data: bDataActual, itemStyle: { color: '#70ad47' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, distance: 4, formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } },
-                                { name: '标准BMI', type: 'bar', data: bDataStd, itemStyle: { color: 'transparent', borderColor: '#e74c3c', borderWidth: 2, borderType: 'dashed' }, barWidth: '28%', label: { show: true, position: 'inside', fontSize: 11, verticalAlign: 'top', color: '#c0392b', fontWeight: 'bold', formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } }
+                                { name: '标准BMI', type: 'bar', data: bDataStd, itemStyle: { color: 'transparent', borderColor: '#333', borderWidth: 2, borderType: 'dashed' }, barWidth: '28%', label: { show: true, position: 'inside', fontSize: 11, verticalAlign: 'top', color: '#333', fontWeight: 'bold', formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } }
                             ];
                             if (bClassVal != null && bDataAvg) bSeries.push({ name: classBmiLabel, type: 'bar', data: bDataAvg, itemStyle: { color: '#8fbc8f' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, formatter: function(p) { return p.value != null ? Number(p.value).toFixed(1) : ''; } } });
                             bmiChart.setOption({
@@ -906,7 +906,7 @@
                                 legend: { data: bSeries.map(function(s) { return s.name; }), bottom: 10, top: 'auto' },
                                 grid: { left: '22%', right: '14%', top: '14%', bottom: '22%', containLabel: true },
                                 xAxis: { type: 'category', name: '测量次数', data: bCats, axisLabel: { fontSize: 13, margin: 10, formatter: function(v, i) { return (bClassVal != null && (i === 1 || i === 3)) ? '' : v; } }, axisTick: { show: true }, axisLine: { show: true } },
-                                yAxis: { type: 'value', name: 'BMI (kg/m²)', min: 0, axisLabel: { fontSize: 13, margin: 14 }, nameTextStyle: { fontSize: 13 }, nameGap: 36 },
+                                yAxis: { type: 'value', name: 'BMI (kg/m²)', min: 10, interval: 1, axisLabel: { fontSize: 13, margin: 14 }, nameTextStyle: { fontSize: 13 }, nameGap: 36 },
                                 series: bSeries
                             });
                         } else if (actualBmi != null || stdBmi != null || classAvgBmi != null) {
@@ -919,7 +919,7 @@
                             var bDataAvg = bClassVal != null ? [null, bClassVal] : null;
                             var bSeries = [
                                 { name: '实际BMI', type: 'bar', data: bDataActual, itemStyle: { color: '#70ad47' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, distance: 4, formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } },
-                                { name: '标准BMI', type: 'bar', data: bDataStd, itemStyle: { color: 'transparent', borderColor: '#e74c3c', borderWidth: 2, borderType: 'dashed' }, barWidth: '28%', label: { show: true, position: 'inside', fontSize: 11, verticalAlign: 'top', color: '#c0392b', fontWeight: 'bold', formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } }
+                                { name: '标准BMI', type: 'bar', data: bDataStd, itemStyle: { color: 'transparent', borderColor: '#333', borderWidth: 2, borderType: 'dashed' }, barWidth: '28%', label: { show: true, position: 'inside', fontSize: 11, verticalAlign: 'top', color: '#333', fontWeight: 'bold', formatter: function(p) { var v = p.value; return (v != null && v > 0) ? Number(v).toFixed(1) : ''; } } }
                             ];
                             if (bClassVal != null && bDataAvg) bSeries.push({ name: classBmiLabel, type: 'bar', data: bDataAvg, itemStyle: { color: '#8fbc8f' }, barWidth: '28%', label: { show: true, position: 'top', fontSize: 12, formatter: function(p) { return p.value != null ? Number(p.value).toFixed(1) : ''; } } });
                             bmiChart.setOption({
@@ -929,7 +929,7 @@
                                 legend: { data: bSeries.map(function(s) { return s.name; }), bottom: 26, top: 'auto' },
                                 grid: { left: '22%', right: '14%', top: '14%', bottom: '22%', containLabel: true },
                                 xAxis: { type: 'category', name: '测量次数', data: bCats, axisLabel: { fontSize: 13, margin: 10, formatter: function(v, i) { return (bClassVal != null && i === 1) ? '' : v; } }, axisTick: { show: true }, axisLine: { show: true } },
-                                yAxis: { type: 'value', name: 'BMI (kg/m²)', min: 0, axisLabel: { fontSize: 13, margin: 14 }, nameTextStyle: { fontSize: 13 }, nameGap: 36 },
+                                yAxis: { type: 'value', name: 'BMI (kg/m²)', min: 10, interval: 1, axisLabel: { fontSize: 13, margin: 14 }, nameTextStyle: { fontSize: 13 }, nameGap: 36 },
                                 series: bSeries
                             });
                         }

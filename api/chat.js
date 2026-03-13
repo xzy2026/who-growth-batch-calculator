@@ -2,6 +2,9 @@
 // 部署后地址：https://你的项目.vercel.app/api/chat
 // 环境变量：AI_API_KEY（必填，DeepSeek API Key）
 
+// 延长超时时间（DeepSeek 可能较慢；Hobby 计划上限约 10s，Pro 可更大）
+export const config = { maxDuration: 30 };
+
 const ALLOWED_ORIGINS = [
   "https://xzy2026.github.io",
   "https://who-growth-batch-calculator.vercel.app",

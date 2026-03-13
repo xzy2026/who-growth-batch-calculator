@@ -249,8 +249,8 @@
     <script>
         (function() {
             var STORAGE_KEY = 'childGrowthReport';
-            // Cloudflare Worker 代理地址（需配置 AI_API_KEY 为 DeepSeek Key）
-            var AI_PROXY_URL = 'https://nutrition-proxy-xyz.2743916370.workers.dev';
+            // Vercel 代理地址
+            var AI_PROXY_URL = 'https://who-growth-batch-calculator.vercel.app/api/chat';
             var percentileToZMap = { 'P3': -1.88, 'P10': -1.28, 'P25': -0.67, 'P50': 0, 'P75': 0.67, 'P90': 1.28, 'P97': 1.88 };
 
             function isNotApplicable(valueStr) {
@@ -1507,7 +1507,7 @@
                     sendBtn.disabled = true;
                     if (responseEl) { responseEl.textContent = '正在请求AI，请稍候…'; responseEl.classList.add('show'); responseEl.classList.remove('ai-qa-error'); }
                     var body = JSON.stringify({ question: question, context: getReportContext() });
-                    fetch(AI_PROXY_URL + '?target=chat', {
+                    fetch(AI_PROXY_URL, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: body

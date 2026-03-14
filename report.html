@@ -1152,7 +1152,7 @@
                                     }
                                     levelLabelsEl.innerHTML = html;
                                 }
-                                if (levelPolarLegendEl) levelPolarLegendEl.innerHTML = '<div class="legend-item"><span class="legend-dot" style="background:#5b9bd5;"></span>本次</div><div class="legend-item"><span class="legend-dot" style="background:#ed7d31;"></span>上次</div>';
+                                if (levelPolarLegendEl) levelPolarLegendEl.innerHTML = '';
                             } else {
                                 var polarDataSingle = levelBarLevelNames.map(levelToPolarNum);
                                 var levelPolarTooltipSingle = { trigger: 'axis', formatter: function(params) { if (!params || params.length === 0) return ''; var i = params[0].dataIndex; var indName = polarAngleCategories[i] || ''; return indName + '：' + (levelBarLevelNames[i] || '—'); } };
@@ -1374,7 +1374,7 @@
                                     }
                                     npLabelsEl.innerHTML = npHtml2;
                                 }
-                                if (nutritionPolarLegendEl) nutritionPolarLegendEl.innerHTML = '<div class="legend-item"><span class="legend-dot" style="background:#5b9bd5;"></span>本次</div><div class="legend-item"><span class="legend-dot" style="background:#ed7d31;"></span>上次</div>';
+                                if (nutritionPolarLegendEl) nutritionPolarLegendEl.innerHTML = '';
                             } else {
                                 var npZSingle = [];
                                 for (var npi = 0; npi < 4; npi++) npZSingle.push(zToPolarRadius(getZValueForIndicator(d2, npi, mode)));
@@ -1746,7 +1746,7 @@
                 var chartBlocks = [];
                 chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">儿童生长水平评价</div><img src="' + chartUrls.barUrl + '" style="' + imgStyleLevel + '" />' + barLegendHtml);
                 if (chartUrls.polarUrl) {
-                    var levelPolarBlock = '<div style="margin-bottom:18px;font-size:15px;">儿童生长水平环形图（表1/表2）</div><div style="position:relative;display:inline-block;">' + ((chartUrls.levelPolarLabelsHtml || '').trim() ? '<div style="position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;font-size:12px;">' + chartUrls.levelPolarLabelsHtml + '</div>' : '') + '<img src="' + chartUrls.polarUrl + '" style="' + imgStyleLevel + ';display:block;" /></div>' + barLegendHtml;
+                    var levelPolarBlock = '<div style="margin-bottom:18px;font-size:15px;">儿童生长水平环形图（表1/表2）</div><div style="position:relative;display:inline-block;">' + ((chartUrls.levelPolarLabelsHtml || '').trim() ? '<div style="position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;font-size:12px;">' + chartUrls.levelPolarLabelsHtml + '</div>' : '') + '<img src="' + chartUrls.polarUrl + '" style="' + imgStyleLevel + ';display:block;" /></div>';
                     chartBlocks.push(levelPolarBlock);
                 }
                 var levelSunburstNoteHtml = '<p style="font-size:12px;color:#666;margin-bottom:8px;line-height:1.5;">内环为测查时点（本次/上次），外环为年龄别体重、年龄别身高、身高别体重、年龄别BMI；评价结果：上、中上、中、中下、下（表1 百分位数法）。</p>';
@@ -1754,7 +1754,7 @@
                 if (chartUrls.levelSunburstUrl) chartBlocks.push('<div style="margin-bottom:12px;font-size:15px;">儿童生长水平层级图（表1 百分位数法）</div>' + levelSunburstNoteHtml + '<img src="' + chartUrls.levelSunburstUrl + '" style="' + imgStyleSunburst + '" />' + levelSunburstLegendHtml);
                 if (chartUrls.nutritionBarUrl) chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">营养状况对比（表3 标准差法）</div><img src="' + chartUrls.nutritionBarUrl + '" style="' + imgStyleLevel + '" />' + barLegendHtml);
                 if (chartUrls.nutritionPolarUrl) {
-                    var nutritionPolarBlock = '<div style="margin-bottom:18px;font-size:15px;">营养状况环形图（表3 标准差法）</div><div style="position:relative;display:inline-block;">' + ((chartUrls.nutritionPolarLabelsHtml || '').trim() ? '<div style="position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;font-size:12px;">' + chartUrls.nutritionPolarLabelsHtml + '</div>' : '') + '<img src="' + chartUrls.nutritionPolarUrl + '" style="' + imgStyleLevel + ';display:block;" /></div>' + barLegendHtml;
+                    var nutritionPolarBlock = '<div style="margin-bottom:18px;font-size:15px;">营养状况环形图（表3 标准差法）</div><div style="position:relative;display:inline-block;">' + ((chartUrls.nutritionPolarLabelsHtml || '').trim() ? '<div style="position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;font-size:12px;">' + chartUrls.nutritionPolarLabelsHtml + '</div>' : '') + '<img src="' + chartUrls.nutritionPolarUrl + '" style="' + imgStyleLevel + ';display:block;" /></div>';
                     chartBlocks.push(nutritionPolarBlock);
                 }
                 var sunburstNoteHtml = '<p style="font-size:12px;color:#666;margin-bottom:8px;line-height:1.5;">内环为测查时点（本次/上次），外环为四项营养指标；外层扇形颜色表示评价结果，依据表3。</p>';

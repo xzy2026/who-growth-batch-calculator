@@ -1449,13 +1449,13 @@
 
                 var childName = (title && title.textContent) ? (title.textContent.indexOf('·') !== -1 ? title.textContent.split('·')[0].trim() : '') : '';
                 var reportDate = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
-                var coverHtml = '<div style="width:800px;min-height:1050px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 40px;box-sizing:border-box;">' +
-                    '<div style="width:100%;max-width:720px;text-align:center;">' +
-                    '<h1 style="font-size:28px;font-weight:bold;color:#1a365d;margin:0 0 24px 0;letter-spacing:2px;">享智云儿童健康成长</h1>' +
-                    '<h2 style="font-size:22px;font-weight:bold;color:#4a7ba7;margin:0 0 12px 0;letter-spacing:1px;">身高/体重 AI数智报告书</h2>' +
-                    '<p style="font-size:14px;color:#366092;margin:0 0 40px 0;letter-spacing:1px;">HEIGHT/WEIGHT AI DIGITAL INTELLIGENCE REPORT</p>' +
-                    '<p style="font-size:15px;color:#475569;margin:0 0 48px 0;">报告日期：' + reportDate + '</p>' +
-                    '<img src="assets/logo.jpg" alt="" style="height:64px;width:auto;margin-top:auto;border-radius:12px;" onerror="this.style.display=\'none\'">' +
+                var coverHtml = '<div style="width:800px;min-height:1050px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;box-sizing:border-box;">' +
+                    '<div style="width:100%;max-width:100%;text-align:center;">' +
+                    '<h1 style="font-size:38px;font-weight:bold;color:#000;margin:0 0 28px 0;letter-spacing:2px;">享智云儿童健康成长</h1>' +
+                    '<h2 style="font-size:28px;font-weight:bold;color:#4a7ba7;margin:0 0 16px 0;letter-spacing:1px;">身高/体重 AI数智报告书</h2>' +
+                    '<p style="font-size:20px;font-weight:500;color:#000;margin:0 0 40px 0;letter-spacing:1px;">HEIGHT/WEIGHT AI DIGITAL INTELLIGENCE REPORT</p>' +
+                    '<p style="font-size:20px;color:#333;margin:0 0 48px 0;">报告日期：' + reportDate + '</p>' +
+                    '<img src="assets/logo.jpg" alt="" style="height:80px;width:auto;margin-top:auto;border-radius:12px;" onerror="this.style.display=\'none\'">' +
                     '</div></div>';
                 var page0 = document.createElement('div');
                 page0.style.cssText = 'width:800px;background:#fff;';
@@ -1485,7 +1485,7 @@
                 var polarLegendHtml = '<div style="display:flex;flex-wrap:wrap;gap:16px 24px;margin-top:10px;font-size:13px;color:#555;justify-content:center;"><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#5b9bd5;"></span>年龄别体重</span><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#70ad47;"></span>年龄别身高</span><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#ed7d31;"></span>身高别体重</span><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#7030a0;"></span>年龄别BMI</span></div>';
                 var chartBlocks = [];
                 chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">儿童生长水平评价</div><img src="' + chartUrls.barUrl + '" style="' + imgStyleLevel + '" />' + barLegendHtml);
-                if (chartUrls.polarUrl) chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">儿童生长水平环形图</div><img src="' + chartUrls.polarUrl + '" style="' + imgStyleLevel + '" />' + (chartUrls.polarUrl2 ? '<img src="' + chartUrls.polarUrl2 + '" style="' + imgStyleLevel + ';margin-top:16px;" />' : '') + polarLegendHtml);
+                if (chartUrls.polarUrl) chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">儿童生长水平环形图</div><img src="' + chartUrls.polarUrl + '" style="' + imgStyleLevel + '" />' + (chartUrls.polarUrl2 ? '<img src="' + chartUrls.polarUrl2 + '" style="' + imgStyleLevel + ';margin-top:16px;" />' : ''));
                 if (chartUrls.nutritionBarUrl) chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">营养状况对比（表3 标准差法）</div><img src="' + chartUrls.nutritionBarUrl + '" style="' + imgStyleLevel + '" />' + barLegendHtml);
                 if (chartUrls.scatterUrl) {
                     chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">身高与体重关系散点图 - 本次</div><img src="' + chartUrls.scatterUrl + '" style="' + imgStyleScatter + '" />');

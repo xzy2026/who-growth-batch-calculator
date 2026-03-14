@@ -1131,17 +1131,19 @@
                         if (levelPolarDom) {
                             var polarChart = echarts.init(levelPolarDom);
                             var polarRadialLabels = { 1: '下', 2: '中下', 3: '中', 4: '中上', 5: '上' };
-                            var polarBaseOpt = { angleAxis: { type: 'category', data: polarAngleCategories, axisLabel: { fontSize: 12 }, splitLine: { show: true, lineStyle: { color: '#e0e0e0' } } }, radiusAxis: { min: 1, max: 5, interval: 1, axisLabel: { fontSize: 11, formatter: function(v) { return polarRadialLabels[Math.round(v)] || v; } }, splitLine: { lineStyle: { color: '#e0e0e0' } } }, polar: { center: ['50%', '52%'], radius: '68%' }, tooltip: { trigger: 'axis', formatter: function(params) { if (!params || params.length === 0) return ''; var i = params[0].dataIndex; var indName = polarAngleCategories[i] || ''; return params.map(function(p) { return indName + ' - ' + (p.seriesName || '') + '：' + (polarRadialLabels[Math.round(p.value)] || p.value); }).join('<br/>'); } } };
+                            var polarBaseOpt = { angleAxis: { type: 'category', data: polarAngleCategories, axisLabel: { fontSize: 12 }, splitLine: { show: true, lineStyle: { color: '#e0e0e0' } } }, radiusAxis: { min: 1, max: 5, interval: 1, axisLabel: { fontSize: 11, formatter: function(v) { return polarRadialLabels[Math.round(v)] || v; } }, splitLine: { lineStyle: { color: '#e0e0e0' } } }, polar: { center: ['50%', '52%'], radius: '68%' } };
                             if (isComparison && d1) {
                                 var polarLvl1 = getLevelBarLevels(d1, mode);
                                 var polarLvl2 = getLevelBarLevels(d2, mode);
                                 var polarData1 = polarLvl1.map(levelToPolarNum);
                                 var polarData2 = polarLvl2.map(levelToPolarNum);
-                                polarChart.setOption(Object.assign({}, polarBaseOpt, { legend: { show: true, orient: 'horizontal', bottom: 8, data: ['本次', '上次'] }, series: [ { name: '本次', type: 'bar', coordinateSystem: 'polar', data: polarData2, itemStyle: { color: '#5b9bd5' }, barWidth: '28%', emphasis: { focus: 'series' } }, { name: '上次', type: 'bar', coordinateSystem: 'polar', data: polarData1, itemStyle: { color: '#ed7d31' }, barWidth: '28%', emphasis: { focus: 'series' } } ] }));
+                                var levelPolarTooltip = { trigger: 'axis', formatter: function(params) { if (!params || params.length === 0) return ''; var i = params[0].dataIndex; var indName = polarAngleCategories[i] || ''; return indName + '<br/>本次：' + (polarLvl2[i] || '—') + '<br/>上次：' + (polarLvl1[i] || '—'); } };
+                                polarChart.setOption(Object.assign({}, polarBaseOpt, { tooltip: levelPolarTooltip, legend: { show: true, orient: 'horizontal', bottom: 8, data: ['本次', '上次'] }, series: [ { name: '本次', type: 'bar', coordinateSystem: 'polar', data: polarData2, itemStyle: { color: '#5b9bd5' }, barWidth: '28%', emphasis: { focus: 'series' } }, { name: '上次', type: 'bar', coordinateSystem: 'polar', data: polarData1, itemStyle: { color: '#ed7d31' }, barWidth: '28%', emphasis: { focus: 'series' } } ] }));
                                 if (levelPolarLegendEl) levelPolarLegendEl.innerHTML = '';
                             } else {
                                 var polarDataSingle = levelBarLevelNames.map(levelToPolarNum);
-                                polarChart.setOption(Object.assign({}, polarBaseOpt, { legend: { show: true, orient: 'horizontal', bottom: 8, data: ['本次'] }, series: [ { name: '本次', type: 'bar', coordinateSystem: 'polar', data: polarDataSingle, itemStyle: { color: '#5b9bd5' }, barWidth: '40%', emphasis: { focus: 'series' } } ] }));
+                                var levelPolarTooltipSingle = { trigger: 'axis', formatter: function(params) { if (!params || params.length === 0) return ''; var i = params[0].dataIndex; var indName = polarAngleCategories[i] || ''; return indName + '：' + (levelBarLevelNames[i] || '—'); } };
+                                polarChart.setOption(Object.assign({}, polarBaseOpt, { tooltip: levelPolarTooltipSingle, legend: { show: true, orient: 'horizontal', bottom: 8, data: ['本次'] }, series: [ { name: '本次', type: 'bar', coordinateSystem: 'polar', data: polarDataSingle, itemStyle: { color: '#5b9bd5' }, barWidth: '40%', emphasis: { focus: 'series' } } ] }));
                                 if (levelPolarLegendEl) levelPolarLegendEl.innerHTML = '';
                             }
                         }

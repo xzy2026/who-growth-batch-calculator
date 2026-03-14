@@ -18,7 +18,7 @@
         .header-logo { height: 56px; width: auto; border-radius: 12px; }
         .header h1 { font-size: 22px; }
         .header p { font-size: 13px; opacity: 0.9; }
-        .content { padding: 24px; }
+        .content { padding: 24px 40px; }
         .report-title { text-align: center; margin-bottom: 20px; font-size: 18px; color: #333; }
         .overview-row { display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; margin-bottom: 24px; }
         .grade-circle { width: 120px; height: 120px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; color: #333; flex-shrink: 0; }
@@ -37,8 +37,8 @@
         .tab.active { color: #366092; font-weight: bold; border-bottom-color: #366092; }
         .panel { display: none; }
         .panel.active { display: block; }
-        .chart-box { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #eee; }
-        .chart-title { font-size: 15px; margin-bottom: 12px; color: #333; }
+        .chart-box { background: #fff; border-radius: 12px; padding: 20px 28px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #eee; }
+        .chart-title { font-size: 15px; margin-bottom: 12px; color: #333; padding: 0 8px; }
         #radarChart, #barChart { width: 100%; height: 360px; }
         .basic-info { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 24px; margin-bottom: 24px; padding: 16px 20px; background: #f8fafc; border-radius: 12px; border: 1px solid #e8ecf0; font-size: 14px; }
         .basic-info .item { display: flex; gap: 8px; }
@@ -57,7 +57,7 @@
         .indicator-table { width: 100%; border-collapse: collapse; font-size: 14px; }
         .indicator-table th, .indicator-table td { border: 1px solid #ddd; padding: 10px 12px; }
         .indicator-table th { background: #e7f3ff; }
-        .eval-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 20px; table-layout: fixed; }
+        .eval-table { width: 100%; max-width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 20px; table-layout: fixed; }
         .eval-table th, .eval-table td { border: 1px solid #ddd; padding: 8px 10px; text-align: center; }
         .eval-table th { background: #366092; color: #fff; }
         .eval-table th:first-child { width: 160px; min-width: 160px; max-width: 160px; box-sizing: border-box; text-align: left; background: #366092; color: #fff; font-weight: 500; line-height: 1.4; word-break: keep-all; white-space: normal; }
@@ -130,7 +130,7 @@
         .compare-table th:first-child { text-align: left; width: 140px; }
         .compare-table .change-up { color: #28a745; }
         .compare-table .change-down { color: #dc3545; }
-        @media (max-width: 480px) { .container { border-radius: 0; } .content { padding: 16px; } .chart-box, .advice-card { padding: 15px; } .back-btn { padding: 12px 20px; } }
+        @media (max-width: 480px) { .container { border-radius: 0; } .content { padding: 16px 24px; } .chart-box, .advice-card { padding: 15px 20px; } .back-btn { padding: 12px 20px; } }
     </style>
 </head>
 <body>
@@ -1704,7 +1704,7 @@
                 }
 
                 var wrapper = document.createElement('div');
-                wrapper.style.cssText = 'position:fixed;top:0;left:0;z-index:99999;width:800px;max-height:100vh;overflow:auto;font-family:Microsoft YaHei,Arial,sans-serif;font-size:14px;color:#333;background:#fff;padding:20px;box-sizing:border-box;';
+                wrapper.style.cssText = 'position:fixed;top:0;left:0;z-index:99999;width:800px;max-height:100vh;overflow:auto;font-family:Microsoft YaHei,Arial,sans-serif;font-size:14px;color:#333;background:#fff;padding:20px 36px;box-sizing:border-box;';
 
                 var childName = (title && title.textContent) ? (title.textContent.indexOf('·') !== -1 ? title.textContent.split('·')[0].trim() : '') : '';
                 var reportDate = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -1736,11 +1736,11 @@
                 var page1 = document.createElement('div');
                 page1.style.width = '800px';
                 page1.style.background = '#fff';
-                page1.style.paddingBottom = '24px';
+                page1.style.padding = '0 36px 24px 36px';
                 page1.innerHTML = page1Parts.join('');
                 wrapper.appendChild(page1);
 
-                var chartPageStyle = 'width:800px;background:#fff;page-break-before:always;padding:16px 20px 24px 20px;';
+                var chartPageStyle = 'width:800px;background:#fff;page-break-before:always;padding:16px 36px 24px 36px;';
                 var barLegendHtml = '<div style="display:flex;flex-wrap:wrap;gap:16px 24px;margin-top:10px;font-size:13px;color:#555;justify-content:center;"><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#5b9bd5;"></span>本次</span><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#ed7d31;"></span>上次</span></div>';
                 var polarLegendHtml = '<div style="display:flex;flex-wrap:wrap;gap:16px 24px;margin-top:10px;font-size:13px;color:#555;justify-content:center;"><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#5b9bd5;"></span>年龄别体重</span><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#70ad47;"></span>年龄别身高</span><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#ed7d31;"></span>身高别体重</span><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#7030a0;"></span>年龄别BMI</span></div>';
                 var chartBlocks = [];
@@ -1775,7 +1775,7 @@
                     chartPageDivs.push(div);
                 }
 
-                var pageTablesStyle = 'width:800px;background:#fff;page-break-before:always;padding:24px 0 40px 0;line-height:1.7;font-size:14px;';
+                var pageTablesStyle = 'width:800px;background:#fff;page-break-before:always;padding:24px 36px 40px 36px;line-height:1.7;font-size:14px;';
                 var page2b = document.createElement('div');
                 page2b.className = 'pdf-page-break';
                 page2b.style.cssText = pageTablesStyle;

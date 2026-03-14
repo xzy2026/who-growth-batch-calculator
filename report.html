@@ -1674,7 +1674,7 @@
                 var imgStyleSunburst = 'width:100%;max-width:780px;height:520px;object-fit:contain;display:block;margin:0 auto 12px auto;';
                 var imgStyleScatter = 'width:100%;max-width:780px;height:340px;object-fit:contain;display:block;margin:0 auto 12px auto;';
                 var page1Parts = ['<div style="text-align:center;margin-bottom:20px;font-size:17px;color:#333;">' + (title.textContent || '身高、体重报告书') + '</div>'];
-                if (basicHtml) page1Parts.push('<div style="margin-bottom:20px;padding:14px 18px;background:#f8fafc;border-radius:8px;">' + basicHtml + '</div>');
+                if (basicHtml) page1Parts.push('<div class="basic-info" style="margin-bottom:20px;padding:14px 18px;background:#f8fafc;border-radius:8px;border:1px solid #e8ecf0;">' + basicHtml + '</div>');
                 if (chartUrls.heightUrl) page1Parts.push('<div style="margin-bottom:14px;font-size:15px;">身高对比</div><img src="' + chartUrls.heightUrl + '" style="' + imgStyleCompare + '" /><p style="margin-top:8px;font-size:12px;color:#666;">身高 (cm)</p>');
                 if (chartUrls.weightUrl) page1Parts.push('<div style="margin-bottom:14px;font-size:15px;">体重对比</div><img src="' + chartUrls.weightUrl + '" style="' + imgStyleCompare + '" /><p style="margin-top:8px;font-size:12px;color:#666;">体重 (kg)</p>');
                 if (chartUrls.bmiUrl) page1Parts.push('<div style="margin-bottom:14px;font-size:15px;">BMI 对比</div><img src="' + chartUrls.bmiUrl + '" style="' + imgStyleCompare + '" /><p style="margin-top:8px;font-size:12px;color:#666;">BMI (kg/m²)</p>');

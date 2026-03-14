@@ -148,7 +148,7 @@
                 <div id="compareChildWrap" class="compare-select-wrap" style="display:none;margin-bottom:16px;">
                     <label>选择儿童：</label>
                     <select id="compareChildSelect"></select>
-                </div>
+                    </div>
                 <div class="report-title" id="reportTitle">—— 身高、体重报告书 ——</div>
                 <div class="basic-info" id="basicInfo"></div>
                 <div class="tabs">
@@ -170,7 +170,7 @@
                         <div class="chart-title">BMI 对比</div>
                         <div id="bmiCompareChart" class="compare-chart"></div>
                         <p style="margin-top:8px;font-size:12px;color:#666;">BMI (kg/m²)</p>
-                    </div>
+                </div>
                     <div class="chart-box" id="levelPieChartBox" style="display:none;">
                         <div class="chart-title">儿童生长水平评价分布（表1/表2 上、中上、中、中下、下）</div>
                         <div id="levelPieChart" class="level-pie-chart"></div>
@@ -180,15 +180,30 @@
                         <div id="levelBarChart" class="level-bar-chart"></div>
                         <div id="levelBarLegend" class="chart-legend" style="margin-top:10px;justify-content:center;"></div>
                         <div id="levelPolarWrap" style="margin-top:24px;">
-                            <div id="levelPolarChart" class="level-bar-chart" style="width:100%;height:320px;"></div>
-                            <div id="levelPolarChart2" class="level-bar-chart" style="width:100%;height:320px;display:none;margin-top:20px;"></div>
+                            <div id="levelPolarChart" class="level-bar-chart" style="width:100%;height:340px;"></div>
                         </div>
                         <div id="levelPolarLegend" class="chart-legend" style="margin-top:10px;justify-content:center;"></div>
+                        <div id="levelSunburstWrap" style="margin-top:24px;overflow:visible;padding:20px 0;">
+                            <div class="chart-title" style="font-size:14px;margin-bottom:8px;">生长水平层级图（表1 百分位数法）</div>
+                            <p class="reference-tables-note" style="font-size:12px;color:#666;margin-bottom:10px;line-height:1.5;">内环为测查时点（本次/上次），外环为四项指标；外层标签框显示百分位/等级与评价结果（上、中上、中、中下、下）。</p>
+                            <div id="levelSunburstChart" class="level-bar-chart" style="width:100%;height:560px;overflow:visible;"></div>
+                            <div id="levelSunburstLegend" class="chart-legend" style="margin-top:10px;justify-content:center;flex-wrap:wrap;gap:12px 20px;"></div>
+                        </div>
                     </div>
                     <div class="chart-box">
                         <div class="chart-title">营养状况对比（表3 标准差法）</div>
                         <div id="nutritionBarChartPersonal" class="level-bar-chart"></div>
                         <div id="nutritionBarLegend" class="chart-legend" style="margin-top:10px;justify-content:center;"></div>
+                        <div id="nutritionPolarWrap" style="margin-top:24px;">
+                            <div id="nutritionPolarChart" class="level-bar-chart" style="width:100%;height:340px;"></div>
+                        </div>
+                        <div id="nutritionPolarLegend" class="chart-legend" style="margin-top:10px;justify-content:center;"></div>
+                        <div id="nutritionSunburstWrap" style="margin-top:24px;overflow:visible;padding:20px 0;">
+                            <div class="chart-title" style="font-size:14px;margin-bottom:8px;">营养状况层级图（表3 标准差法）</div>
+                            <p id="nutritionSunburstNote" class="reference-tables-note" style="font-size:12px;color:#666;margin-bottom:10px;line-height:1.5;">内环为测查时点（本次/上次），外环为四项营养指标；外层标签框显示标准分数与评价结果。</p>
+                            <div id="nutritionSunburstChart" class="level-bar-chart" style="width:100%;height:560px;overflow:visible;"></div>
+                            <div id="nutritionSunburstLegend" class="chart-legend" style="margin-top:10px;justify-content:center;flex-wrap:wrap;gap:12px 20px;"></div>
+                        </div>
                     </div>
                     <div class="chart-box" id="scatterBox" style="display:none;">
                         <div class="chart-title">身高与体重关系散点图</div>
@@ -229,7 +244,7 @@
                 <div id="panelSuggestion" class="panel">
                     <div class="chart-box">
                         <div class="chart-title"><i class="fa-solid fa-lightbulb"></i> 健康建议</div>
-                        <div class="suggestion-box" id="suggestionBox"></div>
+                    <div class="suggestion-box" id="suggestionBox"></div>
                         <div id="suggestionExtras"></div>
                         <div class="checklist-card">
                             <h4><i class="fa-solid fa-clipboard-check"></i> 今日健康小任务</h4>
@@ -1108,34 +1123,102 @@
                             });
                         }
                         var levelPolarDom = document.getElementById('levelPolarChart');
-                        var levelPolarDom2 = document.getElementById('levelPolarChart2');
                         var levelPolarLegendEl = document.getElementById('levelPolarLegend');
-                        var polarIndColors = { 0: '#5b9bd5', 1: '#70ad47', 2: '#ed7d31', 3: '#7030a0' };
-                        var polarLevelOrder = ['下', '中下', '中', '中上', '上'];
-                        function buildPolarSeries(levels, stackId) {
-                            return levelBarCategories.map(function(name, indIdx) {
-                                var lv = levels[indIdx];
-                                var lvIdx = polarLevelOrder.indexOf(lv);
-                                var data = polarLevelOrder.map(function(_, j) { return lvIdx === j ? 1 : 0; });
-                                return { type: 'bar', data: data, coordinateSystem: 'polar', name: name, stack: stackId, itemStyle: { color: polarIndColors[indIdx] }, emphasis: { focus: 'series' } };
-                            });
-                        }
+                        var polarAngleCategories = ['年龄别体重', '年龄别身高', '身高别体重', '年龄别 BMI'];
+                        function levelToPolarNum(lv) { var m = { '下': 1, '中下': 2, '中': 3, '中上': 4, '上': 5 }; return lv && m[lv] != null ? m[lv] : 1; }
                         if (levelPolarDom) {
                             var polarChart = echarts.init(levelPolarDom);
+                            var polarRadialLabels = { 1: '下', 2: '中下', 3: '中', 4: '中上', 5: '上' };
+                            var polarBaseOpt = { angleAxis: { type: 'category', data: polarAngleCategories, axisLabel: { fontSize: 12 }, splitLine: { show: true, lineStyle: { color: '#e0e0e0' } } }, radiusAxis: { min: 1, max: 5, interval: 1, axisLabel: { fontSize: 11, formatter: function(v) { return polarRadialLabels[Math.round(v)] || v; } }, splitLine: { lineStyle: { color: '#e0e0e0' } } }, polar: { center: ['50%', '52%'], radius: '68%' }, tooltip: { trigger: 'axis', formatter: function(params) { if (!params || params.length === 0) return ''; var i = params[0].dataIndex; var indName = polarAngleCategories[i] || ''; return params.map(function(p) { return indName + ' - ' + (p.seriesName || '') + '：' + (polarRadialLabels[Math.round(p.value)] || p.value); }).join('<br/>'); } } };
                             if (isComparison && d1) {
                                 var polarLvl1 = getLevelBarLevels(d1, mode);
                                 var polarLvl2 = getLevelBarLevels(d2, mode);
-                                polarChart.setOption({ angleAxis: { type: 'category', data: polarLevelOrder, axisLabel: { fontSize: 12 } }, radiusAxis: { min: 0, max: 4 }, polar: { center: ['50%', '52%'], radius: '70%' }, series: buildPolarSeries(polarLvl2, 'p1'), legend: { show: true, orient: 'horizontal', bottom: 8, data: levelBarCategories }, tooltip: { trigger: 'axis', formatter: function(p) { var i = p[0].dataIndex; return polarLevelOrder[i] + '：' + levelBarCategories.filter(function(_, j) { return p[j] && p[j].value > 0; }).join('、') || '—'; } }, title: { text: '本次' + (d2.checkDate ? ' (' + d2.checkDate + ')' : ''), left: 'center', top: 4, textStyle: { fontSize: 14 } } });
-                                if (levelPolarDom2) {
-                                    levelPolarDom2.style.display = 'block';
-                                    var polarChart2 = echarts.init(levelPolarDom2);
-                                    polarChart2.setOption({ angleAxis: { type: 'category', data: polarLevelOrder, axisLabel: { fontSize: 12 } }, radiusAxis: { min: 0, max: 4 }, polar: { center: ['50%', '52%'], radius: '70%' }, series: buildPolarSeries(polarLvl1, 'p2'), legend: { show: true, orient: 'horizontal', bottom: 8, data: levelBarCategories }, tooltip: { trigger: 'axis', formatter: function(p) { var i = p[0].dataIndex; return polarLevelOrder[i] + '：' + levelBarCategories.filter(function(_, j) { return p[j] && p[j].value > 0; }).join('、') || '—'; } }, title: { text: '上次' + (d1.checkDate ? ' (' + d1.checkDate + ')' : ''), left: 'center', top: 4, textStyle: { fontSize: 14 } } });
-                                }
+                                var polarData1 = polarLvl1.map(levelToPolarNum);
+                                var polarData2 = polarLvl2.map(levelToPolarNum);
+                                polarChart.setOption(Object.assign({}, polarBaseOpt, { legend: { show: true, orient: 'horizontal', bottom: 8, data: ['本次', '上次'] }, series: [ { name: '本次', type: 'bar', coordinateSystem: 'polar', data: polarData2, itemStyle: { color: '#5b9bd5' }, barWidth: '28%', emphasis: { focus: 'series' } }, { name: '上次', type: 'bar', coordinateSystem: 'polar', data: polarData1, itemStyle: { color: '#ed7d31' }, barWidth: '28%', emphasis: { focus: 'series' } } ] }));
                                 if (levelPolarLegendEl) levelPolarLegendEl.innerHTML = '';
                             } else {
-                                if (levelPolarDom2) levelPolarDom2.style.display = 'none';
-                                polarChart.setOption({ angleAxis: { type: 'category', data: polarLevelOrder, axisLabel: { fontSize: 12 } }, radiusAxis: { min: 0, max: 4 }, polar: { center: ['50%', '52%'], radius: '70%' }, series: buildPolarSeries(levelBarLevelNames, 'p'), legend: { show: true, orient: 'horizontal', bottom: 8, data: levelBarCategories }, tooltip: { trigger: 'axis', formatter: function(p) { var i = p[0].dataIndex; return polarLevelOrder[i] + '：' + levelBarCategories.filter(function(_, j) { return p[j] && p[j].value > 0; }).join('、') || '—'; } }, title: { text: '测查日期：' + (data.checkDate || '—'), left: 'center', top: 4, textStyle: { fontSize: 12, fontWeight: 'normal', color: '#666' } } });
+                                var polarDataSingle = levelBarLevelNames.map(levelToPolarNum);
+                                polarChart.setOption(Object.assign({}, polarBaseOpt, { legend: { show: true, orient: 'horizontal', bottom: 8, data: ['本次'] }, series: [ { name: '本次', type: 'bar', coordinateSystem: 'polar', data: polarDataSingle, itemStyle: { color: '#5b9bd5' }, barWidth: '40%', emphasis: { focus: 'series' } } ] }));
                                 if (levelPolarLegendEl) levelPolarLegendEl.innerHTML = '';
+                            }
+                        }
+                        var levelSunburstDom = document.getElementById('levelSunburstChart');
+                        if (levelSunburstDom) {
+                            var levelIndByCol = { '年龄别体重': 0, '年龄别身长/身高': 1, '年龄别身高': 1, '身长/身高体重': 2, '身高别体重': 2, '年龄别BMI': 3, '年龄别 BMI': 3 };
+                            function getLevelIndicatorValue(d, colIdx) {
+                                var im = {};
+                                (d.indicators || []).forEach(function(ind) { if (levelIndByCol[ind.name] !== undefined) im[levelIndByCol[ind.name]] = ind; });
+                                var ind = im[colIdx];
+                                return ind && ind.value ? String(ind.value).trim() : '—';
+                            }
+                            function buildLevelSunburstChildren(d, timeLabel) {
+                                var children = [];
+                                for (var si = 0; si < 4; si++) {
+                                    var lv = getLevelBarLevels(d, mode)[si];
+                                    var valStr = getLevelIndicatorValue(d, si);
+                                    var name = levelBarCategories[si];
+                                    var segColor = (lv && levelColors[lv]) ? levelColors[lv] : '#b0b0b0';
+                                    var resText = lv || '—';
+                                    children.push({
+                                        name: name,
+                                        value: 1,
+                                        _valStr: valStr,
+                                        _res: resText,
+                                        _indName: name,
+                                        _timeLabel: timeLabel || '本次',
+                                        itemStyle: { color: segColor },
+                                        upperLabel: { show: true }
+                                    });
+                                }
+                                return children;
+                            }
+                            var levelSunburstData = [];
+                            if (isComparison && d1) {
+                                levelSunburstData = [
+                                    { name: '上次', value: 4, itemStyle: { color: '#ed7d31' }, children: buildLevelSunburstChildren(d1, '上次') },
+                                    { name: '本次', value: 4, itemStyle: { color: '#5b9bd5' }, children: buildLevelSunburstChildren(d2, '本次') }
+                                ];
+                            } else {
+                                levelSunburstData = [
+                                    { name: '本次', value: 4, itemStyle: { color: '#5b9bd5' }, children: buildLevelSunburstChildren(d2, '本次') }
+                                ];
+                            }
+                            var levelSunburstLabelRich = { a: { color: '#333', fontWeight: 'bold', fontSize: 12, lineHeight: 22 }, hr: { borderColor: '#8C8D8E', width: '100%', borderWidth: 1, height: 0 }, b: { color: '#4C5058', fontSize: 11, lineHeight: 20 }, c: { color: '#4C5058', fontSize: 11, lineHeight: 20 }, d: { color: '#4C5058', fontSize: 11, lineHeight: 20 } };
+                            var levelSunburstLabelFormatter = function(params) {
+                                var d = params.data;
+                                if (!d || d._valStr === undefined) return params.name || '';
+                                var t = String(d._timeLabel || '本次').replace(/[{}|\\]/g, ' ');
+                                var ind = String(d._indName || d.name || '').replace(/[{}|\\]/g, ' ');
+                                var v = String(d._valStr || '—').replace(/[{}|\\]/g, ' ');
+                                var r = String(d._res || '—').replace(/[{}|\\]/g, ' ');
+                                return '{a|' + t + '}\n{hr|}\n{b|' + ind + '：}\n{c|百分位/等级 ' + v + '}\n{d|评价结果：' + r + '}';
+                            };
+                            var levelSunburstChart = echarts.init(levelSunburstDom);
+                            levelSunburstChart.setOption({
+                                tooltip: { trigger: 'item', formatter: function(params) { var d = params.data; if (d && d._valStr !== undefined) return (d._indName || '') + '<br/>百分位/等级：' + (d._valStr || '—') + '<br/>评价结果：' + (d._res || '—'); return params.name; } },
+                                series: [{
+                                    type: 'sunburst',
+                                    radius: ['12%', '58%'],
+                                    center: ['50%', '50%'],
+                                    data: levelSunburstData,
+                                    sort: null,
+                                    nodeClick: false,
+                                    labelLayout: { hideOverlap: false, moveOverlap: 'shiftXY' },
+                                    emphasis: { focus: 'ancestor' },
+                                    levels: [
+                                        { label: { show: false } },
+                                        { r0: '12%', r: '35%', label: { show: true, position: 'inside', fontSize: 15 } },
+                                        { r0: '35%', r: '58%', upperLabel: { show: true }, label: { show: true, position: 'outside', rotate: false, formatter: levelSunburstLabelFormatter, backgroundColor: '#F6F8FC', borderColor: '#8C8D8E', borderWidth: 1, borderRadius: 4, padding: [10, 12], rich: levelSunburstLabelRich, minMargin: 18 }, labelLine: { show: true, length: 240, length2: 80 } }
+                                    ]
+                                }]
+                            });
+                            var levelSunburstLegendEl = document.getElementById('levelSunburstLegend');
+                            if (levelSunburstLegendEl) {
+                                var leg = ['<div class="legend-item"><span class="legend-dot" style="background:#5b9bd5;"></span>本次</div>'];
+                                if (isComparison && d1) leg.push('<div class="legend-item"><span class="legend-dot" style="background:#ed7d31;"></span>上次</div>', '<span style="color:#ccc;margin:0 4px;">|</span>');
+                                ['下', '中下', '中', '中上', '上'].forEach(function(n) { leg.push('<div class="legend-item"><span class="legend-dot" style="background:' + (levelColors[n] || '#999') + ';"></span>' + n + '</div>'); });
+                                levelSunburstLegendEl.innerHTML = leg.join('');
                             }
                         }
                     }
@@ -1238,6 +1321,122 @@
                             var nutritionLegEl2 = document.getElementById('nutritionBarLegend');
                             if (nutritionLegEl2) nutritionLegEl2.innerHTML = nutritionBarOrder.map(function(n) { return '<div class="legend-item"><span class="legend-dot" style="background:' + (nutritionBarColors[n]||'#999') + ';"></span>' + n + '</div>'; }).join('');
                         }
+                        var nutritionPolarDom = document.getElementById('nutritionPolarChart');
+                        var nutritionPolarLegendEl = document.getElementById('nutritionPolarLegend');
+                        var nutritionPolarCategories = ['年龄别体重', '年龄别身高', '身高别体重', '年龄别 BMI'];
+                        function zToPolarRadius(z) { return (z != null && !isNaN(z)) ? Math.max(0, Math.min(6, z + 3)) : null; }
+                        if (nutritionPolarDom) {
+                            var nutritionPolarChart = echarts.init(nutritionPolarDom);
+                            var polarRadialLabels = { 0: '-3', 1: '-2', 2: '-1', 3: '0', 4: '+1', 5: '+2', 6: '+3' };
+                            var resCurrPolar = [], resPrevPolar = [];
+                            for (var rpi = 0; rpi < 4; rpi++) { resCurrPolar.push(getNutritionResultForIndicator(d2, rpi)); if (d1) resPrevPolar.push(getNutritionResultForIndicator(d1, rpi)); }
+                            var nutritionPolarBase = { angleAxis: { type: 'category', data: nutritionPolarCategories, axisLabel: { fontSize: 12 }, splitLine: { show: true, lineStyle: { color: '#e0e0e0' } } }, radiusAxis: { min: 0, max: 6, interval: 1, axisLabel: { fontSize: 11, formatter: function(v) { return polarRadialLabels[Math.round(v)] || (v >= 0 ? '+' + v : v); } }, name: 'SD', nameLocation: 'end', nameGap: 8, splitLine: { lineStyle: { color: '#e0e0e0' } } }, polar: { center: ['50%', '52%'], radius: '68%' }, tooltip: { trigger: 'axis', formatter: function(params) { if (!params || params.length === 0) return ''; var i = params[0].dataIndex; var indName = nutritionPolarCategories[i] || ''; var parts = []; params.forEach(function(p) { var v = p.value; var z = (typeof v === 'number') ? v - 3 : null; var r = p.seriesIndex === 0 ? (resCurrPolar[i]) : (resPrevPolar[i]); var s = z != null ? (z >= 0 ? '+' : '') + z.toFixed(2) + ' SD' + (r ? ' (' + r + ')' : '') : '—'; parts.push(indName + ' - ' + (p.seriesName || '') + '：' + s); }); return parts.join('<br/>'); } } };
+                            if (isComparison && d1) {
+                                var npZ1 = [], npZ2 = [];
+                                for (var npi = 0; npi < 4; npi++) { npZ1.push(zToPolarRadius(getZValueForIndicator(d1, npi, mode))); npZ2.push(zToPolarRadius(getZValueForIndicator(d2, npi, mode))); }
+                                nutritionPolarChart.setOption(Object.assign({}, nutritionPolarBase, { legend: { show: true, orient: 'horizontal', bottom: 8, data: ['本次', '上次'] }, series: [ { name: '本次', type: 'bar', coordinateSystem: 'polar', data: npZ2.map(function(v) { return v != null ? v : 0; }), itemStyle: { color: '#5b9bd5' }, barWidth: '28%', emphasis: { focus: 'series' } }, { name: '上次', type: 'bar', coordinateSystem: 'polar', data: npZ1.map(function(v) { return v != null ? v : 0; }), itemStyle: { color: '#ed7d31' }, barWidth: '28%', emphasis: { focus: 'series' } } ] }));
+                                if (nutritionPolarLegendEl) nutritionPolarLegendEl.innerHTML = '';
+                            } else {
+                                var npZSingle = [];
+                                for (var npi = 0; npi < 4; npi++) npZSingle.push(zToPolarRadius(getZValueForIndicator(d2, npi, mode)));
+                                var npSingleTooltip = { trigger: 'axis', formatter: function(params) { if (!params || params.length === 0) return ''; var i = params[0].dataIndex; var v = params[0].value; var z = (typeof v === 'number') ? v - 3 : null; var r = resCurrPolar[i]; var s = z != null ? (z >= 0 ? '+' : '') + z.toFixed(2) + ' SD' + (r ? ' (' + r + ')' : '') : '—'; return (nutritionPolarCategories[i] || '') + '：' + s; } };
+                                nutritionPolarChart.setOption(Object.assign({}, nutritionPolarBase, { tooltip: npSingleTooltip, legend: { show: true, orient: 'horizontal', bottom: 8, data: ['本次'] }, series: [ { name: '本次', type: 'bar', coordinateSystem: 'polar', data: npZSingle.map(function(v) { return v != null ? v : 0; }), itemStyle: { color: '#5b9bd5' }, barWidth: '40%', emphasis: { focus: 'series' } } ] }));
+                                if (nutritionPolarLegendEl) nutritionPolarLegendEl.innerHTML = '';
+                            }
+                        }
+                        var nutritionSunburstDom = document.getElementById('nutritionSunburstChart');
+                        if (nutritionSunburstDom) {
+                            var nutritionSunburstChart = echarts.init(nutritionSunburstDom);
+                            function buildSunburstChildren(d, timeLabel) {
+                                var children = [];
+                                for (var si = 0; si < 4; si++) {
+                                    var z = getZValueForIndicator(d, si, mode);
+                                    var res = getNutritionResultForIndicator(d, si);
+                                    var zStr = (z != null && !isNaN(z)) ? (z >= 0 ? '+' : '') + z.toFixed(2) + ' SD' : '—';
+                                    var name = nutritionPolarCategories[si];
+                                    var segColor = nutritionBarColors[res || '—'] || '#b0b0b0';
+                                    var resText = res || '—';
+                                    children.push({
+                                        name: name,
+                                        value: 1,
+                                        _zStr: zStr,
+                                        _res: resText,
+                                        _indName: name,
+                                        _timeLabel: timeLabel || '本次',
+                                        itemStyle: { color: segColor },
+                                        upperLabel: { show: true }
+                                    });
+                                }
+                                return children;
+                            }
+                            var sunburstData = [];
+                            if (isComparison && d1) {
+                                sunburstData = [
+                                    { name: '上次', value: 4, itemStyle: { color: '#ed7d31' }, children: buildSunburstChildren(d1, '上次') },
+                                    { name: '本次', value: 4, itemStyle: { color: '#5b9bd5' }, children: buildSunburstChildren(d2, '本次') }
+                                ];
+                            } else {
+                                sunburstData = [
+                                    { name: '本次', value: 4, itemStyle: { color: '#5b9bd5' }, children: buildSunburstChildren(d2, '本次') }
+                                ];
+                            }
+                            var sunburstLabelRich = {
+                                a: { color: '#333', fontWeight: 'bold', fontSize: 12, lineHeight: 22 },
+                                hr: { borderColor: '#8C8D8E', width: '100%', borderWidth: 1, height: 0 },
+                                b: { color: '#4C5058', fontSize: 11, lineHeight: 20 },
+                                c: { color: '#4C5058', fontSize: 11, lineHeight: 20 },
+                                d: { color: '#4C5058', fontSize: 11, lineHeight: 20 }
+                            };
+                            var sunburstLabelFormatter = function(params) {
+                                var d = params.data;
+                                if (!d || d._zStr === undefined) return params.name || '';
+                                var t = String(d._timeLabel || '本次').replace(/[{}|\\]/g, ' ');
+                                var ind = String(d._indName || d.name || '').replace(/[{}|\\]/g, ' ');
+                                var z = String(d._zStr || '—').replace(/[{}|\\]/g, ' ');
+                                var r = String(d._res || '—').replace(/[{}|\\]/g, ' ');
+                                return '{a|' + t + '}\n{hr|}\n{b|' + ind + '：}\n{c|标准分数 ' + z + '}\n{d|评价结果：' + r + '}';
+                            };
+                            nutritionSunburstChart.setOption({
+                                tooltip: {
+                                    trigger: 'item',
+                                    formatter: function(params) {
+                                        var d = params.data;
+                                        if (d && (d._zStr !== undefined || d._res !== undefined))
+                                            return (d._indName || d.name || '') + '<br/>标准分数：' + (d._zStr || '—') + '<br/>评价结果：' + (d._res || '—');
+                                        return params.name;
+                                    }
+                                },
+                                series: [{
+                                    type: 'sunburst',
+                                    radius: ['12%', '58%'],
+                                    center: ['50%', '50%'],
+                                    data: sunburstData,
+                                    sort: null,
+                                    nodeClick: false,
+                                    labelLayout: { hideOverlap: false, moveOverlap: 'shiftXY' },
+                                    emphasis: { focus: 'ancestor' },
+                                    levels: [
+                                        { label: { show: false } },
+                                        { r0: '12%', r: '35%', label: { show: true, position: 'inside', fontSize: 15 } },
+                                        { r0: '35%', r: '58%', upperLabel: { show: true }, label: { show: true, position: 'outside', rotate: false, formatter: sunburstLabelFormatter, backgroundColor: '#F6F8FC', borderColor: '#8C8D8E', borderWidth: 1, borderRadius: 4, padding: [10, 12], rich: sunburstLabelRich, minMargin: 18 }, labelLine: { show: true, length: 240, length2: 80 } }
+                                    ]
+                                }]
+                            });
+                            var nutritionSunburstLegendEl = document.getElementById('nutritionSunburstLegend');
+                            if (nutritionSunburstLegendEl) {
+                                var legParts = [];
+                                if (isComparison && d1) {
+                                    legParts.push('<div class="legend-item"><span class="legend-dot" style="background:#5b9bd5;"></span>本次</div>');
+                                    legParts.push('<div class="legend-item"><span class="legend-dot" style="background:#ed7d31;"></span>上次</div>');
+                                    legParts.push('<span style="color:#ccc;margin:0 4px;">|</span>');
+                                }
+                                ['重度低体重', '低体重', '重度生长迟缓', '生长迟缓', '重度消瘦', '消瘦', '—', '超重', '肥胖', '重度肥胖'].forEach(function(n) {
+                                    var c = nutritionBarColors[n] || '#b0b0b0';
+                                    legParts.push('<div class="legend-item"><span class="legend-dot" style="background:' + c + ';"></span>' + n + '</div>');
+                                });
+                                nutritionSunburstLegendEl.innerHTML = legParts.join('');
+                            }
+                        }
                     }
                     var scatterBox = document.getElementById('scatterBox');
                     var scatterDom = document.getElementById('hwScatterChart');
@@ -1330,7 +1529,7 @@
             }
 
             function resizeCharts() {
-                ['heightCompareChart', 'weightCompareChart', 'bmiCompareChart', 'levelBarChart', 'levelPolarChart', 'levelPolarChart2', 'nutritionBarChartPersonal', 'hwScatterChart', 'hwScatterChart2'].forEach(function(id) {
+                ['heightCompareChart', 'weightCompareChart', 'bmiCompareChart', 'levelBarChart', 'levelPolarChart', 'levelSunburstChart', 'nutritionBarChartPersonal', 'nutritionPolarChart', 'nutritionSunburstChart', 'hwScatterChart', 'hwScatterChart2'].forEach(function(id) {
                     var el = document.getElementById(id);
                     if (el && typeof echarts !== 'undefined' && echarts.getInstanceByDom(el)) echarts.getInstanceByDom(el).resize();
                 });
@@ -1386,18 +1585,24 @@
                 var captureCharts = function() {
                     var wait = wasOverview ? 0 : 350;
                     setTimeout(function() {
-                        var levelPolarChart = document.getElementById('levelPolarChart') && echarts.getInstanceByDom(document.getElementById('levelPolarChart'));
-                        var levelPolarChart2 = document.getElementById('levelPolarChart2') && echarts.getInstanceByDom(document.getElementById('levelPolarChart2'));
-                        [heightChart, weightChart, bmiChart, levelBarChart, levelPolarChart, levelPolarChart2, nutritionBarChart, scatterChart, scatterChart2].forEach(function(ch) { if (ch && ch.resize) ch.resize(); });
+                            var levelPolarChart = document.getElementById('levelPolarChart') && echarts.getInstanceByDom(document.getElementById('levelPolarChart'));
+                            var levelSunburstChart = document.getElementById('levelSunburstChart') && echarts.getInstanceByDom(document.getElementById('levelSunburstChart'));
+                            var nutritionPolarChart = document.getElementById('nutritionPolarChart') && echarts.getInstanceByDom(document.getElementById('nutritionPolarChart'));
+                            var nutritionSunburstChart = document.getElementById('nutritionSunburstChart') && echarts.getInstanceByDom(document.getElementById('nutritionSunburstChart'));
+                        [heightChart, weightChart, bmiChart, levelBarChart, levelPolarChart, levelSunburstChart, nutritionBarChart, nutritionPolarChart, nutritionSunburstChart, scatterChart, scatterChart2].forEach(function(ch) { if (ch && ch.resize) ch.resize(); });
                         setTimeout(function() {
                             var heightUrl = heightChart ? heightChart.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
                             var weightUrl = weightChart ? weightChart.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
                             var bmiUrl = bmiChart ? bmiChart.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
                             var barUrl = levelBarChart.getDataURL({ type: 'png', pixelRatio: 2 });
                             var levelPolarChart = document.getElementById('levelPolarChart') && echarts.getInstanceByDom(document.getElementById('levelPolarChart'));
-                            var levelPolarChart2 = document.getElementById('levelPolarChart2') && echarts.getInstanceByDom(document.getElementById('levelPolarChart2'));
                             var polarUrl = levelPolarChart ? levelPolarChart.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
-                            var polarUrl2 = levelPolarChart2 ? levelPolarChart2.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
+                            var nutritionPolarChart = document.getElementById('nutritionPolarChart') && echarts.getInstanceByDom(document.getElementById('nutritionPolarChart'));
+                            var nutritionPolarUrl = nutritionPolarChart ? nutritionPolarChart.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
+                            var levelSunburstChart = document.getElementById('levelSunburstChart') && echarts.getInstanceByDom(document.getElementById('levelSunburstChart'));
+                            var levelSunburstUrl = levelSunburstChart ? levelSunburstChart.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
+                            var nutritionSunburstChart = document.getElementById('nutritionSunburstChart') && echarts.getInstanceByDom(document.getElementById('nutritionSunburstChart'));
+                            var nutritionSunburstUrl = nutritionSunburstChart ? nutritionSunburstChart.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
                             var nutritionBarUrl = nutritionBarChart ? nutritionBarChart.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
                             var scatterUrl = scatterChart ? scatterChart.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
                             var scatterUrl2 = scatterChart2 ? scatterChart2.getDataURL({ type: 'png', pixelRatio: 2 }) : null;
@@ -1410,7 +1615,7 @@
                                 if (panel) panel.classList.add('active');
                                 setTimeout(resizeCharts, 50);
                             }
-                            doBuildPdf({ heightUrl: heightUrl, weightUrl: weightUrl, bmiUrl: bmiUrl, barUrl: barUrl, polarUrl: polarUrl, polarUrl2: polarUrl2, nutritionBarUrl: nutritionBarUrl, scatterUrl: scatterUrl, scatterUrl2: scatterUrl2 });
+                            doBuildPdf({ heightUrl: heightUrl, weightUrl: weightUrl, bmiUrl: bmiUrl, barUrl: barUrl, polarUrl: polarUrl, levelSunburstUrl: levelSunburstUrl, nutritionBarUrl: nutritionBarUrl, nutritionPolarUrl: nutritionPolarUrl, nutritionSunburstUrl: nutritionSunburstUrl, scatterUrl: scatterUrl, scatterUrl2: scatterUrl2 });
                         }, 150);
                     }, wait);
                 };
@@ -1463,8 +1668,9 @@
                 wrapper.appendChild(page0);
 
                 var imgStyleCompare = 'width:100%;max-width:780px;height:240px;object-fit:contain;display:block;margin:0 auto 16px auto;';
-                var imgStyleLevel = 'width:100%;max-width:780px;height:300px;object-fit:contain;display:block;margin:0 auto 16px auto;';
-                var imgStyleScatter = 'width:100%;max-width:780px;height:300px;object-fit:contain;display:block;margin:0 auto 16px auto;';
+                var imgStyleLevel = 'width:100%;max-width:780px;height:320px;object-fit:contain;display:block;margin:0 auto 12px auto;';
+                var imgStyleSunburst = 'width:100%;max-width:780px;height:520px;object-fit:contain;display:block;margin:0 auto 12px auto;';
+                var imgStyleScatter = 'width:100%;max-width:780px;height:340px;object-fit:contain;display:block;margin:0 auto 12px auto;';
                 var page1Parts = ['<div style="text-align:center;margin-bottom:20px;font-size:17px;color:#333;">' + (title.textContent || '身高、体重报告书') + '</div>'];
                 if (basicHtml) page1Parts.push('<div style="margin-bottom:20px;padding:14px 18px;background:#f8fafc;border-radius:8px;">' + basicHtml + '</div>');
                 if (chartUrls.heightUrl) page1Parts.push('<div style="margin-bottom:14px;font-size:15px;">身高对比</div><img src="' + chartUrls.heightUrl + '" style="' + imgStyleCompare + '" /><p style="margin-top:8px;font-size:12px;color:#666;">身高 (cm)</p>');
@@ -1480,13 +1686,20 @@
                 page1.innerHTML = page1Parts.join('');
                 wrapper.appendChild(page1);
 
-                var chartPageStyle = 'width:800px;background:#fff;page-break-before:always;padding:24px 0 40px 0;';
+                var chartPageStyle = 'width:800px;background:#fff;page-break-before:always;padding:16px 20px 24px 20px;';
                 var barLegendHtml = '<div style="display:flex;flex-wrap:wrap;gap:16px 24px;margin-top:10px;font-size:13px;color:#555;justify-content:center;"><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#5b9bd5;"></span>本次</span><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#ed7d31;"></span>上次</span></div>';
                 var polarLegendHtml = '<div style="display:flex;flex-wrap:wrap;gap:16px 24px;margin-top:10px;font-size:13px;color:#555;justify-content:center;"><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#5b9bd5;"></span>年龄别体重</span><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#70ad47;"></span>年龄别身高</span><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#ed7d31;"></span>身高别体重</span><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#7030a0;"></span>年龄别BMI</span></div>';
                 var chartBlocks = [];
                 chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">儿童生长水平评价</div><img src="' + chartUrls.barUrl + '" style="' + imgStyleLevel + '" />' + barLegendHtml);
-                if (chartUrls.polarUrl) chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">儿童生长水平环形图</div><img src="' + chartUrls.polarUrl + '" style="' + imgStyleLevel + '" />' + (chartUrls.polarUrl2 ? '<img src="' + chartUrls.polarUrl2 + '" style="' + imgStyleLevel + ';margin-top:16px;" />' : ''));
+                if (chartUrls.polarUrl) chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">儿童生长水平环形图</div><img src="' + chartUrls.polarUrl + '" style="' + imgStyleLevel + '" />');
+                var levelSunburstNoteHtml = '<p style="font-size:12px;color:#666;margin-bottom:8px;line-height:1.5;">内环为测查时点（本次/上次），外环为年龄别体重、年龄别身高、身高别体重、年龄别BMI；评价结果：上、中上、中、中下、下（表1 百分位数法）。</p>';
+                var levelSunburstLegendHtml = '<div style="display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:10px;font-size:12px;color:#555;justify-content:center;"><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#5b9bd5;"></span>本次</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#ed7d31;"></span>上次</span><span style="color:#ddd;margin:0 2px;">|</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#dc3545;"></span>下</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#e69500;"></span>中下</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#28a745;"></span>中</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#17a2b8;"></span>中上</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#6f42c1;"></span>上</span></div>';
+                if (chartUrls.levelSunburstUrl) chartBlocks.push('<div style="margin-bottom:12px;font-size:15px;">儿童生长水平层级图（表1 百分位数法）</div>' + levelSunburstNoteHtml + '<img src="' + chartUrls.levelSunburstUrl + '" style="' + imgStyleSunburst + '" />' + levelSunburstLegendHtml);
                 if (chartUrls.nutritionBarUrl) chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">营养状况对比（表3 标准差法）</div><img src="' + chartUrls.nutritionBarUrl + '" style="' + imgStyleLevel + '" />' + barLegendHtml);
+                if (chartUrls.nutritionPolarUrl) chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">营养状况环形图（表3 标准差法）</div><img src="' + chartUrls.nutritionPolarUrl + '" style="' + imgStyleLevel + '" />');
+                var sunburstNoteHtml = '<p style="font-size:12px;color:#666;margin-bottom:8px;line-height:1.5;">内环为测查时点（本次/上次），外环为四项营养指标；外层扇形颜色表示评价结果，依据表3。</p>';
+                var sunburstLegendHtml = '<div style="display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:10px;font-size:12px;color:#555;justify-content:center;"><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#5b9bd5;"></span>本次</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#ed7d31;"></span>上次</span><span style="color:#ddd;margin:0 2px;">|</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#dc3545;"></span>低体重</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#5a8fd4;"></span>生长迟缓</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#e69500;"></span>消瘦</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#28a745;"></span>—</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#17a2b8;"></span>超重</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#6f42c1;"></span>肥胖</span></div>';
+                if (chartUrls.nutritionSunburstUrl) chartBlocks.push('<div style="margin-bottom:12px;font-size:15px;">营养状况层级图（表3 标准差法）</div>' + sunburstNoteHtml + '<img src="' + chartUrls.nutritionSunburstUrl + '" style="' + imgStyleSunburst + '" />' + sunburstLegendHtml);
                 if (chartUrls.scatterUrl) {
                     chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">身高与体重关系散点图 - 本次</div><img src="' + chartUrls.scatterUrl + '" style="' + imgStyleScatter + '" />');
                     if (chartUrls.scatterUrl2) chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">身高与体重关系散点图 - 上次</div><img src="' + chartUrls.scatterUrl2 + '" style="' + imgStyleScatter + '" />');

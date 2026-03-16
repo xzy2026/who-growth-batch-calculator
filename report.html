@@ -1955,7 +1955,17 @@
                         });
                     }).then(function(data) {
                         var text = (data && (data.answer || data.reply || data.text || data.content)) || '';
-                        if (responseEl) { responseEl.textContent = text || '未获取到回复。'; responseEl.classList.add('show'); responseEl.classList.remove('ai-qa-error'); }
+                        if (responseEl) {
+                            if (text) {
+                                responseEl.textContent = text;
+                                responseEl.classList.remove('ai-qa-error');
+                            } else {
+                                var errHint = (data && (data.error || data.message || data.hint)) || '';
+                                responseEl.textContent = errHint ? ('未获取到回复。（' + errHint + '）') : '未获取到回复。';
+                                responseEl.classList.add('ai-qa-error');
+                            }
+                            responseEl.classList.add('show');
+                        }
                     }).catch(function(err) {
                         var msg = err.message || '网络异常，请稍后重试。';
                         if (err.name === 'AbortError' || (typeof msg === 'string' && (msg.indexOf('fetch') !== -1 || msg.indexOf('timed out') !== -1 || msg.indexOf('Failed') !== -1))) msg = '连接失败或超时。请点击下方「设置代理地址」填写备用 API 地址（如自建代理）后重试。';

@@ -6,7 +6,7 @@
     <title>身高、体重报告书 - 享智云</title>
     <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+    <script src="https://unpkg.com/echarts@5/dist/echarts.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -80,7 +80,15 @@
         .z-alert { color: #dc3545; font-weight: 500; }
         .eval-table-caption { padding: 10px 0 6px 0; font-size: 14px; font-weight: 600; color: #333; }
         .eval-table-wrap { margin-bottom: 16px; }
-        .suggestion-box { background: #e7f3ff; border-left: 4px solid #366092; padding: 16px 20px; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.7; color: #333; }
+        .suggestion-box { background: #f8fcff; border-left: 4px solid #366092; padding: 16px 20px; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.7; color: #333; }
+        .dimension-block { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e8ecf0; }
+        .dimension-block:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .dimension-block h5 { font-size: 15px; color: #366092; margin-bottom: 8px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .dimension-block h5 i { opacity: 0.9; }
+        .dim-analysis { background: #f0f6fc; padding: 10px 14px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; color: #444; line-height: 1.65; }
+        .dim-suggestion { padding-left: 4px; font-size: 13px; color: #333; line-height: 1.7; }
+        .dim-suggestion ul { margin: 4px 0 0 0; padding-left: 18px; }
+        .dim-suggestion li { margin-bottom: 4px; }
         .advice-card { background: #fff; border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #eee; }
         .advice-card.highlight { border-color: #366092; background: #f8fcff; }
         .advice-card h4 { font-size: 15px; margin-bottom: 10px; color: #333; }
@@ -394,12 +402,95 @@
             function getSuggestionText(tier, data) {
                 var name = (data.name || '该儿童').trim() || '该儿童';
                 if (tier.level === 'good') {
-                    return '根据本次评估，' + name + ' 各项生长发育指标整体良好，大部分指标均处于理想范围，仅个别指标存在轻微波动，属于儿童生长过程中的正常现象。饮食上建议继续保持均衡营养，保证优质蛋白、蔬菜水果、谷物的合理搭配，规律三餐，少吃高油高糖高盐零食与含糖饮料。运动方面每天保证适量户外活动，多进行跑跳、球类、骑车等有氧锻炼，同时保持规律作息与充足睡眠，坚持定期监测生长发育即可。';
+                    return '根据本次评估，' + name + ' 各项生长发育指标整体良好，大部分指标均处于理想范围，仅个别指标存在轻微波动，属于儿童生长过程中的正常现象。';
                 }
                 if (tier.level === 'pass') {
-                    return '根据本次评估，' + name + ' 在身高、体重等方面存在一项或多项指标未达理想状态，可能存在偏瘦、超重、生长偏慢等情况。饮食上建议规律三餐，保证足量优质蛋白摄入，控制油炸食品、甜品、含糖饮料，根据孩子情况适当增加或调整总热量。运动方面每周至少保持5天中等强度活动，如快走、跳绳、游泳、球类等，每天户外活动不少于1小时。不必过度焦虑，可到儿保科或营养科做专业咨询，在专业指导下调整饮食与生活习惯，多数孩子能逐步回归正常生长轨迹。';
+                    return '根据本次评估，' + name + ' 在身高、体重等方面存在一项或多项指标未达理想状态，可能存在偏瘦、超重、生长偏慢等情况。不必过度焦虑，可到儿保科或营养科做专业咨询。';
                 }
-                return '根据本次评估，' + name + ' 目前存在较明显的生长发育偏离，为更准确判断原因，建议带' + name + '到儿保科或儿童内分泌科进行全面检查。日常可先从生活方式调整：饮食保证营养均衡，不暴饮暴食、不挑食偏食，合理搭配蛋白质、主食、蔬菜，减少高油高糖食物。运动以温和、可持续为主，如快走、慢跑、跳绳、游泳、伸展运动等，根据孩子身体情况循序渐进。儿童生长发育可塑性强，早发现、早指导、科学干预，能更好地帮助孩子健康成长。';
+                return '根据本次评估，' + name + ' 目前存在较明显的生长发育偏离，建议到儿保科或儿童内分泌科进行全面检查。儿童生长发育可塑性强，早发现、早指导、科学干预，能更好地帮助孩子健康成长。';
+            }
+            function getSuggestionHtml(tier, data) {
+                var name = (data.name || '该儿童').trim() || '该儿童';
+                var intro = getSuggestionText(tier, data);
+                var dietBlock = '<div class="dimension-block">' +
+                    '<h5><i class="fa-solid fa-utensils"></i> 一、膳食与生长发育</h5>' +
+                    '<div class="dim-analysis">' +
+                    '<strong>分析：</strong>合理的膳食能够为孩子提供充足的能量和营养，满足其生长发育的需求，增强免疫力，预防疾病。' +
+                    '蛋白质是身体发育的重要物质基础：富含优质蛋白的食物如鱼虾、蛋类、奶类等，是孩子骨骼与肌肉生长的关键原料；' +
+                    '新鲜的蔬菜和水果则能提供丰富的维生素和矿物质，促进新陈代谢，其中深色蔬菜、奶类、鱼类等还能提供骨骼发育所需的钙和维生素D。' +
+                    '若长期营养不良或缺乏关键营养素（如钙、维生素D、优质蛋白），骨骼发育可能受限，即使遗传身高潜力较高也难以充分实现。' +
+                    '家长在孩子的膳食营养方面起着关键作用，保证饮食多样化、搭配合理，才能为生长提供稳定支撑。' +
+                    '</div>' +
+                    '<div class="dim-suggestion">' +
+                    '<strong>建议：</strong><ul>' +
+                    '<li><strong>多样化与搭配：</strong>保证孩子饮食多样化，做到荤素搭配、粗细结合。每天为孩子提供谷薯类、蔬菜水果、动物性食物及奶类、大豆和坚果等四类食物中的三类及以上。</li>' +
+                    '<li><strong>优质蛋白与关键营养素：</strong>规律三餐，保证足量优质蛋白（如牛奶、鱼类、蛋类、豆类）以及钙、维生素D的摄入，深色蔬菜、适量日照也有助于维生素D的合成。</li>' +
+                    '<li><strong>控制不健康饮食：</strong>控制孩子对高盐、高糖和高脂肪食物的摄入，少喝含糖饮料，少吃高油高糖高盐零食，避免暴饮暴食或挑食偏食。</li>' +
+                    '<li><strong>培养良好习惯：</strong>鼓励孩子参与食物的选择和制作，提高他们的营养素养，建立对均衡饮食的认知。</li>' +
+                    '<li><strong>偏瘦或生长偏慢时：</strong>可适当增加总热量与优质蛋白，如早餐增加鸡蛋/牛奶/坚果，午餐主食与肉类搭配充足；必要时在儿保或营养科指导下评估是否需补充锌、钙等。</li></ul></div></div>';
+                var sportBlock = '<div class="dimension-block">' +
+                    '<h5><i class="fa-solid fa-person-running"></i> 二、运动与生长发育</h5>' +
+                    '<div class="dim-analysis">' +
+                    '<strong>分析：</strong>运动对儿童身高有着显著的影响。' +
+                    '适当的运动可以促进生长激素的分泌——研究显示，运动后血液中的生长激素水平可提升至静息状态的2-4倍，尤其在夜间睡眠中仍会持续作用，对青春期前儿童效果更显著。' +
+                    '运动还能刺激骨骼生长：跳跃、篮球、跳绳等产生纵向压力的运动，能对长骨末端的骺软骨（生长板）形成良性刺激，加速软骨细胞分裂；拉伸类运动（如瑜伽、拉伸操）可增加关节活动范围，有氧运动（如游泳、慢跑）则能增强心肺功能，为身体提供充足氧气。' +
+                    '此外，运动可加强肌肉力量，使身体更加挺拔，改善体态。' +
+                    '需要强调的是，运动对身高的影响主要体现在青春期前及青春期的骨骼发育阶段；身高主要由遗传和营养决定，运动更多是辅助作用。' +
+                    '同时需注意：过度运动或不当冲击可能损伤生长板，反而抑制发育，因此要避免长期大重量举铁、马拉松等超负荷运动。' +
+                    '</div>' +
+                    '<div class="dim-suggestion">' +
+                    '<strong>建议：</strong><ul>' +
+                    '<li><strong>推荐运动类型：</strong>游泳、跳绳、单杠悬垂、羽毛球等全身性、非负重运动；跳跃类（跳绳、篮球）、拉伸类（拉伸操、瑜伽）、有氧类（游泳、慢跑）都适合促进生长。</li>' +
+                    '<li><strong>频率与时长：</strong>每周3-5次，每次30-60分钟；每天可进行30分钟以上的跳跃类或户外活动，刺激骨骼生长与生长激素分泌。</li>' +
+                    '<li><strong>户外与多样性：</strong>每天保证适量户外活动，多进行跑跳、球类、骑车等有氧锻炼，兼顾兴趣与可持续性。</li>' +
+                    '<li><strong>需要避免：</strong>长期大重量举铁、马拉松等超负荷运动可能压迫骨骼或损伤生长板，儿童青少年（骨骼未闭合阶段）应以中等强度、可持续的运动为主。</li>' +
+                    '<li><strong>体态与习惯：</strong>运动以温和、可持续为原则，根据孩子身体情况循序渐进，培养长期运动习惯比短期加量更重要。</li></ul></div></div>';
+                var geneBlock = '<div class="dimension-block">' +
+                    '<h5><i class="fa-solid fa-dna"></i> 三、基因与生长发育</h5>' +
+                    '<div class="dim-analysis">' +
+                    '<strong>分析：</strong>小儿生长发育受遗传因素影响显著，主要体现在身高、体型、成熟速度等方面。' +
+                    '父母身高是预测儿童成年身高的关键指标，遗传公式（如父母平均身高±6.5cm）常用于估算儿童身高范围，但实际生长可能因后天环境而波动。' +
+                    '基因通过调控生长板活性、生长激素受体敏感性等，影响骨骼纵向生长；部分遗传性疾病（如某些染色体或内分泌异常）若未及时干预，也可能导致发育迟缓。' +
+                    '儿童达到坐、爬、走等大运动里程碑的年龄存在个体差异，其中部分与遗传相关。' +
+                    '需要明确的是，遗传并非唯一因素：营养、睡眠、运动、情绪、疾病等都会与基因共同作用，最终影响发育结果——即使遗传身高潜力较高，若长期营养不良或缺乏关键营养素，骨骼发育可能受限；反之，通过科学的后天干预，可以在遗传潜力范围内尽量发挥生长空间。' +
+                    '</div>' +
+                    '<div class="dim-suggestion">' +
+                    '<strong>建议：</strong><ul>' +
+                    '<li><strong>理性看待遗传：</strong>遗传决定了大致的生长趋势和潜力范围，不必与同龄人简单对比，每个孩子有自己的节奏。</li>' +
+                    '<li><strong>后天优化空间：</strong>在遗传基础上，保证充足营养（优质蛋白、钙、维生素D）、规律睡眠、适量运动、稳定情绪，有助于孩子达到遗传潜力上限。</li>' +
+                    '<li><strong>定期监测：</strong>坚持定期监测身高、体重等指标，若持续明显偏离遗传预期或出现发育里程碑延迟，可到儿保科或专科排查是否有疾病或环境因素干扰。</li>' +
+                    '<li><strong>特殊情况：</strong>若家族中有遗传性发育相关疾病史，或孩子有特殊面容、智力与体格发育不一致等情况，建议及早专科评估。</li></ul></div></div>';
+                var sleepBlock = '<div class="dimension-block">' +
+                    '<h5><i class="fa-solid fa-moon"></i> 四、休息（睡眠）与生长发育</h5>' +
+                    '<div class="dim-analysis">' +
+                    '<strong>分析：</strong>睡眠与生长发育关系密切。' +
+                    '生长激素的分泌主要在儿童睡眠时进行，约80%的生长激素在睡眠中分泌，因此儿童休息质量很大程度影响到生长发育。' +
+                    '不同年龄对睡眠时长的需求不同：三岁之前的儿童每天休息时间建议在十三小时左右，三岁到五岁约十一个小时，十岁之前的小学生建议达到十个小时左右；且应尽量保证儿童最晚在九点多之前进入睡眠状态，这样对于早上七点左右上学的孩子，能控制在大约十小时的睡眠时间。' +
+                    '若长期睡眠不足或晚睡早起，除了会影响生长激素分泌、错失骨骼生长的关键窗口期，还会对儿童的大脑智力发育、心理精神状态产生负面影响，并可能导致早上精神不佳、食欲下降，形成恶性循环；长时间休息不良还可能造成免疫力降低、记忆力下降。' +
+                    '保证儿童睡眠的合理充足，需要依靠家长的正确管控，而不少家庭存在作息不规律或睡前刺激过多等问题，值得重视。' +
+                    '</div>' +
+                    '<div class="dim-suggestion">' +
+                    '<strong>建议：</strong><ul>' +
+                    '<li><strong>保证时长与节律：</strong>按年龄保证充足睡眠（学龄前约10-11小时，学龄儿童约10小时，青春期约8-10小时），尽量固定作息，晚9点前入睡。</li>' +
+                    '<li><strong>睡前环境：</strong>睡前避免电子设备、剧烈运动或过于兴奋的活动；晚上早点结束剧烈运动，饮食上避免太刺激、难消化的食物，以便孩子在合理时间内顺利入眠。</li>' +
+                    '<li><strong>养成习惯：</strong>建立固定的睡前程序（如洗漱、阅读、熄灯时间），养成良好睡眠习惯，有利于稳定生物钟。</li>' +
+                    '<li><strong>家长示范与管控：</strong>家长可带头规律作息，并温和坚定地执行睡眠时间，避免因溺爱或疏忽导致孩子长期晚睡。</li></ul></div></div>';
+                var emotionBlock = '<div class="dimension-block">' +
+                    '<h5><i class="fa-solid fa-face-smile"></i> 五、情绪与生长发育</h5>' +
+                    '<div class="dim-analysis">' +
+                    '<strong>分析：</strong>情绪会从多个方面影响身高发育。' +
+                    '生长激素是促进骨骼发育的关键物质，主要由深度睡眠时分泌；长期处于紧张、焦虑或抑郁状态时，人体会分泌过量的皮质醇（压力激素），抑制生长激素的合成与释放——研究表明，长期高压环境下生活的儿童，生长激素水平可能降低30%以上。' +
+                    '情绪问题还常伴随入睡困难、睡眠浅等，而深度睡眠正是生长激素分泌的高峰期，若长期睡眠不足（如每晚少于7小时），可能错失骨骼生长的关键窗口期。' +
+                    '此外，负面情绪会影响食欲和消化功能：焦虑可能引发暴饮暴食或厌食，导致营养摄入不均衡；压力还会减少肠道对钙、维生素D等骨骼必需营养的吸收率。' +
+                    '需要澄清的是，偶尔的情绪波动不会显著影响身高，只有长期（超过3个月）的负面情绪才需警惕；且情绪对身高的影响通常在遗传潜力范围内波动，不会完全改变遗传决定的生长上限。' +
+                    '</div>' +
+                    '<div class="dim-suggestion">' +
+                    '<strong>建议：</strong><ul>' +
+                    '<li><strong>心理健康与支持：</strong>建立家庭支持系统，通过沟通缓解压力；培养兴趣爱好（如运动、艺术）帮助孩子释放情绪。若情绪问题持续超过2周，建议寻求心理咨询或医学帮助。</li>' +
+                    '<li><strong>作息与睡眠：</strong>保证充足睡眠（如青春期儿童每天8-10小时），固定作息时间，睡前避免电子设备刺激，有助于减少焦虑对睡眠的干扰。</li>' +
+                    '<li><strong>饮食与运动：</strong>保证蛋白质、钙、维生素D的摄入（如牛奶、鱼类、深色蔬菜）；每天30分钟以上的跳跃类运动（如篮球、跳绳）既可刺激骨骼生长，也有助于情绪宣泄。</li>' +
+                    '<li><strong>不必过度焦虑：</strong>短期情绪波动无碍身高，家长保持平和、给予陪伴与理解，往往比单纯强调“长高”更能帮助孩子稳定情绪、健康成长。</li></ul></div></div>';
+                return '<p style="margin-bottom:16px;">' + intro + ' 以下从五个维度（膳食、运动、基因、休息、情绪）为您分析并给出建议。</p>' + dietBlock + sportBlock + geneBlock + sleepBlock + emotionBlock;
             }
 
             function renderReport(raw) {
@@ -546,7 +637,7 @@
                         }
                     } catch (e) {}
                 }
-                document.getElementById('suggestionBox').textContent = getSuggestionText(tier, data);
+                document.getElementById('suggestionBox').innerHTML = getSuggestionHtml(tier, data);
                 var extras = document.getElementById('suggestionExtras');
                 if (extras) {
                     var hl = getRelevantAdviceKeys(data);
@@ -1015,7 +1106,7 @@
                         }
                     }
                     var levelOrder = ['下', '中下', '中', '中上', '上'];
-                    var levelColors = { '下': '#dc3545', '中下': '#e69500', '中': '#28a745', '中上': '#17a2b8', '上': '#6f42c1' };
+                    var levelColors = { '下': '#dc3545', '中下': '#e69500', '中': '#28a745', '中上': '#e69500', '上': '#dc3545' };
                     function buildLevelNames(d, m) {
                         var inds = (d.indicators || []).filter(function(i) { return i.id !== 'ageHead' && i.name !== '年龄别头围'; });
                         var names = [];
@@ -1192,6 +1283,8 @@
                                         _res: resText,
                                         _indName: name,
                                         _timeLabel: timeLabel || '本次',
+                                        _side: timeLabel || '本次',
+                                        _indIndex: si,
                                         itemStyle: { color: segColor },
                                         upperLabel: { show: true }
                                     });
@@ -1209,19 +1302,81 @@
                                     { name: '本次', value: 4, itemStyle: { color: '#5b9bd5' }, children: buildLevelSunburstChildren(d2, '本次') }
                                 ];
                             }
-                            var levelSunburstLabelRich = { a: { color: '#333', fontWeight: 'bold', fontSize: 12, lineHeight: 22 }, hr: { borderColor: '#8C8D8E', width: '100%', borderWidth: 1, height: 0 }, b: { color: '#4C5058', fontSize: 11, lineHeight: 20 }, c: { color: '#4C5058', fontSize: 11, lineHeight: 20 }, d: { color: '#4C5058', fontSize: 11, lineHeight: 20 } };
+                            var levelSunburstLabelRich = { a: { color: '#333', fontWeight: 'bold', fontSize: 13, lineHeight: 22 }, hr: { borderColor: '#8C8D8E', width: '100%', borderWidth: 1, height: 0 }, b: { color: '#4C5058', fontSize: 11, lineHeight: 20 }, c: { color: '#4C5058', fontSize: 11, lineHeight: 20 } };
                             var levelSunburstLabelFormatter = function(params) {
                                 var d = params.data;
                                 if (!d || d._valStr === undefined) return params.name || '';
-                                var t = String(d._timeLabel || '本次').replace(/[{}|\\]/g, ' ');
                                 var ind = String(d._indName || d.name || '').replace(/[{}|\\]/g, ' ');
                                 var v = String(d._valStr || '—').replace(/[{}|\\]/g, ' ');
                                 var r = String(d._res || '—').replace(/[{}|\\]/g, ' ');
-                                return '{a|' + t + '}\n{hr|}\n{b|' + ind + '：}\n{c|百分位/等级 ' + v + '}\n{d|评价结果：' + r + '}';
+                                return '{a|' + ind + '}\n{hr|}\n{b|百分位/等级 ' + v + '}\n{c|评价结果：' + r + '}';
                             };
                             var levelSunburstChart = echarts.init(levelSunburstDom);
+                            function buildLevelSunburstGraphic(w, h, data, isComp) {
+                                var cx = w / 2, cy = h / 2;
+                                var minSize = Math.min(w, h);
+                                var rOuterRing = minSize * 0.58;
+                                var leftX = w * 0.08, rightX = w * 0.92;
+                                var labelW = 140, labelH = 72;
+                                var deg = Math.PI / 180;
+                                var anglesLeft = [247.5, 202.5, 157.5, 112.5];
+                                var anglesRight = [292.5, 337.5, 22.5, 67.5];
+                                var anglesSingle = [135, 225, 315, 45];
+                                var leftCol = (data && data[isComp ? 1 : 0]) ? (data[isComp ? 1 : 0].children || []) : [];
+                                var rightCol = (isComp && data && data[0]) ? (data[0].children || []) : [];
+                                var allItems = [];
+                                var push = function(col, angles) {
+                                    if (!col) return;
+                                    for (var i = 0; i < 4 && i < col.length; i++) {
+                                        var a = angles[i] * deg;
+                                        var sx = cx + rOuterRing * Math.cos(a), sy = cy + rOuterRing * Math.sin(a);
+                                        allItems.push({ sx: sx, sy: sy, data: col[i] });
+                                    }
+                                };
+                                if (isComp) {
+                                    push(leftCol, anglesLeft);
+                                    push(rightCol, anglesRight);
+                                } else {
+                                    push(leftCol, anglesSingle);
+                                }
+                                var elements = [];
+                                var edgeLeft = leftX + labelW;
+                                var edgeRight = rightX - labelW;
+                                function addLabel(it, edgeX, boxX, rowY) {
+                                    if (!it || !it.data) return;
+                                    if (it.data._labelPos) it.data._labelPos = [edgeX, rowY];
+                                    elements.push({ type: 'rect', shape: { x: boxX, y: rowY - labelH / 2, width: labelW, height: labelH }, style: { fill: '#F6F8FC', stroke: '#8C8D8E', lineWidth: 1 } });
+                                    var d = it.data;
+                                    var t = (d._indName || d.name || '') + '\n百分位/等级 ' + (d._valStr || '—') + '\n评价结果：' + (d._res || '—');
+                                    elements.push({ type: 'text', left: boxX + 12, top: rowY - labelH / 2 + 10, style: { text: t, fontSize: 11, fill: '#333', lineHeight: 20 }, z: 2 });
+                                }
+                                if (isComp) {
+                                    for (var i = 0; i < 4; i++) {
+                                        var rowY = h * (0.18 + 0.64 * i / 3);
+                                        if (allItems[i]) addLabel(allItems[i], edgeLeft, leftX, rowY);
+                                        if (allItems[4 + i]) addLabel(allItems[4 + i], edgeRight, rightX - labelW, rowY);
+                                    }
+                                } else {
+                                    for (var j = 0; j < allItems.length; j++) {
+                                        var it = allItems[j];
+                                        var indIndex = (it.data && (it.data._indIndex != null ? it.data._indIndex : 0));
+                                        if (indIndex < 0 || indIndex > 3) indIndex = 0;
+                                        var rowY = h * (0.18 + 0.64 * indIndex / 3);
+                                        var onLeft = it.sx < cx;
+                                        addLabel(it, onLeft ? edgeLeft : edgeRight, onLeft ? leftX : rightX - labelW, rowY);
+                                    }
+                                }
+                                return elements;
+                            }
+                            if (typeof window.__buildLevelSunburstGraphic === 'undefined') window.__buildLevelSunburstGraphic = buildLevelSunburstGraphic;
+                            var levelSunburstW = levelSunburstDom.offsetWidth || 800;
+                            var levelSunburstH = 560;
+                            if (typeof window.__levelSunburstCfg === 'undefined') window.__levelSunburstCfg = {};
+                            window.__levelSunburstCfg.data = levelSunburstData;
+                            window.__levelSunburstCfg.isComparison = isComparison;
                             levelSunburstChart.setOption({
                                 tooltip: { trigger: 'item', formatter: function(params) { var d = params.data; if (d && d._valStr !== undefined) return (d._indName || '') + '<br/>百分位/等级：' + (d._valStr || '—') + '<br/>评价结果：' + (d._res || '—'); return params.name; } },
+                                graphic: buildLevelSunburstGraphic(levelSunburstW, levelSunburstH, levelSunburstData, isComparison),
                                 series: [{
                                     type: 'sunburst',
                                     radius: ['12%', '58%'],
@@ -1229,12 +1384,11 @@
                                     data: levelSunburstData,
                                     sort: null,
                                     nodeClick: false,
-                                    labelLayout: { hideOverlap: false, moveOverlap: 'shiftXY' },
                                     emphasis: { focus: 'ancestor' },
                                     levels: [
                                         { label: { show: false } },
                                         { r0: '12%', r: '35%', label: { show: true, position: 'inside', fontSize: 15 } },
-                                        { r0: '35%', r: '58%', upperLabel: { show: true }, label: { show: true, position: 'outside', rotate: false, formatter: levelSunburstLabelFormatter, backgroundColor: '#F6F8FC', borderColor: '#8C8D8E', borderWidth: 1, borderRadius: 4, padding: [10, 12], rich: levelSunburstLabelRich, minMargin: 28 }, labelLine: { show: true, length: 280, length2: 100 } }
+                                        { r0: '35%', r: '58%', upperLabel: { show: true }, label: { show: true, position: 'inside', fontSize: 11, formatter: function(params) { var d = params.data; return d ? (d._indName || d.name || '') : (params.name || ''); } }, labelLine: { show: false } }
                                     ]
                                 }]
                             });
@@ -1409,6 +1563,7 @@
                                         _zStr: zStr,
                                         _res: resText,
                                         _indName: name,
+                                        _indIndex: si,
                                         _timeLabel: timeLabel || '本次',
                                         itemStyle: { color: segColor },
                                         upperLabel: { show: true }
@@ -1427,22 +1582,68 @@
                                     { name: '本次', value: 4, itemStyle: { color: '#5b9bd5' }, children: buildSunburstChildren(d2, '本次') }
                                 ];
                             }
-                            var sunburstLabelRich = {
-                                a: { color: '#333', fontWeight: 'bold', fontSize: 12, lineHeight: 22 },
-                                hr: { borderColor: '#8C8D8E', width: '100%', borderWidth: 1, height: 0 },
-                                b: { color: '#4C5058', fontSize: 11, lineHeight: 20 },
-                                c: { color: '#4C5058', fontSize: 11, lineHeight: 20 },
-                                d: { color: '#4C5058', fontSize: 11, lineHeight: 20 }
-                            };
-                            var sunburstLabelFormatter = function(params) {
-                                var d = params.data;
-                                if (!d || d._zStr === undefined) return params.name || '';
-                                var t = String(d._timeLabel || '本次').replace(/[{}|\\]/g, ' ');
-                                var ind = String(d._indName || d.name || '').replace(/[{}|\\]/g, ' ');
-                                var z = String(d._zStr || '—').replace(/[{}|\\]/g, ' ');
-                                var r = String(d._res || '—').replace(/[{}|\\]/g, ' ');
-                                return '{a|' + t + '}\n{hr|}\n{b|' + ind + '：}\n{c|标准分数 ' + z + '}\n{d|评价结果：' + r + '}';
-                            };
+                            function buildNutritionSunburstGraphic(w, h, data, isComp) {
+                                var cx = w / 2, cy = h / 2;
+                                var minSize = Math.min(w, h);
+                                var rOuterRing = minSize * 0.58;
+                                var leftX = w * 0.08, rightX = w * 0.92;
+                                var labelW = 140, labelH = 72;
+                                var deg = Math.PI / 180;
+                                var anglesLeft = [247.5, 202.5, 157.5, 112.5];
+                                var anglesRight = [292.5, 337.5, 22.5, 67.5];
+                                var anglesSingle = [135, 225, 315, 45];
+                                var leftCol = (data && data[isComp ? 1 : 0]) ? (data[isComp ? 1 : 0].children || []) : [];
+                                var rightCol = (isComp && data && data[0]) ? (data[0].children || []) : [];
+                                var allItems = [];
+                                var push = function(col, angles) {
+                                    if (!col) return;
+                                    for (var i = 0; i < 4 && i < col.length; i++) {
+                                        var a = angles[i] * deg;
+                                        var sx = cx + rOuterRing * Math.cos(a), sy = cy + rOuterRing * Math.sin(a);
+                                        allItems.push({ sx: sx, sy: sy, data: col[i] });
+                                    }
+                                };
+                                if (isComp) {
+                                    push(leftCol, anglesLeft);
+                                    push(rightCol, anglesRight);
+                                } else {
+                                    push(leftCol, anglesSingle);
+                                }
+                                var elements = [];
+                                var edgeLeft = leftX + labelW;
+                                var edgeRight = rightX - labelW;
+                                function addLabel(it, edgeX, boxX, rowY) {
+                                    if (!it || !it.data) return;
+                                    if (it.data._labelPos) it.data._labelPos = [edgeX, rowY];
+                                    elements.push({ type: 'rect', shape: { x: boxX, y: rowY - labelH / 2, width: labelW, height: labelH }, style: { fill: '#F6F8FC', stroke: '#8C8D8E', lineWidth: 1 } });
+                                    var d = it.data;
+                                    var t = (d._indName || d.name || '') + '\n标准分数 ' + (d._zStr || '—') + '\n评价结果：' + (d._res || '—');
+                                    elements.push({ type: 'text', left: boxX + 12, top: rowY - labelH / 2 + 10, style: { text: t, fontSize: 11, fill: '#333', lineHeight: 20 }, z: 2 });
+                                }
+                                if (isComp) {
+                                    for (var i = 0; i < 4; i++) {
+                                        var rowY = h * (0.18 + 0.64 * i / 3);
+                                        if (allItems[i]) addLabel(allItems[i], edgeLeft, leftX, rowY);
+                                        if (allItems[4 + i]) addLabel(allItems[4 + i], edgeRight, rightX - labelW, rowY);
+                                    }
+                                } else {
+                                    for (var j = 0; j < allItems.length; j++) {
+                                        var it = allItems[j];
+                                        var indIndex = (it.data && (it.data._indIndex != null ? it.data._indIndex : 0));
+                                        if (indIndex < 0 || indIndex > 3) indIndex = 0;
+                                        var rowY = h * (0.18 + 0.64 * indIndex / 3);
+                                        var onLeft = it.sx < cx;
+                                        addLabel(it, onLeft ? edgeLeft : edgeRight, onLeft ? leftX : rightX - labelW, rowY);
+                                    }
+                                }
+                                return elements;
+                            }
+                            if (typeof window.__buildNutritionSunburstGraphic === 'undefined') window.__buildNutritionSunburstGraphic = buildNutritionSunburstGraphic;
+                            var nutritionSunburstW = nutritionSunburstDom.offsetWidth || 800;
+                            var nutritionSunburstH = 560;
+                            if (typeof window.__nutritionSunburstCfg === 'undefined') window.__nutritionSunburstCfg = {};
+                            window.__nutritionSunburstCfg.data = sunburstData;
+                            window.__nutritionSunburstCfg.isComparison = isComparison && !!d1;
                             nutritionSunburstChart.setOption({
                                 tooltip: {
                                     trigger: 'item',
@@ -1453,6 +1654,7 @@
                                         return params.name;
                                     }
                                 },
+                                graphic: buildNutritionSunburstGraphic(nutritionSunburstW, nutritionSunburstH, sunburstData, isComparison && !!d1),
                                 series: [{
                                     type: 'sunburst',
                                     radius: ['12%', '58%'],
@@ -1460,12 +1662,11 @@
                                     data: sunburstData,
                                     sort: null,
                                     nodeClick: false,
-                                    labelLayout: { hideOverlap: false, moveOverlap: 'shiftXY' },
                                     emphasis: { focus: 'ancestor' },
                                     levels: [
                                         { label: { show: false } },
                                         { r0: '12%', r: '35%', label: { show: true, position: 'inside', fontSize: 15 } },
-                                        { r0: '35%', r: '58%', upperLabel: { show: true }, label: { show: true, position: 'outside', rotate: false, formatter: sunburstLabelFormatter, backgroundColor: '#F6F8FC', borderColor: '#8C8D8E', borderWidth: 1, borderRadius: 4, padding: [10, 12], rich: sunburstLabelRich, minMargin: 28 }, labelLine: { show: true, length: 280, length2: 100 } }
+                                        { r0: '35%', r: '58%', upperLabel: { show: true }, label: { show: true, position: 'inside', fontSize: 11, formatter: function(params) { var d = params.data; return d ? (d._indName || d.name || '') : (params.name || ''); } }, labelLine: { show: false } }
                                     ]
                                 }]
                             });
@@ -1543,7 +1744,7 @@
                                 legend: { orient: 'horizontal', bottom: 26, left: 'center', data: seriesCurr.map(function(s) { return s.name; }) },
                                 grid: { left: '14%', right: '10%', top: '12%', bottom: '22%', containLabel: true },
                                 xAxis: { type: 'value', name: '身高 (cm)', min: 80, max: 160, interval: 5, nameGap: 36, axisLabel: { fontSize: 12 } },
-                                yAxis: { type: 'value', name: '体重 (kg)', min: 0, max: 40, interval: 5, nameGap: 36, axisLabel: { fontSize: 12 } },
+                                yAxis: { type: 'value', name: '体重 (kg)', min: 5, max: 40, interval: 5, nameGap: 36, axisLabel: { fontSize: 12 } },
                                 series: seriesCurr
                             });
                             if (isComparison && d1 && d1.height != null && d1.weight != null && !isNaN(Number(d1.height)) && !isNaN(Number(d1.weight)) && scatterDom2) {
@@ -1561,7 +1762,7 @@
                                     legend: { orient: 'horizontal', bottom: 26, left: 'center', data: seriesPrev.map(function(s) { return s.name; }) },
                                     grid: { left: '14%', right: '10%', top: '12%', bottom: '22%', containLabel: true },
                                     xAxis: { type: 'value', name: '身高 (cm)', min: 80, max: 160, interval: 5, nameGap: 36, axisLabel: { fontSize: 12 } },
-                                    yAxis: { type: 'value', name: '体重 (kg)', min: 0, max: 40, interval: 5, nameGap: 36, axisLabel: { fontSize: 12 } },
+                                    yAxis: { type: 'value', name: '体重 (kg)', min: 5, max: 40, interval: 5, nameGap: 36, axisLabel: { fontSize: 12 } },
                                     series: seriesPrev
                                 });
                             } else {
@@ -1580,6 +1781,16 @@
                     var el = document.getElementById(id);
                     if (el && typeof echarts !== 'undefined' && echarts.getInstanceByDom(el)) echarts.getInstanceByDom(el).resize();
                 });
+                var levelSunburstCh = document.getElementById('levelSunburstChart') && typeof echarts !== 'undefined' && echarts.getInstanceByDom(document.getElementById('levelSunburstChart'));
+                if (levelSunburstCh && window.__levelSunburstCfg && window.__buildLevelSunburstGraphic) {
+                    var w = levelSunburstCh.getWidth(), h = levelSunburstCh.getHeight();
+                    levelSunburstCh.setOption({ graphic: window.__buildLevelSunburstGraphic(w, h, window.__levelSunburstCfg.data, window.__levelSunburstCfg.isComparison) });
+                }
+                var nutritionSunburstCh = document.getElementById('nutritionSunburstChart') && typeof echarts !== 'undefined' && echarts.getInstanceByDom(document.getElementById('nutritionSunburstChart'));
+                if (nutritionSunburstCh && window.__nutritionSunburstCfg && window.__buildNutritionSunburstGraphic) {
+                    var nw = nutritionSunburstCh.getWidth(), nh = nutritionSunburstCh.getHeight();
+                    nutritionSunburstCh.setOption({ graphic: window.__buildNutritionSunburstGraphic(nw, nh, window.__nutritionSunburstCfg.data, window.__nutritionSunburstCfg.isComparison) });
+                }
             }
             function initCollapseToggles() { /* 表1/表2/表3 已取消折叠，始终展开 */ }
             function initTabs() {
@@ -1690,15 +1901,20 @@
                 var wrapper = document.createElement('div');
                 wrapper.style.cssText = 'position:fixed;top:0;left:0;z-index:99999;width:800px;max-height:100vh;overflow:auto;font-family:Microsoft YaHei,Arial,sans-serif;font-size:14px;color:#333;background:#fff;padding:20px 36px;box-sizing:border-box;';
 
-                var childName = (title && title.textContent) ? (title.textContent.indexOf('·') !== -1 ? title.textContent.split('·')[0].trim() : '') : '';
+                var childName = '';
+                if (basicInfo) {
+                    var nameEl = basicInfo.querySelector('.item-name .value');
+                    if (nameEl && nameEl.textContent) childName = nameEl.textContent.trim();
+                }
+                if (!childName && title && title.textContent && title.textContent.indexOf('·') !== -1) childName = title.textContent.split('·')[0].trim();
                 var reportDate = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
-                var coverHtml = '<div style="width:800px;min-height:1050px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;box-sizing:border-box;">' +
+                var coverHtml = '<div style="width:800px;min-height:1050px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:100px 20px 60px;box-sizing:border-box;">' +
                     '<div style="width:100%;max-width:100%;text-align:center;">' +
-                    '<h1 style="font-size:38px;font-weight:bold;color:#000;margin:0 0 28px 0;letter-spacing:2px;">享智云<sup style="font-size:0.45em;vertical-align:top;">®</sup>儿童健康成长</h1>' +
-                    '<h2 style="font-size:28px;font-weight:bold;color:#4a7ba7;margin:0 0 16px 0;letter-spacing:1px;">身高/体重 AI数智报告书</h2>' +
-                    '<p style="font-size:20px;font-weight:500;color:#000;margin:0 0 40px 0;letter-spacing:1px;">HEIGHT/WEIGHT AI DIGITAL INTELLIGENCE REPORT</p>' +
-                    '<p style="font-size:20px;color:#333;margin:0 0 48px 0;">报告日期：' + reportDate + '</p>' +
-                    '<img src="assets/logo.jpg" alt="" style="height:80px;width:auto;margin-top:auto;border-radius:12px;" onerror="this.style.display=\'none\'">' +
+                    '<h1 style="font-size:52px;font-weight:bold;color:#000;margin:0 0 36px 0;letter-spacing:2px;">享智云<sup style="font-size:0.45em;vertical-align:top;">®</sup>儿童健康成长</h1>' +
+                    '<h2 style="font-size:36px;font-weight:bold;color:#4a7ba7;margin:0 0 24px 0;letter-spacing:1px;">身高/体重 AI数智报告书</h2>' +
+                    '<p style="font-size:28px;font-weight:600;color:#333;margin:0 0 32px 0;">姓名：' + (childName || '—') + '</p>' +
+                    '<p style="font-size:24px;color:#333;margin:0 0 56px 0;">报告日期：' + reportDate + '</p>' +
+                    '<img src="assets/logo.jpg" alt="" style="height:96px;width:auto;margin-top:auto;border-radius:12px;" onerror="this.style.display=\'none\'">' +
                     '</div></div>';
                 var page0 = document.createElement('div');
                 page0.style.cssText = 'width:800px;background:#fff;';
@@ -1709,7 +1925,7 @@
                 var imgStyleLevel = 'width:100%;max-width:780px;height:320px;object-fit:contain;display:block;margin:0 auto 12px auto;';
                 var imgStyleSunburst = 'width:100%;max-width:780px;height:520px;object-fit:contain;display:block;margin:0 auto 12px auto;';
                 var imgStyleScatter = 'width:100%;max-width:780px;height:340px;object-fit:contain;display:block;margin:0 auto 12px auto;';
-                var page1Parts = ['<div style="text-align:center;margin-bottom:20px;font-size:17px;color:#333;">' + (title.textContent || '身高、体重报告书') + '</div>'];
+                var page1Parts = [];
                 if (basicHtml) page1Parts.push('<div class="basic-info" style="margin-bottom:20px;padding:14px 18px;background:#f8fafc;border-radius:8px;border:1px solid #e8ecf0;">' + basicHtml + '</div>');
                 if (chartUrls.heightUrl) page1Parts.push('<div style="margin-bottom:14px;font-size:15px;">身高对比（单位：cm）</div><img src="' + chartUrls.heightUrl + '" style="' + imgStyleCompare + '" />');
                 if (chartUrls.weightUrl) page1Parts.push('<div style="margin-bottom:14px;font-size:15px;">体重对比（单位：kg）</div><img src="' + chartUrls.weightUrl + '" style="' + imgStyleCompare + '" />');
@@ -1734,7 +1950,7 @@
                     chartBlocks.push(levelPolarBlock);
                 }
                 var levelSunburstNoteHtml = '<p style="font-size:12px;color:#666;margin-bottom:8px;line-height:1.5;">内环为测查时点（本次/上次），外环为年龄别体重、年龄别身高、身高别体重、年龄别BMI；评价结果：上、中上、中、中下、下（表1 百分位数法）。</p>';
-                var levelSunburstLegendHtml = '<div style="display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:10px;font-size:12px;color:#555;justify-content:center;"><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#5b9bd5;"></span>本次</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#ed7d31;"></span>上次</span><span style="color:#ddd;margin:0 2px;">|</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#dc3545;"></span>下</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#e69500;"></span>中下</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#28a745;"></span>中</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#17a2b8;"></span>中上</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#6f42c1;"></span>上</span></div>';
+                var levelSunburstLegendHtml = '<div style="display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:10px;font-size:12px;color:#555;justify-content:center;"><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#5b9bd5;"></span>本次</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#ed7d31;"></span>上次</span><span style="color:#ddd;margin:0 2px;">|</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#dc3545;"></span>下</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#e69500;"></span>中下</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#28a745;"></span>中</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#e69500;"></span>中上</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#dc3545;"></span>上</span></div>';
                 if (chartUrls.levelSunburstUrl) chartBlocks.push('<div style="margin-bottom:12px;font-size:15px;">儿童生长水平层级图（表1 百分位数法）</div>' + levelSunburstNoteHtml + '<img src="' + chartUrls.levelSunburstUrl + '" style="' + imgStyleSunburst + '" />' + levelSunburstLegendHtml);
                 if (chartUrls.nutritionBarUrl) chartBlocks.push('<div style="margin-bottom:18px;font-size:15px;">营养状况对比（表3 标准差法）</div><img src="' + chartUrls.nutritionBarUrl + '" style="' + imgStyleLevel + '" />' + barLegendHtml);
                 if (chartUrls.nutritionPolarUrl) {
@@ -1788,23 +2004,50 @@
                     wrapper.appendChild(pageCompare);
                 }
 
-                var page3 = document.createElement('div');
-                page3.className = 'pdf-page-break';
-                page3.style.width = '800px';
-                page3.style.background = '#fff';
-                page3.style.pageBreakBefore = 'always';
-                var panelSuggestion = document.getElementById('panelSuggestion');
-                var suggestionChartBox = panelSuggestion ? panelSuggestion.querySelector('.chart-box') : null;
-                var suggestionFullHtml = suggestionChartBox ? suggestionChartBox.innerHTML : '';
                 var disclaimerHtml = '<div style="margin-top:40px;padding-top:20px;border-top:1px solid #eee;font-size:12px;color:#94a3b8;text-align:center;line-height:1.6;">本报告参照 WS/T 423-2022，数据分析仅供参考，不作为诊断医疗依据。如有疑问请咨询售后。</div>';
-                if (suggestionFullHtml) {
-                    page3.innerHTML = '<div style="padding:0 24px 24px 24px;font-size:14px;line-height:1.7;">' + suggestionFullHtml + '</div>' + disclaimerHtml;
+                var suggestionBaseStyle = 'background:#f8fcff;border-left:4px solid #366092;padding:16px 20px;border-radius:0 8px 8px 0;font-size:14px;line-height:1.7;color:#333;';
+                var suggestionPageStyle = 'width:800px;background:#fff;padding:24px 36px 40px 36px;font-size:14px;line-height:1.7;box-sizing:border-box;';
+                var introEl = suggestionBox.querySelector('p');
+                var blockEls = suggestionBox.querySelectorAll('.dimension-block');
+                var suggestionPages = [];
+                if (blockEls.length >= 5 && introEl) {
+                    var page3a = document.createElement('div');
+                    page3a.className = 'pdf-page-break';
+                    page3a.style.cssText = suggestionPageStyle + ' page-break-before:always;';
+                    page3a.innerHTML = '<div style="margin-bottom:16px;font-size:16px;font-weight:bold;">健康建议</div>' +
+                        '<div class="suggestion-box" style="' + suggestionBaseStyle + '">' + introEl.outerHTML + blockEls[0].outerHTML + blockEls[1].outerHTML + '</div>';
+                    wrapper.appendChild(page3a);
+                    suggestionPages.push(page3a);
+                    var page3b = document.createElement('div');
+                    page3b.className = 'pdf-page-break';
+                    page3b.style.cssText = suggestionPageStyle + ' page-break-before:always;';
+                    page3b.innerHTML = '<div style="margin-bottom:16px;font-size:15px;font-weight:600;color:#366092;">方案建议（续）</div>' +
+                        '<div class="suggestion-box" style="' + suggestionBaseStyle + '">' + blockEls[2].outerHTML + blockEls[3].outerHTML + '</div>';
+                    wrapper.appendChild(page3b);
+                    suggestionPages.push(page3b);
+                    var page3c = document.createElement('div');
+                    page3c.className = 'pdf-page-break';
+                    page3c.style.cssText = suggestionPageStyle + ' page-break-before:always;';
+                    page3c.innerHTML = '<div class="suggestion-box" style="' + suggestionBaseStyle + '">' + blockEls[4].outerHTML + '</div>' + disclaimerHtml;
+                    wrapper.appendChild(page3c);
+                    suggestionPages.push(page3c);
                 } else {
-                    var suggestionText = (suggestionBox.innerText || suggestionBox.textContent || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-                    page3.innerHTML = '<div style="margin-bottom:12px;font-size:16px;font-weight:bold;">方案建议</div>' +
-                        '<div style="background:#e7f3ff;border-left:4px solid #366092;padding:16px 20px;font-size:14px;line-height:1.8;">' + suggestionText + '</div>' + disclaimerHtml;
+                    var page3 = document.createElement('div');
+                    page3.className = 'pdf-page-break';
+                    page3.style.cssText = 'width:800px;background:#fff;page-break-before:always;' + suggestionPageStyle;
+                    var panelSuggestion = document.getElementById('panelSuggestion');
+                    var suggestionChartBox = panelSuggestion ? panelSuggestion.querySelector('.chart-box') : null;
+                    var suggestionFullHtml = suggestionChartBox ? suggestionChartBox.innerHTML : '';
+                    if (suggestionFullHtml) {
+                        page3.innerHTML = '<div style="padding:0 24px 24px 24px;font-size:14px;line-height:1.7;">' + suggestionFullHtml + '</div>' + disclaimerHtml;
+                    } else {
+                        var suggestionText = (suggestionBox.innerText || suggestionBox.textContent || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                        page3.innerHTML = '<div style="margin-bottom:12px;font-size:16px;font-weight:bold;">方案建议</div>' +
+                            '<div style="background:#e7f3ff;border-left:4px solid #366092;padding:16px 20px;font-size:14px;line-height:1.8;">' + suggestionText + '</div>' + disclaimerHtml;
+                    }
+                    wrapper.appendChild(page3);
+                    suggestionPages = [page3];
                 }
-                wrapper.appendChild(page3);
 
                 document.body.appendChild(wrapper);
                 var name = (function() {
@@ -1825,7 +2068,7 @@
                     var JsPDF = window.jspdf && window.jspdf.jsPDF ? window.jspdf.jsPDF : (window.jspdf || window.JsPDF);
                     if (!JsPDF) { html2pdf().set({ margin: 12, filename: filename }).from(wrapper).save().then(removeWrapper).catch(removeWrapper); return; }
                     function renderAll() {
-                        var allDivs = [page0, page1].concat(chartPageDivs).concat([page2b]).concat(page2c ? [page2c] : []).concat(pageCompare ? [pageCompare] : []).concat([page3]);
+                        var allDivs = [page0, page1].concat(chartPageDivs).concat([page2b]).concat(page2c ? [page2c] : []).concat(pageCompare ? [pageCompare] : []).concat(suggestionPages);
                         var p = Promise.resolve([]);
                         allDivs.forEach(function(div) {
                             p = p.then(function(cs) {

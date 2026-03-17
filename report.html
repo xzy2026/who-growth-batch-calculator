@@ -253,6 +253,7 @@
                         <div class="chart-title"><i class="fa-solid fa-lightbulb"></i> 健康建议</div>
                     <div class="suggestion-box" id="suggestionBox"></div>
                         <div id="suggestionExtras"></div>
+                        <!-- 今日健康小任务 暂时注释
                         <div class="checklist-card">
                             <h4><i class="fa-solid fa-clipboard-check"></i> 今日健康小任务</h4>
                             <label class="checklist-item"><input type="checkbox" id="ck1"> 早餐吃了鸡蛋/牛奶</label>
@@ -261,6 +262,7 @@
                             <label class="checklist-item"><input type="checkbox" id="ck4"> 晚上9点前上床睡觉</label>
                             <p class="checklist-done" id="checklistDone" style="display:none;">✅ 完成3项以上，给孩子一个拥抱吧！</p>
                         </div>
+                        -->
                         <p class="warm-msg">🌱 每个孩子都有自己的成长节奏，您的用心陪伴，就是最好的营养剂。</p>
                         <div class="ai-qa-entry">
                             <div class="ai-qa-title"><i class="fa-solid fa-robot"></i> AI营养师问答</div>
@@ -642,13 +644,12 @@
                 document.getElementById('suggestionBox').innerHTML = getSuggestionHtml(tier, data);
                 var extras = document.getElementById('suggestionExtras');
                 if (extras) {
-                    var hl = getRelevantAdviceKeys(data);
-                    var hlCls = function(k) { return hl.indexOf(k) !== -1 ? ' advice-card highlight' : ' advice-card'; };
-                    if (tier.level === 'good') {
-                        extras.innerHTML = '<div class="excellent-badge"><div class="icon">🏅</div><div>太棒了！请继续保持当前的饮食运动习惯。</div></div>';
-                    } else {
-                        extras.innerHTML = '<div class="advice-card' + hlCls('underweight') + '"><h4>偏瘦宝宝专属建议</h4><ul><li>早餐增加鸡蛋/牛奶/坚果</li><li>午餐主食加倍，搭配肉类</li><li>睡前可喝一小杯酸奶</li></ul></div><div class="advice-card' + hlCls('overweight') + '"><h4>超重风险预警</h4><ul><li>戒掉含糖饮料，改喝白水</li><li>零食换成水果/黄瓜条</li><li>饭后散步15分钟再坐下</li></ul></div><div class="advice-card' + hlCls('growth') + '"><h4>生长偏慢怎么办？</h4><ul><li>确保每晚9点前入睡</li><li>每天晒太阳15分钟促维生素D</li><li>咨询医生是否需补锌/钙</li></ul></div>';
-                    }
+                    // 偏瘦/超重/生长偏慢 三块建议卡、良好时的 excellent-badge 暂时注释
+                    // var hl = getRelevantAdviceKeys(data);
+                    // var hlCls = function(k) { return hl.indexOf(k) !== -1 ? ' advice-card highlight' : ' advice-card'; };
+                    extras.innerHTML = '';
+                    // if (tier.level === 'good') { extras.innerHTML = '<div class="excellent-badge">...</div>'; }
+                    // else { extras.innerHTML = '<div class="advice-card'>偏瘦宝宝专属建议...</div>...'; }
                 }
                 var reportId = (data.name || '') + '_' + (data.birthDate || '');
                 var today = new Date().toISOString().slice(0,10);

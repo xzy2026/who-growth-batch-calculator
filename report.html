@@ -62,15 +62,17 @@
         .eval-table th { background: #366092; color: #fff; }
         .eval-table th:first-child { width: 160px; min-width: 160px; max-width: 160px; box-sizing: border-box; text-align: left; background: #366092; color: #fff; font-weight: 500; line-height: 1.4; word-break: keep-all; white-space: normal; }
         .eval-table td.first-col { width: 160px; min-width: 160px; max-width: 160px; box-sizing: border-box; text-align: left; background: #f0f0f0; color: #333; font-weight: 500; line-height: 1.4; word-break: keep-all; white-space: normal; }
-        #comprehensiveTable, #comprehensiveTablePrev { table-layout: fixed; }
-        #comprehensiveTable col:nth-child(1), #comprehensiveTablePrev col:nth-child(1) { width: 8%; }
-        #comprehensiveTable col:nth-child(2), #comprehensiveTablePrev col:nth-child(2) { width: 8%; }
-        #comprehensiveTable col:nth-child(3), #comprehensiveTablePrev col:nth-child(3) { width: 8%; }
+        #comprehensiveTable, #comprehensiveTablePrev { table-layout: fixed; width: 100%; box-sizing: border-box; }
+        #comprehensiveTable col:nth-child(1), #comprehensiveTablePrev col:nth-child(1) { width: 12%; }
+        #comprehensiveTable col:nth-child(2), #comprehensiveTablePrev col:nth-child(2) { width: 9%; }
+        #comprehensiveTable col:nth-child(3), #comprehensiveTablePrev col:nth-child(3) { width: 9%; }
         #comprehensiveTable col:nth-child(4), #comprehensiveTablePrev col:nth-child(4) { width: 8%; }
-        #comprehensiveTable col:nth-child(5), #comprehensiveTablePrev col:nth-child(5) { width: 8%; }
-        #comprehensiveTable col:nth-child(6), #comprehensiveTablePrev col:nth-child(6) { width: 60%; }
-        #comprehensiveTable th:first-child, #comprehensiveTable td:first-child, #comprehensiveTablePrev th:first-child, #comprehensiveTablePrev td:first-child { width: 8% !important; min-width: auto !important; max-width: none !important; }
-        #comprehensiveTable td:last-child, #comprehensiveTablePrev td:last-child { text-align: left; font-size: 12px; word-wrap: break-word; white-space: normal; }
+        #comprehensiveTable col:nth-child(5), #comprehensiveTablePrev col:nth-child(5) { width: 10%; }
+        #comprehensiveTable col:nth-child(6), #comprehensiveTablePrev col:nth-child(6) { width: 52%; }
+        #comprehensiveTable th:first-child, #comprehensiveTable td:first-child, #comprehensiveTablePrev th:first-child, #comprehensiveTablePrev td:first-child { width: 12% !important; min-width: 90px !important; max-width: none !important; box-sizing: border-box; }
+        #comprehensiveTable th:not(:last-child), #comprehensiveTable td:not(:last-child), #comprehensiveTablePrev th:not(:last-child), #comprehensiveTablePrev td:not(:last-child) { white-space: nowrap; box-sizing: border-box; }
+        #comprehensiveTable td:last-child, #comprehensiveTablePrev td:last-child { text-align: left; font-size: 12px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; white-space: normal; box-sizing: border-box; min-width: 0; }
+        #comprehensiveTable th:last-child, #comprehensiveTablePrev th:last-child { width: 52% !important; box-sizing: border-box; }
         .chart-values-summary { margin-top: 16px; font-size: 14px; }
         .chart-values-summary table { width: 100%; border-collapse: collapse; }
         .chart-values-summary th, .chart-values-summary td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
@@ -130,8 +132,8 @@
         .compare-select-wrap select { padding: 8px 12px; font-size: 14px; border: 1px solid #ddd; border-radius: 6px; min-width: 200px; }
         .compare-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 20px; }
         .compare-table th, .compare-table td { border: 1px solid #ddd; padding: 10px 12px; text-align: center; }
-        .compare-table th { background: #366092; color: #fff; }
-        .compare-table th:first-child { text-align: left; width: 140px; }
+        .compare-table th { background: #366092; color: #fff; white-space: nowrap; }
+        .compare-table th:first-child, .compare-table td:first-child { width: 200px; min-width: 200px; white-space: nowrap; }
         .compare-table .change-up { color: #28a745; }
         .compare-table .change-down { color: #dc3545; }
         @media (max-width: 480px) { .container { border-radius: 0; } .content { padding: 16px 24px; } .chart-box, .advice-card { padding: 15px 20px; } .back-btn { padding: 12px 20px; } }
@@ -847,10 +849,13 @@
                         var res = ind ? (ind.result || '').trim() : '';
                         if (res === '-') res = '';
                         var matchRow = getNutritionRowIndex(c, ind ? ind.result : '');
+                        var prevInd = prevIndicators && ind ? findIndById(ind.id, prevIndicators) : null;
+                        var prevRes = prevInd ? (prevInd.result || '').trim() : '';
+                        if (prevRes === '-') prevRes = '—';
                         var cell = '';
                         if (matchRow === rowIdx) {
-                            cell = res || '';
-                            if (prevIndicators && ind) { var prevInd = findIndById(ind.id, prevIndicators); var prevRes = prevInd ? (prevInd.result || '').trim() : ''; if (prevRes === '-') prevRes = '—'; cell = cell + (cell ? '（' + (prevRes || '—') + '）' : ''); }
+                            cell = res || '—';
+                            if (prevIndicators && prevRes) cell = cell + '（' + prevRes + '）';
                         } else if (rowIdx === 3) cell = '';
                         t3Html += '<td>' + cell + '</td>';
                     }
@@ -859,7 +864,11 @@
                 t3Html += '</tbody>';
                 document.getElementById('table3StdNutrition').innerHTML = t3Html;
                 var refNoteEl = document.getElementById('referenceTablesNote');
-                if (refNoteEl) { refNoteEl.textContent = (isComparison && d1) ? '注：括号内为上次测查的评价结果。' : ''; refNoteEl.style.display = (isComparison && d1) ? 'block' : 'none'; }
+                if (refNoteEl) {
+                    var dashNote = '注：表内「—」表示该标准差区间下该指标不给出具体诊断分类，通常表示正常或健康范围。';
+                    refNoteEl.textContent = (isComparison && d1) ? dashNote + ' 括号内为上次测查的评价结果。' : dashNote;
+                    refNoteEl.style.display = 'block';
+                }
 
                 var levelNames = [];
                 for (var li = 0; li < indicators.length; li++) {

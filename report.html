@@ -449,11 +449,11 @@
                 var scatterPrev = (month1 != null && h1 != null) ? [[month1, h1]] : [];
                 var scatterCur = (month2 != null && h2 != null) ? [[month2, h2]] : [];
                 var series = [
-                    { name: 'P3', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P3[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#c55a11' }, itemStyle: { color: '#c55a11' } },
-                    { name: 'P15', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P15[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#f2c200' }, itemStyle: { color: '#f2c200' } },
-                    { name: 'P50', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P50[i]]; }), symbol: 'none', lineStyle: { width: 2.5, color: '#70ad47' }, itemStyle: { color: '#70ad47' } },
-                    { name: 'P85', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P85[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#f2c200' }, itemStyle: { color: '#f2c200' } },
-                    { name: 'P97', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P97[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#c55a11' }, itemStyle: { color: '#c55a11' } },
+                    { name: 'P3', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P3[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#c55a11' }, itemStyle: { color: '#c55a11' }, endLabel: { show: true, formatter: 'P3', color: '#c55a11', distance: 6 } },
+                    { name: 'P15', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P15[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#f2c200' }, itemStyle: { color: '#f2c200' }, endLabel: { show: true, formatter: 'P15', color: '#b08f00', distance: 6 } },
+                    { name: 'P50', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P50[i]]; }), symbol: 'none', lineStyle: { width: 2.5, color: '#70ad47' }, itemStyle: { color: '#70ad47' }, endLabel: { show: true, formatter: 'P50', color: '#4c7f2d', distance: 6 } },
+                    { name: 'P85', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P85[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#f2c200' }, itemStyle: { color: '#f2c200' }, endLabel: { show: true, formatter: 'P85', color: '#b08f00', distance: 6 } },
+                    { name: 'P97', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P97[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#c55a11' }, itemStyle: { color: '#c55a11' }, endLabel: { show: true, formatter: 'P97', color: '#c55a11', distance: 6 } },
                     { name: '上次', type: 'scatter', data: scatterPrev, symbolSize: 14, itemStyle: { color: '#ed7d31' }, label: { show: true, position: 'top', formatter: '上次' } },
                     { name: '本次', type: 'scatter', data: scatterCur, symbolSize: 14, itemStyle: { color: '#5b9bd5' }, label: { show: true, position: 'top', formatter: '本次' } }
                 ];
@@ -463,7 +463,7 @@
                 ch.setOption({
                     tooltip: { trigger: 'axis' },
                     legend: { data: ['P3', 'P15', 'P50', 'P85', 'P97', '上次', '本次'], bottom: 8, top: 'auto' },
-                    grid: { left: '6%', right: '2%', top: '10%', bottom: '22%', containLabel: true },
+                    grid: { left: '6%', right: '10%', top: '10%', bottom: '22%', containLabel: true },
                     xAxis: { type: 'value', name: '月龄', min: 24, max: 84, interval: 3, splitLine: { show: true, lineStyle: { type: 'solid', opacity: 0.15 } }, axisLabel: { interval: 0, lineHeight: 16, formatter: function(v) { var m = Math.round(Number(v)); if (m < 24 || m > 84 || m % 3 !== 0) return ''; if (m % 12 === 0) return m + '月\n' + (m / 12) + '岁'; return m + '月'; } } },
                     yAxis: { type: 'value', name: '身高 (cm)', scale: true, splitNumber: 14, splitLine: { show: true, lineStyle: { type: 'solid', opacity: 0.15 } } },
                     series: series
@@ -482,11 +482,11 @@
                 var scatterPrev = (month1 != null && w1 != null) ? [[month1, w1]] : [];
                 var scatterCur = (month2 != null && w2 != null) ? [[month2, w2]] : [];
                 var series = [
-                    { name: 'P3', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P3[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#c55a11' }, itemStyle: { color: '#c55a11' } },
-                    { name: 'P15', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P15[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#f2c200' }, itemStyle: { color: '#f2c200' } },
-                    { name: 'P50', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P50[i]]; }), symbol: 'none', lineStyle: { width: 2.5, color: '#70ad47' }, itemStyle: { color: '#70ad47' } },
-                    { name: 'P85', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P85[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#f2c200' }, itemStyle: { color: '#f2c200' } },
-                    { name: 'P97', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P97[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#c55a11' }, itemStyle: { color: '#c55a11' } },
+                    { name: 'P3', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P3[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#c55a11' }, itemStyle: { color: '#c55a11' }, endLabel: { show: true, formatter: 'P3', color: '#c55a11', distance: 6 } },
+                    { name: 'P15', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P15[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#f2c200' }, itemStyle: { color: '#f2c200' }, endLabel: { show: true, formatter: 'P15', color: '#b08f00', distance: 6 } },
+                    { name: 'P50', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P50[i]]; }), symbol: 'none', lineStyle: { width: 2.5, color: '#70ad47' }, itemStyle: { color: '#70ad47' }, endLabel: { show: true, formatter: 'P50', color: '#4c7f2d', distance: 6 } },
+                    { name: 'P85', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P85[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#f2c200' }, itemStyle: { color: '#f2c200' }, endLabel: { show: true, formatter: 'P85', color: '#b08f00', distance: 6 } },
+                    { name: 'P97', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P97[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#c55a11' }, itemStyle: { color: '#c55a11' }, endLabel: { show: true, formatter: 'P97', color: '#c55a11', distance: 6 } },
                     { name: '上次', type: 'scatter', data: scatterPrev, symbolSize: 14, itemStyle: { color: '#ed7d31' }, label: { show: true, position: 'top', formatter: '上次' } },
                     { name: '本次', type: 'scatter', data: scatterCur, symbolSize: 14, itemStyle: { color: '#5b9bd5' }, label: { show: true, position: 'top', formatter: '本次' } }
                 ];
@@ -494,7 +494,7 @@
                 ch.setOption({
                     tooltip: { trigger: 'axis' },
                     legend: { data: ['P3', 'P15', 'P50', 'P85', 'P97', '上次', '本次'], bottom: 8, top: 'auto' },
-                    grid: { left: '6%', right: '2%', top: '10%', bottom: '22%', containLabel: true },
+                    grid: { left: '6%', right: '10%', top: '10%', bottom: '22%', containLabel: true },
                     xAxis: { type: 'value', name: '月龄', min: 24, max: 84, interval: 3, splitLine: { show: true, lineStyle: { type: 'solid', opacity: 0.15 } }, axisLabel: { interval: 0, lineHeight: 16, formatter: function(v) { var m = Math.round(Number(v)); if (m < 24 || m > 84 || m % 3 !== 0) return ''; if (m % 12 === 0) return m + '月\n' + (m / 12) + '岁'; return m + '月'; } } },
                     yAxis: { type: 'value', name: '体重 (kg)', scale: true, splitNumber: 14, splitLine: { show: true, lineStyle: { type: 'solid', opacity: 0.15 } } },
                     series: series
@@ -514,11 +514,11 @@
                 var scatterPrev = (month1 != null && b1 != null) ? [[month1, b1]] : [];
                 var scatterCur = (month2 != null && b2 != null) ? [[month2, b2]] : [];
                 var series = [
-                    { name: 'P3', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P3[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#c55a11' }, itemStyle: { color: '#c55a11' } },
-                    { name: 'P15', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P15[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#f2c200' }, itemStyle: { color: '#f2c200' } },
-                    { name: 'P50', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P50[i]]; }), symbol: 'none', lineStyle: { width: 2.5, color: '#70ad47' }, itemStyle: { color: '#70ad47' } },
-                    { name: 'P85', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P85[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#f2c200' }, itemStyle: { color: '#f2c200' } },
-                    { name: 'P97', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P97[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#c55a11' }, itemStyle: { color: '#c55a11' } },
+                    { name: 'P3', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P3[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#c55a11' }, itemStyle: { color: '#c55a11' }, endLabel: { show: true, formatter: 'P3', color: '#c55a11', distance: 6 } },
+                    { name: 'P15', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P15[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#f2c200' }, itemStyle: { color: '#f2c200' }, endLabel: { show: true, formatter: 'P15', color: '#b08f00', distance: 6 } },
+                    { name: 'P50', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P50[i]]; }), symbol: 'none', lineStyle: { width: 2.5, color: '#70ad47' }, itemStyle: { color: '#70ad47' }, endLabel: { show: true, formatter: 'P50', color: '#4c7f2d', distance: 6 } },
+                    { name: 'P85', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P85[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#f2c200' }, itemStyle: { color: '#f2c200' }, endLabel: { show: true, formatter: 'P85', color: '#b08f00', distance: 6 } },
+                    { name: 'P97', type: 'line', data: curve.months.map(function(m, i) { return [m, curve.P97[i]]; }), symbol: 'none', lineStyle: { width: 2, color: '#c55a11' }, itemStyle: { color: '#c55a11' }, endLabel: { show: true, formatter: 'P97', color: '#c55a11', distance: 6 } },
                     { name: '上次', type: 'scatter', data: scatterPrev, symbolSize: 14, itemStyle: { color: '#ed7d31' }, label: { show: true, position: 'top', formatter: '上次' } },
                     { name: '本次', type: 'scatter', data: scatterCur, symbolSize: 14, itemStyle: { color: '#5b9bd5' }, label: { show: true, position: 'top', formatter: '本次' } }
                 ];
@@ -526,7 +526,7 @@
                 ch.setOption({
                     tooltip: { trigger: 'axis' },
                     legend: { data: ['P3', 'P15', 'P50', 'P85', 'P97', '上次', '本次'], bottom: 8, top: 'auto' },
-                    grid: { left: '6%', right: '2%', top: '10%', bottom: '22%', containLabel: true },
+                    grid: { left: '6%', right: '10%', top: '10%', bottom: '22%', containLabel: true },
                     xAxis: { type: 'value', name: '月龄', min: 24, max: 84, interval: 3, splitLine: { show: true, lineStyle: { type: 'solid', opacity: 0.15 } }, axisLabel: { interval: 0, lineHeight: 16, formatter: function(v) { var m = Math.round(Number(v)); if (m < 24 || m > 84 || m % 3 !== 0) return ''; if (m % 12 === 0) return m + '月\n' + (m / 12) + '岁'; return m + '月'; } } },
                     yAxis: { type: 'value', name: 'BMI (kg/m²)', scale: true, splitNumber: 12, splitLine: { show: true, lineStyle: { type: 'solid', opacity: 0.15 } } },
                     series: series

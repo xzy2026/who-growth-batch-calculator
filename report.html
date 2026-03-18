@@ -163,7 +163,7 @@
                 </div>
                 <div id="panelOverview" class="panel active">
                     <div class="chart-box">
-                        <div class="chart-title">身高百分位曲线图（0～7岁）</div>
+                        <div class="chart-title">身高百分位曲线图（2～7岁）</div>
                         <p class="reference-tables-note" style="font-size:12px;color:#666;margin-bottom:8px;">图中曲线为参考百分位（P3、P15、P50、P85、P97），圆点为两次测查数据。</p>
                         <div id="heightPercentileChart" class="compare-chart" style="height:320px;"></div>
                     </div>
@@ -172,7 +172,7 @@
                         <div id="heightCompareChart" class="compare-chart"></div>
                     </div>
                     <div class="chart-box">
-                        <div class="chart-title">体重百分位曲线图（0～7岁）</div>
+                        <div class="chart-title">体重百分位曲线图（2～7岁）</div>
                         <p class="reference-tables-note" style="font-size:12px;color:#666;margin-bottom:8px;">图中曲线为参考百分位（P3、P15、P50、P85、P97），圆点为两次测查数据。</p>
                         <div id="weightPercentileChart" class="compare-chart" style="height:320px;"></div>
                     </div>
@@ -181,7 +181,7 @@
                         <div id="weightCompareChart" class="compare-chart"></div>
                     </div>
                     <div class="chart-box">
-                        <div class="chart-title">BMI百分位曲线图（0～7岁）</div>
+                        <div class="chart-title">BMI百分位曲线图（2～7岁）</div>
                         <p class="reference-tables-note" style="font-size:12px;color:#666;margin-bottom:8px;">图中曲线为参考百分位（P3、P15、P50、P85、P97），圆点为两次测查数据。</p>
                         <div id="bmiPercentileChart" class="compare-chart" style="height:320px;"></div>
                     </div>
@@ -463,8 +463,8 @@
                 ch.setOption({
                     tooltip: { trigger: 'axis' },
                     legend: { data: ['P3', 'P15', 'P50', 'P85', 'P97', '上次', '本次'], bottom: 8, top: 'auto' },
-                    grid: { left: '12%', right: '8%', top: '10%', bottom: '22%', containLabel: true },
-                    xAxis: { type: 'value', name: '月龄', min: 0, max: 84, interval: 3, splitLine: { show: true, lineStyle: { type: 'solid', opacity: 0.15 } }, axisLabel: { formatter: function(v) { return monthToAgeLabel(v); }, interval: 2, rotate: 30 } },
+                    grid: { left: '6%', right: '2%', top: '10%', bottom: '22%', containLabel: true },
+                    xAxis: { type: 'value', name: '月龄', min: 24, max: 84, interval: 3, splitLine: { show: true, lineStyle: { type: 'solid', opacity: 0.15 } }, axisLabel: { interval: 0, lineHeight: 16, formatter: function(v) { var m = Math.round(Number(v)); if (m < 24 || m > 84 || m % 3 !== 0) return ''; if (m % 12 === 0) return m + '月\n' + (m / 12) + '岁'; return m + '月'; } } },
                     yAxis: { type: 'value', name: '身高 (cm)', scale: true, splitNumber: 14, splitLine: { show: true, lineStyle: { type: 'solid', opacity: 0.15 } } },
                     series: series
                 }, true);
@@ -494,8 +494,8 @@
                 ch.setOption({
                     tooltip: { trigger: 'axis' },
                     legend: { data: ['P3', 'P15', 'P50', 'P85', 'P97', '上次', '本次'], bottom: 8, top: 'auto' },
-                    grid: { left: '12%', right: '8%', top: '10%', bottom: '22%', containLabel: true },
-                    xAxis: { type: 'value', name: '月龄', min: 0, max: 84, interval: 3, splitLine: { show: true, lineStyle: { type: 'solid', opacity: 0.15 } }, axisLabel: { formatter: function(v) { return monthToAgeLabel(v); }, interval: 2, rotate: 30 } },
+                    grid: { left: '6%', right: '2%', top: '10%', bottom: '22%', containLabel: true },
+                    xAxis: { type: 'value', name: '月龄', min: 24, max: 84, interval: 3, splitLine: { show: true, lineStyle: { type: 'solid', opacity: 0.15 } }, axisLabel: { interval: 0, lineHeight: 16, formatter: function(v) { var m = Math.round(Number(v)); if (m < 24 || m > 84 || m % 3 !== 0) return ''; if (m % 12 === 0) return m + '月\n' + (m / 12) + '岁'; return m + '月'; } } },
                     yAxis: { type: 'value', name: '体重 (kg)', scale: true, splitNumber: 14, splitLine: { show: true, lineStyle: { type: 'solid', opacity: 0.15 } } },
                     series: series
                 }, true);
@@ -526,8 +526,8 @@
                 ch.setOption({
                     tooltip: { trigger: 'axis' },
                     legend: { data: ['P3', 'P15', 'P50', 'P85', 'P97', '上次', '本次'], bottom: 8, top: 'auto' },
-                    grid: { left: '12%', right: '8%', top: '10%', bottom: '22%', containLabel: true },
-                    xAxis: { type: 'value', name: '月龄', min: 0, max: 84, interval: 3, splitLine: { show: true, lineStyle: { type: 'solid', opacity: 0.15 } }, axisLabel: { formatter: function(v) { return monthToAgeLabel(v); }, interval: 2, rotate: 30 } },
+                    grid: { left: '6%', right: '2%', top: '10%', bottom: '22%', containLabel: true },
+                    xAxis: { type: 'value', name: '月龄', min: 24, max: 84, interval: 3, splitLine: { show: true, lineStyle: { type: 'solid', opacity: 0.15 } }, axisLabel: { interval: 0, lineHeight: 16, formatter: function(v) { var m = Math.round(Number(v)); if (m < 24 || m > 84 || m % 3 !== 0) return ''; if (m % 12 === 0) return m + '月\n' + (m / 12) + '岁'; return m + '月'; } } },
                     yAxis: { type: 'value', name: 'BMI (kg/m²)', scale: true, splitNumber: 12, splitLine: { show: true, lineStyle: { type: 'solid', opacity: 0.15 } } },
                     series: series
                 }, true);
@@ -724,7 +724,41 @@
                     '<li><strong>作息与睡眠：</strong>保证充足睡眠（如青春期儿童每天8-10小时），固定作息时间，睡前避免电子设备刺激，有助于减少焦虑对睡眠的干扰。</li>' +
                     '<li><strong>饮食与运动：</strong>保证蛋白质、钙、维生素D的摄入（如牛奶、鱼类、深色蔬菜）；每天30分钟以上的跳跃类运动（如篮球、跳绳）既可刺激骨骼生长，也有助于情绪宣泄。</li>' +
                     '<li><strong>不必过度焦虑：</strong>短期情绪波动无碍身高，家长保持平和、给予陪伴与理解，往往比单纯强调“长高”更能帮助孩子稳定情绪、健康成长。</li></ul></div></div>';
-                return '<p style="margin-bottom:16px;">' + intro + ' 以下从五个维度（基因、运动、膳食、休息、情绪）为您分析并给出建议。</p>' + geneBlock + sportBlock + dietBlock + sleepBlock + emotionBlock;
+                var interventionBlock = '<div class="dimension-block">' +
+                    '<h5><i class="fa-solid fa-clipboard-list"></i> 六、分层级干预策略管理</h5>' +
+                    '<div class="dim-analysis">' +
+                    '<strong>① 肥胖儿童管理</strong><br>' +
+                    '<strong>饮食调整：</strong>减少高糖高脂食物（如油炸食品、碳酸饮料），增加蔬果及优质蛋白（鱼虾、豆制品）；用餐顺序改为"先喝汤→再吃菜→后主食"，控制进食速度。<br>' +
+                    '<strong>运动处方：</strong>每日保证1小时户外活动，针对性设计跳绳、慢跑等有氧运动。<br>' +
+                    '<strong>睡眠优化：</strong>确保每日睡眠11~12小时，调整作息避免晚于22点入睡，促进生长激素分泌。<br><br>' +
+                    '<strong>② 低体重/发育迟缓儿童干预</strong><br>' +
+                    '<strong>营养强化：</strong>增加主食热量及植物油摄入，补充牛肉、牛奶等高蛋白食物；改善挑食习惯，少食多餐。<br>' +
+                    '<strong>消化促进：</strong>结合运动改善肠胃功能，如餐后轻度活动。' +
+                    '</div></div>';
+                var archiveBlock = '<div class="dimension-block">' +
+                    '<h5><i class="fa-solid fa-folder-open"></i> 七、建立个性化健康档案与追踪</h5>' +
+                    '<div class="dim-suggestion"><ul>' +
+                    '<li><strong>专案管理：</strong>对异常指标儿童建立专项档案（如肥胖儿、贫血儿），每1~3个月复测数据，动态调整方案。</li>' +
+                    '<li><strong>跨部门协作：</strong>联合妇幼保健院开展体检，对龋齿、视力问题同步干预，形成全面健康报告。</li>' +
+                    '<li><strong>技术应用：</strong>可通过运动手环数据分析生活习惯（如久坐时间），制定睡眠改善计划（如睡前热牛奶、捏脊助眠）。</li></ul></div></div>';
+                var coeducationBlock = '<div class="dimension-block">' +
+                    '<h5><i class="fa-solid fa-people-arrows"></i> 八、家园共育机制</h5>' +
+                    '<div class="dim-suggestion"><ul>' +
+                    '<li><strong>及时反馈：</strong>测量结果同步家长，解读发育曲线并提供居家建议（如控制电子产品使用≤1小时/天）。</li>' +
+                    '<li><strong>联合行动：</strong>为家长提供"健康小贴士"，如肥胖儿家庭食谱、低体重儿营养餐单，确保家园饮食标准一致。</li>' +
+                    '<li><strong>行为矫正：</strong>引导家长参与运动计划（如亲子徒步）、建立规律作息，避免过度代劳（如减少抱行/推车）。</li></ul></div></div>';
+                var habitBlock = '<div class="dimension-block">' +
+                    '<h5><i class="fa-solid fa-seedling"></i> 九、系统化培养健康习惯</h5>' +
+                    '<div class="dim-suggestion"><ul>' +
+                    '<li><strong>融入课程：</strong>将体测、柔韧性测试纳入常规活动，提升身体机能。</li>' +
+                    '<li><strong>心理关怀：</strong>关注肥胖儿自卑倾向，通过团体游戏增强自信，避免心理问题加剧。</li>' +
+                    '<li><strong>环境创设：</strong>优化户外场地，增加攀爬、球类设施，自然促进运动量。</li></ul></div></div>';
+                var summaryBlock = '<div class="dimension-block">' +
+                    '<h5><i class="fa-solid fa-flag-checkered"></i> 总结</h5>' +
+                    '<div class="dim-analysis">' +
+                    '幼儿园身高体重管理以定期监测为基础，通过分层级干预、家园协同、个性化追踪三大核心手段，确保儿童科学发育。' +
+                    '</div></div>';
+                return '<p style="margin-bottom:16px;">' + intro + ' 以下从五个维度（基因、运动、膳食、休息、情绪）为您分析并给出建议。</p>' + geneBlock + sportBlock + dietBlock + sleepBlock + emotionBlock + interventionBlock + archiveBlock + coeducationBlock + habitBlock + summaryBlock;
             }
 
             function renderReport(raw) {
@@ -2223,7 +2257,7 @@
                 }
 
                 var wrapper = document.createElement('div');
-                wrapper.style.cssText = 'position:fixed;top:0;left:0;z-index:99999;width:800px;max-height:100vh;overflow:auto;font-family:Microsoft YaHei,Arial,sans-serif;font-size:14px;color:#333;background:#fff;padding:20px 36px;box-sizing:border-box;';
+                wrapper.style.cssText = 'position:fixed;top:0;left:0;z-index:99999;width:800px;max-height:100vh;overflow:auto;font-family:Microsoft YaHei,Arial,sans-serif;font-size:14px;color:#333;background:#fff;padding:20px 20px;box-sizing:border-box;';
 
                 var childName = '';
                 if (basicInfo) {
@@ -2263,10 +2297,10 @@
                 var page1 = document.createElement('div');
                 page1.style.width = '800px';
                 page1.style.background = '#fff';
-                page1.style.padding = '16px 36px 24px 36px';
+                page1.style.padding = '16px 20px 24px 20px';
                 wrapper.appendChild(page1);
 
-                var chartPageStyle = 'width:800px;background:#fff;page-break-before:always;padding:16px 36px 24px 36px;';
+                var chartPageStyle = 'width:800px;background:#fff;page-break-before:always;padding:16px 20px 24px 20px;';
                 var barLegendHtml = '<div style="display:flex;flex-wrap:wrap;gap:16px 24px;margin-top:10px;font-size:13px;color:#555;justify-content:center;"><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#ed7d31;"></span>上次</span><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#5b9bd5;"></span>本次</span></div>';
                 var polarLegendHtml = '<div style="display:flex;flex-wrap:wrap;gap:16px 24px;margin-top:10px;font-size:13px;color:#555;justify-content:center;"><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#5b9bd5;"></span>年龄别体重</span><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#70ad47;"></span>年龄别身高</span><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#ed7d31;"></span>身高别体重</span><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#7030a0;"></span>年龄别BMI</span></div>';
                 var chartPageDivs = [];
@@ -2315,11 +2349,11 @@
                 }
                 var compareBlocks = [];
                 var b;
-                b = mkChartBlock('身高百分位曲线图（0～7岁）', chartUrls.heightPercentileUrl, imgStylePercentile, '', 300); if (b) compareBlocks.push(b);
+                b = mkChartBlock('身高百分位曲线图（2～7岁）', chartUrls.heightPercentileUrl, imgStylePercentile, '', 300); if (b) compareBlocks.push(b);
                 b = mkChartBlock('身高对比（单位：cm）', chartUrls.heightUrl, imgStyleCompare, '', 300); if (b) compareBlocks.push(b);
-                b = mkChartBlock('体重百分位曲线图（0～7岁）', chartUrls.weightPercentileUrl, imgStylePercentile, '', 300); if (b) compareBlocks.push(b);
+                b = mkChartBlock('体重百分位曲线图（2～7岁）', chartUrls.weightPercentileUrl, imgStylePercentile, '', 300); if (b) compareBlocks.push(b);
                 b = mkChartBlock('体重对比（单位：kg）', chartUrls.weightUrl, imgStyleCompare, '', 300); if (b) compareBlocks.push(b);
-                b = mkChartBlock('BMI百分位曲线图（0～7岁）', chartUrls.bmiPercentileUrl, imgStylePercentile, '', 300); if (b) compareBlocks.push(b);
+                b = mkChartBlock('BMI百分位曲线图（2～7岁）', chartUrls.bmiPercentileUrl, imgStylePercentile, '', 300); if (b) compareBlocks.push(b);
                 b = mkChartBlock('BMI 对比（单位：kg/m²）', chartUrls.bmiUrl, imgStyleCompare, '', 280); if (b) compareBlocks.push(b);
                 var firstPageHeight = basicHtml ? 190 : 0;
                 while (compareBlocks.length > 0 && firstPageHeight + compareBlocks[0].est <= 820) {
@@ -2353,7 +2387,7 @@
                 }
                 appendPackedPages(chartBlocks, 860);
 
-                var pageTablesStyle = 'width:800px;background:#fff;page-break-before:always;padding:24px 36px 40px 36px;line-height:1.7;font-size:14px;';
+                var pageTablesStyle = 'width:800px;background:#fff;page-break-before:always;padding:24px 20px 40px 20px;line-height:1.7;font-size:14px;';
                 var page2b = document.createElement('div');
                 page2b.className = 'pdf-page-break';
                 page2b.style.cssText = pageTablesStyle;
@@ -2386,7 +2420,7 @@
                 var pdfPageMinHeight = 1120;
                 var pdfFooterDisclaimer = '本报告参照 WS/T 423-2022，数据分析仅供参考，不作为诊断医疗依据。如有疑问请咨询售后。';
                 var suggestionBaseStyle = 'background:#f8fcff;border-left:4px solid #366092;padding:16px 20px;border-radius:0 8px 8px 0;font-size:14px;line-height:1.7;color:#333;';
-                var suggestionPageStyle = 'width:800px;background:#fff;padding:24px 36px 40px 36px;font-size:14px;line-height:1.7;box-sizing:border-box;';
+                var suggestionPageStyle = 'width:800px;background:#fff;padding:24px 20px 40px 20px;font-size:14px;line-height:1.7;box-sizing:border-box;';
                 var introEl = suggestionBox.querySelector('p');
                 var blockEls = suggestionBox.querySelectorAll('.dimension-block');
                 var suggestionPages = [];
@@ -2408,9 +2442,23 @@
                     var page3c = document.createElement('div');
                     page3c.className = 'pdf-page-break';
                     page3c.style.cssText = suggestionPageStyle + ' page-break-before:always;';
-                    page3c.innerHTML = '<div class="suggestion-box" style="' + suggestionBaseStyle + '">' + blockEls[4].outerHTML + '</div>';
+                    var page3cContent = blockEls[4].outerHTML;
+                    if (blockEls.length > 5) page3cContent += blockEls[5].outerHTML;
+                    page3c.innerHTML = '<div style="margin-bottom:16px;font-size:15px;font-weight:600;color:#366092;">方案建议（续）</div>' +
+                        '<div class="suggestion-box" style="' + suggestionBaseStyle + '">' + page3cContent + '</div>';
                     wrapper.appendChild(page3c);
                     suggestionPages.push(page3c);
+                    if (blockEls.length > 6) {
+                        var page3d = document.createElement('div');
+                        page3d.className = 'pdf-page-break';
+                        page3d.style.cssText = suggestionPageStyle + ' page-break-before:always;';
+                        var page3dContent = '';
+                        for (var bi = 6; bi < blockEls.length; bi++) page3dContent += blockEls[bi].outerHTML;
+                        page3d.innerHTML = '<div style="margin-bottom:16px;font-size:15px;font-weight:600;color:#366092;">方案建议（续）</div>' +
+                            '<div class="suggestion-box" style="' + suggestionBaseStyle + '">' + page3dContent + '</div>';
+                        wrapper.appendChild(page3d);
+                        suggestionPages.push(page3d);
+                    }
                 } else {
                     var page3 = document.createElement('div');
                     page3.className = 'pdf-page-break';
@@ -2481,15 +2529,17 @@
                             var w = pdf.internal.pageSize.getWidth();
                             var h = pdf.internal.pageSize.getHeight();
                             var imgW = w;
-                            function addPageCanvas(canvas) {
+                            function addPageCanvas(canvas, pageIndex) {
                                 var imgH = (canvas.height * w) / canvas.width;
                                 var drawH = Math.min(imgH, h);
-                                var y = drawH < h ? (h - drawH) / 2 : 0;
+                                var baseY = drawH < h ? (h - drawH) / 2 : 0;
+                                var chartPageOffset = pageIndex > 0 ? 8 : 0;
+                                var y = Math.min(Math.max(0, baseY + chartPageOffset), Math.max(0, h - drawH));
                                 pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, y, imgW, drawH);
                             }
                             canvases.forEach(function(c, i) {
                                 if (i > 0) pdf.addPage();
-                                addPageCanvas(c);
+                                addPageCanvas(c, i);
                             });
                             if (isPreview) {
                                 var blob = pdf.output('blob');

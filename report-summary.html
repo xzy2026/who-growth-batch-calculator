@@ -15,7 +15,10 @@
         .container { max-width: 900px; margin: 0 auto; background: #fff; min-height: 100vh; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-radius: 0 0 12px 12px; }
         .header { background: linear-gradient(135deg, #366092 0%, #4a7ba7 100%); color: white; padding: 24px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 16px; }
         .header-logo { height: 56px; width: auto; border-radius: 12px; }
-        .content { padding: 24px; }
+        .content { padding: 24px 40px; }
+        .section-main-title { display: flex; align-items: center; gap: 14px; margin: 8px 0 16px 0; }
+        .section-main-title .txt { color: #ff7a00; font-size: 34px; font-weight: 700; line-height: 1; white-space: nowrap; }
+        .section-main-title .line { flex: 1; border-top: 2px solid #f2d4b4; }
         .report-title { text-align: center; margin-bottom: 20px; font-size: 18px; color: #333; }
         .stats-row { text-align: center; margin-bottom: 24px; font-size: 15px; color: #666; }
         .tabs { display: flex; gap: 0; border-bottom: 2px solid #e0e0e0; margin-bottom: 20px; }
@@ -24,8 +27,8 @@
         .tab.active { color: #366092; font-weight: bold; border-bottom-color: #366092; }
         .panel { display: none; }
         .panel.active { display: block; }
-        .chart-box { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #eee; }
-        .chart-title { font-size: 15px; margin-bottom: 12px; color: #333; }
+        .chart-box { background: #fff; border-radius: 12px; padding: 20px 28px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #eee; }
+        .chart-title { font-size: 15px; margin-bottom: 12px; color: #f07a00; padding: 0 8px; }
         .chart-subtitle { font-size: 12px; color: #666; margin: -8px 0 10px 0; }
         .chart-legend { display: flex; flex-wrap: wrap; gap: 16px 24px; margin-top: 10px; font-size: 13px; color: #555; align-items: center; }
         .chart-legend .legend-item { display: flex; align-items: center; gap: 6px; }
@@ -33,36 +36,41 @@
         #genderPieChart, #levelPieChart, #nutritionPieChart { width: 100%; height: 320px; }
         #levelBarChart, #nutritionBarChart { width: 100%; height: 320px; }
         #heightWeightScatterChart { width: 100%; height: 360px; }
+        .percentile-chart { width: 100%; height: 360px; }
+        .compare-bar-chart { width: 100%; height: 300px; }
+        .polar-chart { width: 100%; height: 380px; }
+        .polar-labels-wrap { position: relative; }
+        .polar-labels-overlay { position: absolute; top: 40px; left: 0; right: 0; bottom: 44px; pointer-events: none; font-size: 12px; }
         .fail-summary { background: #fff5f5; border-left: 4px solid #dc3545; padding: 12px 16px; font-size: 14px; line-height: 1.8; color: #333; margin-top: 12px; border-radius: 0 8px 8px 0; }
         .card-list { display: flex; flex-direction: column; gap: 12px; }
         .indicator-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; }
-        .indicator-card .icon { width: 48px; height: 48px; background: #e7f3ff; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #366092; flex-shrink: 0; }
+        .indicator-card .icon { width: 48px; height: 48px; background: #fff4e8; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #f07a00; flex-shrink: 0; }
         .indicator-card .content { flex: 1; }
         .indicator-card .name { font-size: 15px; font-weight: bold; color: #333; margin-bottom: 4px; }
         .indicator-card .values { font-size: 14px; color: #666; }
-        .suggestion-box { background: #f8fcff; border-left: 4px solid #366092; padding: 16px 20px; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.7; color: #333; }
+        .suggestion-box { background: #fff7ef; border-left: 4px solid #f28b1a; padding: 16px 20px; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.7; color: #333; }
         .dimension-block { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e8ecf0; }
         .dimension-block:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
-        .dimension-block h5 { font-size: 15px; color: #366092; margin-bottom: 8px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .dimension-block h5 { font-size: 15px; color: #f07a00; margin-bottom: 8px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
         .dimension-block h5 i { opacity: 0.9; }
-        .dim-analysis { background: #f0f6fc; padding: 10px 14px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; color: #444; line-height: 1.65; }
+        .dim-analysis { background: #fff4e8; padding: 10px 14px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; color: #444; line-height: 1.65; }
         .dim-suggestion { padding-left: 4px; font-size: 13px; color: #333; line-height: 1.7; }
         .dim-suggestion ul { margin: 4px 0 0 0; padding-left: 18px; }
         .dim-suggestion li { margin-bottom: 4px; }
         .back-row { text-align: center; margin-top: 24px; }
-        .back-btn { display: inline-block; padding: 10px 24px; background: #366092; color: #fff; text-decoration: none; border-radius: 8px; font-size: 14px; border: none; cursor: pointer; margin-left: 8px; }
+        .back-btn { display: inline-block; padding: 12px 28px; background: #366092; color: #fff; text-decoration: none; border-radius: 8px; font-size: 14px; border: none; cursor: pointer; margin-left: 8px; }
         .back-btn:hover { background: #4a7ba7; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(54,96,146,0.35); }
         .back-btn:first-child { margin-left: 0; }
         .back-btn { transition: all 0.3s ease; min-height: 44px; }
         .stat-bar { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 12px; background: #eef2f7; padding: 16px; border-radius: 10px; margin-bottom: 20px; }
         .stat-bar .item { text-align: center; font-size: 14px; }
-        .stat-bar .num { font-size: 18px; font-weight: bold; color: #366092; }
-        .stat-bar a { color: #366092; text-decoration: none; }
+        .stat-bar .num { font-size: 18px; font-weight: bold; color: #f07a00; }
+        .stat-bar a { color: #f07a00; text-decoration: none; }
         .stat-bar a:hover { text-decoration: underline; }
         .teacher-msg { margin-top: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; font-size: 14px; color: #666; }
         .warm-msg { text-align: center; font-style: italic; margin-top: 24px; background: #fafbfc; }
         .advice-card { background: #fff; border-radius: 10px; padding: 14px 18px; margin-bottom: 12px; border: 1px solid #eee; }
-        .advice-card.highlight { border-color: #366092; background: #f8fcff; }
+        .advice-card.highlight { border-color: #f28b1a; background: #fff7ef; }
         .advice-card h4 { font-size: 14px; margin-bottom: 8px; color: #333; }
         .advice-card ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.8; color: #555; }
         @media (max-width: 480px) { .container { border-radius: 0; } .content { padding: 16px; } .stat-bar { flex-direction: column; } }
@@ -95,6 +103,8 @@
                     <div class="tab" data-tab="suggestion">方案建议</div>
                 </div>
                 <div id="panelOverview" class="panel active">
+                    <div class="section-main-title"><span class="txt">/ 图表趋势分析 /</span><span class="line"></span></div>
+                    <div class="reference-tables-note" style="font-size:12px;color:#666;margin:4px 0 18px 2px;">本系统参照中华人民共和国卫生行业标准（WS/T 423-2022）</div>
                     <div class="chart-box">
                         <div class="chart-title">全班性别分布</div>
                         <div id="genderPieChart"></div>
@@ -126,12 +136,57 @@
                             <span class="legend-item"><span class="legend-dot" style="background:#70ad47;"></span> 女</span>
                         </div>
                     </div>
+                    <div class="chart-box">
+                        <div class="chart-title">身高百分位曲线图（2～7岁）— 全班叠加</div>
+                        <p class="chart-subtitle">曲线为参考百分位（P3、P15、P50、P85、P97），圆点为每位儿童实测值。</p>
+                        <div id="heightPercentileChart" class="percentile-chart"></div>
+                    </div>
+                    <div class="chart-box">
+                        <div class="chart-title">体重百分位曲线图（2～7岁）— 全班叠加</div>
+                        <p class="chart-subtitle">曲线为参考百分位（P3、P15、P50、P85、P97），圆点为每位儿童实测值。</p>
+                        <div id="weightPercentileChart" class="percentile-chart"></div>
+                    </div>
+                    <div class="chart-box">
+                        <div class="chart-title">BMI百分位曲线图（2～7岁）— 全班叠加</div>
+                        <p class="chart-subtitle">曲线为参考百分位（P3、P15、P50、P85、P97），圆点为每位儿童实测值。</p>
+                        <div id="bmiPercentileChart" class="percentile-chart"></div>
+                    </div>
+                    <div class="chart-box">
+                        <div class="chart-title">身高班均 vs 标准值对比</div>
+                        <div id="heightCompareBar" class="compare-bar-chart"></div>
+                    </div>
+                    <div class="chart-box">
+                        <div class="chart-title">体重班均 vs 标准值对比</div>
+                        <div id="weightCompareBar" class="compare-bar-chart"></div>
+                    </div>
+                    <div class="chart-box">
+                        <div class="chart-title">BMI 班均 vs 标准值对比</div>
+                        <div id="bmiCompareBar" class="compare-bar-chart"></div>
+                    </div>
+                    <div class="chart-box">
+                        <div class="chart-title">生长水平综合评价 — 极坐标图</div>
+                        <p class="chart-subtitle">4 项指标平均等级雷达对比（男/女分组）</p>
+                        <div class="polar-labels-wrap">
+                            <div id="levelPolarChart" class="polar-chart"></div>
+                            <div id="levelPolarLabels" class="polar-labels-overlay"></div>
+                        </div>
+                    </div>
+                    <div class="chart-box">
+                        <div class="chart-title">营养状况综合评价 — 极坐标图</div>
+                        <p class="chart-subtitle">4 项指标平均 Z 分雷达对比（男/女分组）</p>
+                        <div class="polar-labels-wrap">
+                            <div id="nutritionPolarChart" class="polar-chart"></div>
+                            <div id="nutritionPolarLabels" class="polar-labels-overlay"></div>
+                        </div>
+                    </div>
                 </div>
                 <div id="panelDetail" class="panel">
+                    <div class="section-main-title"><span class="txt">/ 评估标准表格 /</span><span class="line"></span></div>
                     <div class="chart-title">各指标批次统计（表1/表2 等级）</div>
                     <div class="card-list" id="cardList"></div>
                 </div>
                 <div id="panelSuggestion" class="panel">
+                    <div class="section-main-title"><span class="txt">/ 个性化方案建议 /</span><span class="line"></span></div>
                     <div class="chart-box">
                         <div class="chart-title"><i class="fa-solid fa-lightbulb"></i> 健康建议</div>
                         <div class="suggestion-box" id="suggestionBox"></div>
@@ -141,7 +196,8 @@
                 </div>
                 <div class="back-row">
                     <a href="javascript:window.close()" class="back-btn">关闭报告</a>
-                    <a href="javascript:void(0)" class="back-btn" id="downloadReportBtn">下载报告</a>
+                    <a href="javascript:void(0)" class="back-btn" id="previewReportBtn" style="margin-left:12px;">预览报告</a>
+                    <a href="javascript:void(0)" class="back-btn" id="downloadReportBtn" style="margin-left:12px;">下载报告</a>
                 </div>
             </div>
         </div>
@@ -277,6 +333,105 @@
                     '幼儿园身高体重管理以定期监测为基础，通过分层级干预、家园协同、个性化追踪三大核心手段，确保儿童科学发育。' +
                     '</div></div>';
                 return '<p style="margin-bottom:16px;">' + intro + ' 以下从五个维度（基因、运动、膳食、休息、情绪）为您分析并给出建议。</p>' + geneBlock + sportBlock + dietBlock + sleepBlock + emotionBlock + kindergartenManageBlock;
+            }
+
+            var Z_FOR_P = { P3: -1.88, P15: -1.04, P50: 0, P85: 1.04, P97: 1.88 };
+            var EMBEDDED_STD_TABLES = {
+                B1: {"0":{"mean":3.5,"SD":0.4},"1":{"mean":4.6,"SD":0.5},"2":{"mean":5.8,"SD":0.7},"3":{"mean":6.8,"SD":0.8},"4":{"mean":7.5,"SD":0.8},"5":{"mean":8,"SD":0.9},"6":{"mean":8.4,"SD":1},"7":{"mean":8.8,"SD":1},"8":{"mean":9.1,"SD":1},"9":{"mean":9.4,"SD":1},"10":{"mean":9.6,"SD":1.1},"11":{"mean":9.8,"SD":1.1},"12":{"mean":10.1,"SD":1.1},"13":{"mean":10.3,"SD":1.1},"14":{"mean":10.5,"SD":1.1},"15":{"mean":10.7,"SD":1.1},"16":{"mean":10.9,"SD":1.2},"17":{"mean":11.1,"SD":1.2},"18":{"mean":11.3,"SD":1.2},"19":{"mean":11.5,"SD":1.3},"20":{"mean":11.7,"SD":1.3},"21":{"mean":11.9,"SD":1.4},"22":{"mean":12.2,"SD":1.3},"23":{"mean":12.4,"SD":1.3},"24":{"mean":12.6,"SD":1.4},"27":{"mean":13.1,"SD":1.5},"30":{"mean":13.7,"SD":1.5},"33":{"mean":14.2,"SD":1.6},"36":{"mean":14.6,"SD":1.7},"39":{"mean":15.2,"SD":1.7},"42":{"mean":15.7,"SD":1.8},"45":{"mean":16.2,"SD":1.9},"48":{"mean":16.7,"SD":2.1},"51":{"mean":17.3,"SD":2.1},"54":{"mean":17.9,"SD":2.2},"57":{"mean":18.4,"SD":2.4},"60":{"mean":19.1,"SD":2.5},"63":{"mean":19.7,"SD":2.6}},
+                B2: {"5":{"mean":65.3,"SD":2.3},"6":{"mean":67.1,"SD":2.3},"7":{"mean":68.7,"SD":2.3},"8":{"mean":70.1,"SD":2.4},"9":{"mean":71.5,"SD":2.4},"10":{"mean":72.8,"SD":2.5},"11":{"mean":74,"SD":2.6},"12":{"mean":75.2,"SD":2.6},"13":{"mean":76.4,"SD":2.6},"14":{"mean":77.5,"SD":2.7},"15":{"mean":78.6,"SD":2.8},"16":{"mean":79.7,"SD":2.8},"17":{"mean":80.8,"SD":2.8},"18":{"mean":81.9,"SD":2.8},"19":{"mean":82.9,"SD":2.9},"20":{"mean":83.9,"SD":2.9},"21":{"mean":84.9,"SD":2.9},"22":{"mean":85.8,"SD":3},"23":{"mean":86.8,"SD":3},"24":{"mean":87,"SD":3.1},"27":{"mean":89.5,"SD":3.2},"30":{"mean":91.9,"SD":3.3},"33":{"mean":94.1,"SD":3.4},"36":{"mean":96.2,"SD":3.5},"39":{"mean":98.2,"SD":3.6},"42":{"mean":100.1,"SD":3.6},"45":{"mean":101.9,"SD":3.7},"48":{"mean":103.7,"SD":3.8},"51":{"mean":105.4,"SD":3.9},"54":{"mean":107.2,"SD":4},"57":{"mean":109,"SD":4.1},"60":{"mean":110.8,"SD":4.2},"63":{"mean":112.6,"SD":4.2},"66":{"mean":114.3,"SD":4.3},"69":{"mean":115.9,"SD":4.5},"72":{"mean":117.5,"SD":4.5},"75":{"mean":119.1,"SD":4.6},"78":{"mean":120.6,"SD":4.7}}
+            };
+            var EMBEDDED_BMI_PERCENTILES = {"male":{"24":{"P3":14.1,"P10":14.7,"P25":15.3,"P50":16.1,"P75":17,"P90":17.9,"P97":18.8},"27":{"P3":14,"P10":14.5,"P25":15.2,"P50":15.9,"P75":16.8,"P90":17.6,"P97":18.6},"30":{"P3":13.9,"P10":14.4,"P25":15,"P50":15.8,"P75":16.6,"P90":17.4,"P97":18.4},"33":{"P3":13.7,"P10":14.3,"P25":14.9,"P50":15.6,"P75":16.5,"P90":17.3,"P97":18.2},"36":{"P3":13.7,"P10":14.2,"P25":14.8,"P50":15.5,"P75":16.3,"P90":17.2,"P97":18.1},"39":{"P3":13.6,"P10":14.1,"P25":14.7,"P50":15.4,"P75":16.3,"P90":17.1,"P97":18},"42":{"P3":13.5,"P10":14.1,"P25":14.7,"P50":15.4,"P75":16.2,"P90":17,"P97":17.9},"45":{"P3":13.5,"P10":14,"P25":14.6,"P50":15.3,"P75":16.2,"P90":17,"P97":17.9},"48":{"P3":13.4,"P10":14,"P25":14.6,"P50":15.3,"P75":16.1,"P90":17,"P97":17.9},"51":{"P3":13.4,"P10":13.9,"P25":14.5,"P50":15.3,"P75":16.1,"P90":17,"P97":17.9},"54":{"P3":13.4,"P10":13.9,"P25":14.5,"P50":15.3,"P75":16.1,"P90":17,"P97":18},"57":{"P3":13.3,"P10":13.9,"P25":14.5,"P50":15.3,"P75":16.1,"P90":17.1,"P97":18.1},"60":{"P3":13.3,"P10":13.8,"P25":14.5,"P50":15.3,"P75":16.2,"P90":17.1,"P97":18.2},"63":{"P3":13.2,"P10":13.8,"P25":14.5,"P50":15.3,"P75":16.2,"P90":17.2,"P97":18.3},"66":{"P3":13.2,"P10":13.8,"P25":14.5,"P50":15.3,"P75":16.3,"P90":17.3,"P97":18.5},"69":{"P3":13.2,"P10":13.8,"P25":14.5,"P50":15.3,"P75":16.3,"P90":17.4,"P97":18.6},"72":{"P3":13.2,"P10":13.8,"P25":14.5,"P50":15.4,"P75":16.4,"P90":17.5,"P97":18.8},"75":{"P3":13.1,"P10":13.8,"P25":14.5,"P50":15.4,"P75":16.5,"P90":17.6,"P97":19},"78":{"P3":13.1,"P10":13.8,"P25":14.5,"P50":15.4,"P75":16.5,"P90":17.7,"P97":19.2},"81":{"P3":13.1,"P10":13.7,"P25":14.5,"P50":15.4,"P75":16.6,"P90":17.8,"P97":19.4}},"female":{"24":{"P3":13.8,"P10":14.4,"P25":15,"P50":15.8,"P75":16.6,"P90":17.4,"P97":18.4},"27":{"P3":13.7,"P10":14.2,"P25":14.8,"P50":15.6,"P75":16.4,"P90":17.3,"P97":18.2},"30":{"P3":13.6,"P10":14.1,"P25":14.7,"P50":15.5,"P75":16.3,"P90":17.1,"P97":18},"33":{"P3":13.5,"P10":14,"P25":14.6,"P50":15.4,"P75":16.2,"P90":17,"P97":17.9},"36":{"P3":13.4,"P10":13.9,"P25":14.5,"P50":15.3,"P75":16.1,"P90":16.9,"P97":17.9},"39":{"P3":13.3,"P10":13.9,"P25":14.5,"P50":15.2,"P75":16.1,"P90":16.9,"P97":17.8},"42":{"P3":13.3,"P10":13.8,"P25":14.4,"P50":15.2,"P75":16,"P90":16.9,"P97":17.8},"45":{"P3":13.2,"P10":13.7,"P25":14.4,"P50":15.1,"P75":16,"P90":16.8,"P97":17.8},"48":{"P3":13.1,"P10":13.7,"P25":14.3,"P50":15.1,"P75":15.9,"P90":16.8,"P97":17.8},"51":{"P3":13.1,"P10":13.6,"P25":14.3,"P50":15,"P75":15.9,"P90":16.8,"P97":17.8},"54":{"P3":13,"P10":13.6,"P25":14.2,"P50":15,"P75":15.9,"P90":16.8,"P97":17.9},"57":{"P3":13,"P10":13.6,"P25":14.2,"P50":15,"P75":15.9,"P90":16.8,"P97":17.9},"60":{"P3":13,"P10":13.5,"P25":14.2,"P50":15,"P75":15.9,"P90":16.9,"P97":18},"63":{"P3":12.9,"P10":13.5,"P25":14.2,"P50":15,"P75":15.9,"P90":16.9,"P97":18},"66":{"P3":12.9,"P10":13.5,"P25":14.2,"P50":15,"P75":16,"P90":17,"P97":18.1},"69":{"P3":12.9,"P10":13.5,"P25":14.2,"P50":15,"P75":16,"P90":17,"P97":18.2},"72":{"P3":12.9,"P10":13.5,"P25":14.1,"P50":15,"P75":16,"P90":17.1,"P97":18.3},"75":{"P3":12.8,"P10":13.5,"P25":14.1,"P50":15,"P75":16,"P90":17.1,"P97":18.4},"78":{"P3":12.8,"P10":13.4,"P25":14.1,"P50":15,"P75":16.1,"P90":17.2,"P97":18.4},"81":{"P3":12.8,"P10":13.4,"P25":14.1,"P50":15,"P75":16.1,"P90":17.2,"P97":18.5}}};
+            function parseDateToYMD(str) {
+                if (!str || typeof str !== 'string') return null;
+                var s = str.trim();
+                var m = s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+                if (m) return { y: parseInt(m[1], 10), m: parseInt(m[2], 10), d: parseInt(m[3], 10) };
+                var m2 = s.match(/^(\d{4})[-/](\d{1,2})/);
+                if (m2) return { y: parseInt(m2[1], 10), m: parseInt(m2[2], 10), d: 15 };
+                return null;
+            }
+            function ageInMonths(birthStr, checkStr) {
+                var b = parseDateToYMD(birthStr), c = parseDateToYMD(checkStr);
+                if (!b || !c) return null;
+                return (c.y - b.y) * 12 + (c.m - b.m) + (c.d - b.d) / 30;
+            }
+            function interpolatePoint(tableObj, month) {
+                if (!tableObj || typeof tableObj !== 'object') return null;
+                var mo = Math.max(0, Math.floor(month));
+                if (tableObj[mo] != null && tableObj[mo].mean != null) return { mean: tableObj[mo].mean, SD: tableObj[mo].SD || 0 };
+                var keys = Object.keys(tableObj).map(Number).filter(function(k) { return !isNaN(k); }).sort(function(a, b) { return a - b; });
+                if (keys.length === 0) return null;
+                if (mo <= keys[0]) return tableObj[keys[0]] ? { mean: tableObj[keys[0]].mean, SD: tableObj[keys[0]].SD || 0 } : null;
+                if (mo >= keys[keys.length - 1]) return tableObj[keys[keys.length - 1]] ? { mean: tableObj[keys[keys.length - 1]].mean, SD: tableObj[keys[keys.length - 1]].SD || 0 } : null;
+                var i = 0; while (i < keys.length && keys[i] < mo) i++;
+                var low = keys[i - 1], high = keys[i];
+                var lowVal = tableObj[low], highVal = tableObj[high];
+                if (!lowVal || !highVal) return lowVal || highVal;
+                var t = (mo - low) / (high - low);
+                return { mean: lowVal.mean + t * (highVal.mean - lowVal.mean), SD: lowVal.SD + t * (highVal.SD - lowVal.SD) };
+            }
+            function buildCurveSeries(tableObj, maxMonth) {
+                maxMonth = maxMonth == null ? 84 : maxMonth;
+                var months = [], P3 = [], P15 = [], P50 = [], P85 = [], P97 = [];
+                for (var mo = 0; mo <= maxMonth; mo++) {
+                    var pt = interpolatePoint(tableObj, mo);
+                    if (!pt) continue;
+                    months.push(mo);
+                    P3.push(Number((pt.mean + Z_FOR_P.P3 * pt.SD).toFixed(2)));
+                    P15.push(Number((pt.mean + Z_FOR_P.P15 * pt.SD).toFixed(2)));
+                    P50.push(Number((pt.mean + Z_FOR_P.P50 * pt.SD).toFixed(2)));
+                    P85.push(Number((pt.mean + Z_FOR_P.P85 * pt.SD).toFixed(2)));
+                    P97.push(Number((pt.mean + Z_FOR_P.P97 * pt.SD).toFixed(2)));
+                }
+                return { months: months, P3: P3, P15: P15, P50: P50, P85: P85, P97: P97 };
+            }
+            function interpolatePercentileRow(tableObj, month) {
+                if (!tableObj || typeof tableObj !== 'object') return null;
+                var mo = Math.max(0, Math.floor(month));
+                if (tableObj[mo]) return tableObj[mo];
+                var keys = Object.keys(tableObj).map(Number).filter(function(k) { return !isNaN(k); }).sort(function(a, b) { return a - b; });
+                if (keys.length === 0) return null;
+                if (mo <= keys[0]) return tableObj[keys[0]];
+                if (mo >= keys[keys.length - 1]) return tableObj[keys[keys.length - 1]];
+                var i = 0; while (i < keys.length && keys[i] < mo) i++;
+                var low = keys[i - 1], high = keys[i];
+                var lv = tableObj[low], hv = tableObj[high];
+                if (!lv || !hv) return lv || hv;
+                var t = (mo - low) / (high - low);
+                return { P3: lv.P3+t*(hv.P3-lv.P3), P10: lv.P10+t*(hv.P10-lv.P10), P25: lv.P25+t*(hv.P25-lv.P25), P50: lv.P50+t*(hv.P50-lv.P50), P75: lv.P75+t*(hv.P75-lv.P75), P90: lv.P90+t*(hv.P90-lv.P90), P97: lv.P97+t*(hv.P97-lv.P97) };
+            }
+            function buildBmiCurveSeries(tableObj, maxMonth) {
+                maxMonth = maxMonth == null ? 84 : maxMonth;
+                var months = [], P3 = [], P15 = [], P50 = [], P85 = [], P97 = [];
+                for (var mo = 0; mo <= maxMonth; mo++) {
+                    var row = interpolatePercentileRow(tableObj, mo);
+                    if (!row) continue;
+                    months.push(mo);
+                    var p15 = Number(row.P10) + (Number(row.P25) - Number(row.P10)) / 3;
+                    var p85 = Number(row.P75) + (Number(row.P90) - Number(row.P75)) * (2 / 3);
+                    P3.push(Number(Number(row.P3).toFixed(2)));
+                    P15.push(Number(p15.toFixed(2)));
+                    P50.push(Number(Number(row.P50).toFixed(2)));
+                    P85.push(Number(p85.toFixed(2)));
+                    P97.push(Number(Number(row.P97).toFixed(2)));
+                }
+                return { months: months, P3: P3, P15: P15, P50: P50, P85: P85, P97: P97 };
+            }
+            function makePercentileOption(curve, scatterMale, scatterFemale, yName) {
+                var lineColors = { P3: '#c55a11', P15: '#f2c200', P50: '#70ad47', P85: '#f2c200', P97: '#c55a11' };
+                var series = ['P3','P15','P50','P85','P97'].map(function(p) {
+                    return { name: p, type: 'line', data: curve.months.map(function(m, i) { return [m, curve[p][i]]; }), symbol: 'none', lineStyle: { width: p === 'P50' ? 2.5 : 2, color: lineColors[p] }, itemStyle: { color: lineColors[p] }, endLabel: { show: true, formatter: p, color: lineColors[p], distance: 6 } };
+                });
+                series.push({ name: '男', type: 'scatter', data: scatterMale, symbolSize: 8, itemStyle: { color: '#5b9bd5', opacity: 0.7 } });
+                series.push({ name: '女', type: 'scatter', data: scatterFemale, symbolSize: 8, itemStyle: { color: '#70ad47', opacity: 0.7 } });
+                return {
+                    tooltip: { trigger: 'item', formatter: function(p) { if (p.seriesType === 'scatter') return (p.name || '—') + '<br/>月龄：' + (p.value[0] ? Math.round(p.value[0]) : '—') + '<br/>' + yName + '：' + (p.value[1] != null ? p.value[1] : '—'); return p.seriesName + '：' + (p.value ? p.value[1] : ''); } },
+                    legend: { data: ['P3','P15','P50','P85','P97','男','女'], bottom: 8 },
+                    grid: { left: '6%', right: '10%', top: '10%', bottom: '22%', containLabel: true },
+                    xAxis: { type: 'value', name: '月龄', min: 24, max: 84, interval: 3, splitLine: { show: true, lineStyle: { type: 'solid', opacity: 0.15 } }, axisLabel: { interval: 0, lineHeight: 16, formatter: function(v) { var m = Math.round(Number(v)); if (m < 24 || m > 84 || m % 3 !== 0) return ''; if (m % 12 === 0) return m + '月\n' + (m / 12) + '岁'; return m + '月'; } } },
+                    yAxis: { type: 'value', name: yName, scale: true, splitNumber: 14, splitLine: { show: true, lineStyle: { type: 'solid', opacity: 0.15 } } },
+                    series: series
+                };
             }
 
             function renderReport(raw) {
@@ -440,6 +595,170 @@
                 var scatterChart = echarts.init(document.getElementById('heightWeightScatterChart'));
                 scatterChart.setOption(scatterOption);
 
+                // ===== 新增图表 =====
+                var checkDate = (data.checkDate || data.measureDate || '').toString().trim();
+                var heightScatterM = [], heightScatterF = [], weightScatterM = [], weightScatterF = [], bmiScatterM = [], bmiScatterF = [];
+                var sumHM = 0, cntHM = 0, sumHF = 0, cntHF = 0, sumWM = 0, cntWM = 0, sumWF = 0, cntWF = 0, sumBmiM = 0, cntBmiM = 0, sumBmiF = 0, cntBmiF = 0;
+                var avgMonthM = 0, avgMonthF = 0, cntMonthM = 0, cntMonthF = 0;
+                rows.forEach(function(row) {
+                    var g = (row.gender || '').trim();
+                    var birth = (row.birthDate || row.birth || '').toString().trim();
+                    var check = (row.checkDate || row.measureDate || row.measurementDate || checkDate || '').toString().trim();
+                    var mo = ageInMonths(birth, check);
+                    var h = row.height != null && !isNaN(Number(row.height)) ? Number(row.height) : null;
+                    var w = row.weight != null && !isNaN(Number(row.weight)) ? Number(row.weight) : null;
+                    var bmi = (h && w && h > 0) ? Math.round(w / (h / 100) / (h / 100) * 10) / 10 : null;
+                    if (row.bmi != null && !isNaN(Number(row.bmi))) bmi = Number(row.bmi);
+                    var name = (row.name || '—').trim() || '—';
+                    if (mo != null && mo >= 24 && mo <= 84) {
+                        if (h != null) { var pt = { value: [mo, h], name: name }; if (g === '男') { heightScatterM.push(pt); sumHM += h; cntHM++; } else { heightScatterF.push(pt); sumHF += h; cntHF++; } }
+                        if (w != null) { var pw = { value: [mo, w], name: name }; if (g === '男') { weightScatterM.push(pw); sumWM += w; cntWM++; } else { weightScatterF.push(pw); sumWF += w; cntWF++; } }
+                        if (bmi != null) { var pb = { value: [mo, bmi], name: name }; if (g === '男') { bmiScatterM.push(pb); sumBmiM += bmi; cntBmiM++; } else { bmiScatterF.push(pb); sumBmiF += bmi; cntBmiF++; } }
+                        if (g === '男') { avgMonthM += mo; cntMonthM++; } else { avgMonthF += mo; cntMonthF++; }
+                    }
+                });
+                if (cntMonthM > 0) avgMonthM = Math.round(avgMonthM / cntMonthM);
+                if (cntMonthF > 0) avgMonthF = Math.round(avgMonthF / cntMonthF);
+
+                // 6a. 身高百分位曲线图
+                var heightCurve = buildCurveSeries(EMBEDDED_STD_TABLES.B2, 84);
+                var hpDom = document.getElementById('heightPercentileChart');
+                if (hpDom) {
+                    var hpChart = echarts.init(hpDom);
+                    hpChart.setOption(makePercentileOption(heightCurve, heightScatterM, heightScatterF, '身高 (cm)'), true);
+                }
+                // 6b. 体重百分位曲线图
+                var weightCurve = buildCurveSeries(EMBEDDED_STD_TABLES.B1, 84);
+                var wpDom = document.getElementById('weightPercentileChart');
+                if (wpDom) {
+                    var wpChart = echarts.init(wpDom);
+                    wpChart.setOption(makePercentileOption(weightCurve, weightScatterM, weightScatterF, '体重 (kg)'), true);
+                }
+                // 6c. BMI百分位曲线图（取男生数据绘制标准线；散点仍按性别区分）
+                var bmiCurveM = buildBmiCurveSeries(EMBEDDED_BMI_PERCENTILES.male, 84);
+                var bpDom = document.getElementById('bmiPercentileChart');
+                if (bpDom) {
+                    var bpChart = echarts.init(bpDom);
+                    bpChart.setOption(makePercentileOption(bmiCurveM, bmiScatterM, bmiScatterF, 'BMI (kg/m²)'), true);
+                }
+
+                // 7. 身高/体重/BMI 班均 vs 标准对比柱状图
+                function renderCompareBar(domId, label, unit, avgM, avgF, stdM, stdF) {
+                    var dom = document.getElementById(domId);
+                    if (!dom) return;
+                    var chart = echarts.init(dom);
+                    var cats = [];
+                    var actualData = [], stdData = [];
+                    if (avgM != null) { cats.push('男生'); actualData.push(Math.round(avgM * 10) / 10); stdData.push(Math.round(stdM * 10) / 10); }
+                    if (avgF != null) { cats.push('女生'); actualData.push(Math.round(avgF * 10) / 10); stdData.push(Math.round(stdF * 10) / 10); }
+                    if (cats.length === 0) { dom.innerHTML = '<div style="text-align:center;color:#999;padding:40px;">数据不足</div>'; return null; }
+                    var lblFmt = function(p) { return p.value != null ? Number(p.value).toFixed(1) : ''; };
+                    chart.setOption({
+                        tooltip: { trigger: 'axis' },
+                        legend: { data: ['班级平均' + label, '标准' + label], bottom: 6 },
+                        grid: { left: '16%', right: '10%', top: '14%', bottom: '22%', containLabel: true },
+                        xAxis: { type: 'category', data: cats, axisLabel: { fontSize: 13 } },
+                        yAxis: { type: 'value', name: label + ' (' + unit + ')', axisLabel: { fontSize: 12 }, nameGap: 36 },
+                        series: [
+                            { name: '班级平均' + label, type: 'bar', data: actualData, itemStyle: { color: '#5b9bd5' }, barWidth: '30%', label: { show: true, position: 'top', formatter: lblFmt } },
+                            { name: '标准' + label, type: 'bar', data: stdData, itemStyle: { color: '#28a745' }, barWidth: '30%', label: { show: true, position: 'top', formatter: lblFmt } }
+                        ]
+                    });
+                    return chart;
+                }
+                var stdPtM = avgMonthM > 0 ? interpolatePoint(EMBEDDED_STD_TABLES.B2, avgMonthM) : null;
+                var stdPtF = avgMonthF > 0 ? interpolatePoint(EMBEDDED_STD_TABLES.B2, avgMonthF) : null;
+                var stdWtM = avgMonthM > 0 ? interpolatePoint(EMBEDDED_STD_TABLES.B1, avgMonthM) : null;
+                var stdWtF = avgMonthF > 0 ? interpolatePoint(EMBEDDED_STD_TABLES.B1, avgMonthF) : null;
+                var stdBmiRowM = avgMonthM > 0 ? interpolatePercentileRow(EMBEDDED_BMI_PERCENTILES.male, avgMonthM) : null;
+                var stdBmiRowF = avgMonthF > 0 ? interpolatePercentileRow(EMBEDDED_BMI_PERCENTILES.female, avgMonthF) : null;
+                var hcChart = renderCompareBar('heightCompareBar', '身高', 'cm', cntHM > 0 ? sumHM / cntHM : null, cntHF > 0 ? sumHF / cntHF : null, stdPtM ? stdPtM.mean : 0, stdPtF ? stdPtF.mean : 0);
+                var wcChart = renderCompareBar('weightCompareBar', '体重', 'kg', cntWM > 0 ? sumWM / cntWM : null, cntWF > 0 ? sumWF / cntWF : null, stdWtM ? stdWtM.mean : 0, stdWtF ? stdWtF.mean : 0);
+                var bcChart = renderCompareBar('bmiCompareBar', 'BMI', 'kg/m²', cntBmiM > 0 ? sumBmiM / cntBmiM : null, cntBmiF > 0 ? sumBmiF / cntBmiF : null, stdBmiRowM ? stdBmiRowM.P50 : 0, stdBmiRowF ? stdBmiRowF.P50 : 0);
+
+                // 8. 极坐标图（生长水平 + 营养状况）
+                var levelToNum = { '下': 1, '中下': 2, '中': 3, '中上': 4, '上': 5 };
+                var polarCats = ['年龄别体重', '年龄别身高', '身高别体重', '年龄别 BMI'];
+                var avgLevelM = [0,0,0,0], cntLevelM = [0,0,0,0], avgLevelF = [0,0,0,0], cntLevelF = [0,0,0,0];
+                var avgZpolM = [0,0,0,0], cntZpolM = [0,0,0,0], avgZpolF = [0,0,0,0], cntZpolF = [0,0,0,0];
+                rows.forEach(function(row) {
+                    var g = (row.gender || '').trim();
+                    var inds = row.indicators || [];
+                    inds.forEach(function(ind) {
+                        var ci = indIds.indexOf(ind.id);
+                        if (ci < 0) return;
+                        var lv = getGrowthLevelFromValue((ind.value || '').trim(), mode);
+                        var num = levelToNum[lv];
+                        if (num != null) { if (g === '男') { avgLevelM[ci] += num; cntLevelM[ci]++; } else { avgLevelF[ci] += num; cntLevelF[ci]++; } }
+                        var z = parseValueToZ(ind.value, mode);
+                        if (z != null) { if (g === '男') { avgZpolM[ci] += z; cntZpolM[ci]++; } else { avgZpolF[ci] += z; cntZpolF[ci]++; } }
+                    });
+                });
+                var polarDataM = avgLevelM.map(function(s, i) { return cntLevelM[i] > 0 ? Math.round(s / cntLevelM[i] * 10) / 10 : 0; });
+                var polarDataF = avgLevelF.map(function(s, i) { return cntLevelF[i] > 0 ? Math.round(s / cntLevelF[i] * 10) / 10 : 0; });
+                var levelPolarDom = document.getElementById('levelPolarChart');
+                var levelPolarChart2 = null;
+                if (levelPolarDom) {
+                    levelPolarChart2 = echarts.init(levelPolarDom);
+                    levelPolarChart2.setOption({
+                        angleAxis: { type: 'category', data: polarCats, axisLabel: { show: false }, splitLine: { show: true, lineStyle: { color: '#e0e0e0' } } },
+                        radiusAxis: { min: 1, max: 5, interval: 1, axisLabel: { show: false }, splitLine: { show: true, lineStyle: { color: '#e0e0e0' } } },
+                        polar: { center: ['50%', '50%'], radius: '68%' },
+                        tooltip: { trigger: 'axis', formatter: function(params) { if (!params || !params.length) return ''; var i = params[0].dataIndex; var lines = [polarCats[i] || '']; params.forEach(function(p) { var lvMap = { 1: '下', 2: '中下', 3: '中', 4: '中上', 5: '上' }; var v = p.value; var near = lvMap[Math.round(v)] || ''; lines.push(p.seriesName + '：' + v + (near ? ' (' + near + ')' : '')); }); return lines.join('<br/>'); } },
+                        legend: { show: true, bottom: 8, data: ['男生', '女生'] },
+                        series: [
+                            { name: '男生', type: 'bar', coordinateSystem: 'polar', data: polarDataM, itemStyle: { color: '#5b9bd5' }, barWidth: '28%' },
+                            { name: '女生', type: 'bar', coordinateSystem: 'polar', data: polarDataF, itemStyle: { color: '#70ad47' }, barWidth: '28%' }
+                        ]
+                    });
+                    var lpLabels = document.getElementById('levelPolarLabels');
+                    if (lpLabels) {
+                        var lvMap = { 1: '下', 2: '中下', 3: '中', 4: '中上', 5: '上' };
+                        var boxS = 'background:#F6F8FC;border:1px solid #8C8D8E;border-radius:4px;padding:6px 10px;line-height:1.5;font-size:12px;';
+                        var posMap = [{ t: '8%', r: '8%' }, { b: '8%', r: '8%' }, { b: '8%', l: '8%' }, { t: '8%', l: '8%' }];
+                        var lhtml = '';
+                        for (var li = 0; li < 4; li++) {
+                            var p = posMap[li];
+                            var mVal = polarDataM[li], fVal = polarDataF[li];
+                            lhtml += '<div style="position:absolute;' + (p.t ? 'top:'+p.t+';' : '') + (p.b ? 'bottom:'+p.b+';' : '') + (p.l ? 'left:'+p.l+';' : '') + (p.r ? 'right:'+p.r+';' : '') + boxS + '">' + polarCats[li] + '<br/>男：' + mVal + (lvMap[Math.round(mVal)] ? ' ('+lvMap[Math.round(mVal)]+')' : '') + '<br/>女：' + fVal + (lvMap[Math.round(fVal)] ? ' ('+lvMap[Math.round(fVal)]+')' : '') + '</div>';
+                        }
+                        lpLabels.innerHTML = lhtml;
+                    }
+                }
+
+                function zToPolarRadius(z) { return (z != null && !isNaN(z)) ? Math.max(0, Math.min(6, z + 3)) : 0; }
+                var npDataM = avgZpolM.map(function(s, i) { return cntZpolM[i] > 0 ? zToPolarRadius(s / cntZpolM[i]) : 0; });
+                var npDataF = avgZpolF.map(function(s, i) { return cntZpolF[i] > 0 ? zToPolarRadius(s / cntZpolF[i]) : 0; });
+                var nutritionPolarDom = document.getElementById('nutritionPolarChart');
+                var nutritionPolarChart2 = null;
+                if (nutritionPolarDom) {
+                    nutritionPolarChart2 = echarts.init(nutritionPolarDom);
+                    nutritionPolarChart2.setOption({
+                        angleAxis: { type: 'category', data: polarCats, axisLabel: { show: false }, splitLine: { show: true, lineStyle: { color: '#e0e0e0' } } },
+                        radiusAxis: { min: 0, max: 6, interval: 1, axisLabel: { show: false }, splitLine: { lineStyle: { color: '#e0e0e0' } } },
+                        polar: { center: ['50%', '50%'], radius: '68%' },
+                        tooltip: { trigger: 'axis', formatter: function(params) { if (!params || !params.length) return ''; var i = params[0].dataIndex; var lines = [polarCats[i] || '']; params.forEach(function(p) { var v = p.value; var z = (typeof v === 'number') ? (v - 3) : null; lines.push(p.seriesName + '：' + (z != null ? (z >= 0 ? '+' : '') + z.toFixed(2) + ' SD' : '—')); }); return lines.join('<br/>'); } },
+                        legend: { show: true, bottom: 8, data: ['男生', '女生'] },
+                        series: [
+                            { name: '男生', type: 'bar', coordinateSystem: 'polar', data: npDataM, itemStyle: { color: '#5b9bd5' }, barWidth: '28%' },
+                            { name: '女生', type: 'bar', coordinateSystem: 'polar', data: npDataF, itemStyle: { color: '#70ad47' }, barWidth: '28%' }
+                        ]
+                    });
+                    var npLabels = document.getElementById('nutritionPolarLabels');
+                    if (npLabels) {
+                        var npBoxS = 'background:#F6F8FC;border:1px solid #8C8D8E;border-radius:4px;padding:6px 10px;line-height:1.5;font-size:12px;';
+                        var npPosMap = [{ t: '8%', r: '8%' }, { b: '8%', r: '8%' }, { b: '8%', l: '8%' }, { t: '8%', l: '8%' }];
+                        var nphtml = '';
+                        for (var ni = 0; ni < 4; ni++) {
+                            var np = npPosMap[ni];
+                            var zmVal = cntZpolM[ni] > 0 ? (avgZpolM[ni] / cntZpolM[ni]) : null;
+                            var zfVal = cntZpolF[ni] > 0 ? (avgZpolF[ni] / cntZpolF[ni]) : null;
+                            nphtml += '<div style="position:absolute;' + (np.t ? 'top:'+np.t+';' : '') + (np.b ? 'bottom:'+np.b+';' : '') + (np.l ? 'left:'+np.l+';' : '') + (np.r ? 'right:'+np.r+';' : '') + npBoxS + '">' + polarCats[ni] + '<br/>男：' + (zmVal != null ? (zmVal >= 0 ? '+' : '') + zmVal.toFixed(2) + ' SD' : '—') + '<br/>女：' + (zfVal != null ? (zfVal >= 0 ? '+' : '') + zfVal.toFixed(2) + ' SD' : '—') + '</div>';
+                        }
+                        npLabels.innerHTML = nphtml;
+                    }
+                }
+
                 // 各指标批次统计（表1/表2：平均 Z 分 + 各等级占比）
                 var avgZ = [];
                 for (var i = 0; i < 4; i++) avgZ.push(countZ[i] > 0 ? sumZ[i] / countZ[i] : 0);
@@ -470,6 +789,7 @@
                 if (batchAdv) batchAdv.innerHTML = '';
 
                 window._batchReportData = { total: total, indNames: indNames, genderMale: genderMale, genderFemale: genderFemale, levelPieCounts: levelPieCounts, indLevelCounts: indLevelCounts };
+                window._extraCharts = { hpChart: hpChart, wpChart: wpChart, bpChart: bpChart, hcChart: hcChart, wcChart: wcChart, bcChart: bcChart, levelPolarChart2: levelPolarChart2, nutritionPolarChart2: nutritionPolarChart2 };
             }
 
             function initTabs() {
@@ -482,7 +802,7 @@
                         var panel = document.getElementById('panel' + t.charAt(0).toUpperCase() + t.slice(1));
                         if (panel) panel.classList.add('active');
                         setTimeout(function() {
-                            ['genderPieChart', 'levelPieChart', 'levelBarChart', 'nutritionPieChart', 'nutritionBarChart', 'heightWeightScatterChart'].forEach(function(id) {
+                            ['genderPieChart', 'levelPieChart', 'levelBarChart', 'nutritionPieChart', 'nutritionBarChart', 'heightWeightScatterChart', 'heightPercentileChart', 'weightPercentileChart', 'bmiPercentileChart', 'heightCompareBar', 'weightCompareBar', 'bmiCompareBar', 'levelPolarChart', 'nutritionPolarChart'].forEach(function(id) {
                                 var el = document.getElementById(id);
                                 if (el && typeof echarts !== 'undefined' && echarts.getInstanceByDom(el)) echarts.getInstanceByDom(el).resize();
                             });
@@ -491,14 +811,15 @@
                 });
             }
 
-            function downloadReport() {
+            function downloadReport(opts) {
+                var isPreview = opts && opts.preview;
                 var d = window._batchReportData;
                 if (!d || typeof html2canvas === 'undefined' || typeof jspdf === 'undefined') { alert('请稍候再试或刷新后下载。'); return; }
                 var JsPDF = window.jspdf && window.jspdf.jsPDF ? window.jspdf.jsPDF : window.jspdf;
                 if (!JsPDF) { alert('PDF 库未加载。'); return; }
-                var charts = ['genderPieChart', 'levelPieChart', 'levelBarChart', 'nutritionPieChart', 'nutritionBarChart', 'heightWeightScatterChart'];
+                var charts = ['genderPieChart', 'levelPieChart', 'levelBarChart', 'nutritionPieChart', 'nutritionBarChart', 'heightWeightScatterChart', 'heightPercentileChart', 'weightPercentileChart', 'bmiPercentileChart', 'heightCompareBar', 'weightCompareBar', 'bmiCompareBar', 'levelPolarChart', 'nutritionPolarChart'];
                 var chartInstances = charts.map(function(id) { var el = document.getElementById(id); return el && echarts.getInstanceByDom(el); });
-                if (chartInstances.some(function(c) { return !c; })) { alert('图表未就绪。'); return; }
+                if (!chartInstances[0] || !chartInstances[1] || !chartInstances[2]) { alert('图表未就绪。'); return; }
 
                 var panelOverview = document.getElementById('panelOverview');
                 var activeTab = document.querySelector('.tab.active');
@@ -515,7 +836,7 @@
                 function getChartUrls(cb) {
                     var wait = wasOverview ? 0 : 350;
                     setTimeout(function() {
-                        var urls = chartInstances.map(function(c) { return c.getDataURL({ type: 'png', pixelRatio: 2 }); });
+                        var urls = chartInstances.map(function(c) { return c ? c.getDataURL({ type: 'png', pixelRatio: 2 }) : null; });
                         if (!wasOverview && activeTab) {
                             document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
                             document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
@@ -525,49 +846,79 @@
                             if (panel) panel.classList.add('active');
                             setTimeout(function() { chartInstances.forEach(function(c) { if (c && c.resize) c.resize(); }); }, 50);
                         }
-                        cb(urls[0], urls[1], urls[2], urls[3], urls[4], urls[5]);
+                        cb(urls);
                     }, wait);
                 }
 
-                getChartUrls(function(genderUrl, levelPieUrl, levelBarUrl, nutritionPieUrl, nutritionBarUrl, scatterUrl) {
+                getChartUrls(function(urls) {
+                    var genderUrl = urls[0], levelPieUrl = urls[1], levelBarUrl = urls[2], nutritionPieUrl = urls[3], nutritionBarUrl = urls[4], scatterUrl = urls[5];
+                    var heightPUrl = urls[6], weightPUrl = urls[7], bmiPUrl = urls[8], heightCUrl = urls[9], weightCUrl = urls[10], bmiCUrl = urls[11], levelPolUrl = urls[12], nutritionPolUrl = urls[13];
                     var wrapper = document.createElement('div');
                     wrapper.style.cssText = 'position:fixed;top:0;left:0;z-index:99999;width:800px;max-height:100vh;overflow:auto;font-family:Microsoft YaHei,Arial,sans-serif;font-size:14px;color:#333;background:#fff;padding:20px;box-sizing:border-box;';
 
                     var reportDate = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
-                    var coverHtml = '<div style="width:800px;min-height:1050px;background:linear-gradient(180deg,#e8eef5 0%,#fff 28%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 40px;box-sizing:border-box;">' +
-                        '<div style="width:100%;max-width:720px;text-align:center;">' +
-                        '<img src="assets/logo.jpg" alt="" style="height:72px;width:auto;margin-bottom:48px;border-radius:12px;" onerror="this.style.display=\'none\'">' +
-                        '<div style="width:120px;height:4px;background:linear-gradient(90deg,#366092,#4a7ba7);margin:0 auto 32px auto;border-radius:2px;"></div>' +
-                        '<h1 style="font-size:36px;font-weight:bold;color:#1a365d;margin:0 0 16px 0;letter-spacing:4px;">生长评价总体报告</h1>' +
-                        '<p style="font-size:18px;color:#4a7ba7;margin:0 0 48px 0;letter-spacing:2px;">享智云 · 7岁以下儿童生长标准</p>' +
-                        '<p style="font-size:14px;color:#64748b;margin:0 0 56px 0;">WS/T 423—2022</p>' +
-                        '<div style="width:200px;height:1px;background:#e2e8f0;margin:0 auto 32px auto;"></div>' +
-                        '<p style="font-size:15px;color:#475569;margin:0 0 8px 0;">报告日期：' + reportDate + '</p>' +
-                        '<p style="font-size:15px;color:#475569;margin:0 0 80px 0;">体测人数：' + (d.total || 0) + ' 人</p>' +
-                        '<p style="font-size:13px;color:#94a3b8;line-height:1.8;max-width:520px;margin:0 auto;">本报告参照 WS/T 423-2022 编制，数据仅供参考，不作为诊断依据。<br>如有疑问请咨询医疗机构。</p>' +
+                    var coverHtml = '<div style="width:800px;height:1132px;background:linear-gradient(180deg,#fff9f4 0%,#fff4ea 58%,#ffecd9 100%);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:60px 20px 60px;box-sizing:border-box;position:relative;overflow:hidden;">' +
+                        '<div style="position:absolute;left:-120px;top:640px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle at 35% 35%, rgba(255,177,113,0.35) 0%, rgba(255,177,113,0.18) 45%, rgba(255,177,113,0.02) 100%);"></div>' +
+                        '<div style="position:absolute;right:-160px;bottom:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle at 35% 35%, rgba(255,153,84,0.28) 0%, rgba(255,153,84,0.12) 50%, rgba(255,153,84,0.01) 100%);"></div>' +
+                        '<div style="width:100%;max-width:100%;text-align:center;">' +
+                        '<h1 style="font-size:52px;font-weight:bold;color:#ff7a00;margin:0 0 36px 0;letter-spacing:2px;">生长评价总体报告</h1>' +
+                        '<h2 style="font-size:36px;font-weight:bold;color:#f28b1a;margin:0 0 24px 0;letter-spacing:1px;">享智云 · 7岁以下儿童生长标准</h2>' +
+                        '</div>' +
+                        '<div style="width:100%;max-width:100%;text-align:center;margin-top:380px;">' +
+                        '<p style="font-size:28px;font-weight:600;color:#f07a00;margin:0 0 32px 0;">测试人数：' + (d.total || 0) + ' 人</p>' +
+                        '<p style="font-size:24px;color:#f28b1a;margin:0 0 56px 0;">报告日期：' + reportDate + '</p>' +
+                        '<img src="assets/logo-report.jpg" alt="" style="height:96px;width:auto;border-radius:12px;box-shadow:0 6px 14px rgba(233,131,42,0.18);" onerror="this.style.display=\'none\'">' +
                         '</div></div>';
                     var page0 = document.createElement('div');
-                    page0.style.cssText = 'width:800px;background:#fff;';
+                    page0.style.cssText = 'width:800px;height:1132px;background:#fff;overflow:hidden;';
                     page0.innerHTML = coverHtml;
                     wrapper.appendChild(page0);
 
                     var imgStyle = 'width:100%;max-width:800px;height:360px;object-fit:contain;display:block;margin:0 auto 20px auto;';
+                    var imgStyleSm = 'width:100%;max-width:800px;height:300px;object-fit:contain;display:block;margin:0 auto 20px auto;';
+                    function mkTitle(t) { return '<div style="margin-bottom:8px;font-size:15px;font-weight:600;color:#f07a00;">' + t + '</div>'; }
+                    function mkImg(url, style) { return url ? '<img src="' + url + '" style="' + (style || imgStyle) + '" />' : ''; }
+
                     var page1 = document.createElement('div');
                     page1.style.cssText = 'width:800px;background:#fff;padding:20px 0;';
-                    page1.innerHTML = '<div style="text-align:center;margin-bottom:20px;font-size:18px;">生长评价总体报告</div><div style="text-align:center;margin-bottom:24px;font-size:14px;">体测人数：' + (d.total || 0) + ' 人</div>' +
-                        '<div style="margin-bottom:8px;font-size:15px;">全班性别分布</div><img src="' + genderUrl + '" style="' + imgStyle + '" />' +
-                        '<div style="margin-bottom:8px;font-size:15px;">全班生长指标评价结果分布（表1/表2）</div><img src="' + levelPieUrl + '" style="' + imgStyle + '" />';
+                    page1.innerHTML = '<div style="text-align:center;margin-bottom:20px;font-size:18px;font-weight:600;color:#f07a00;">生长评价总体报告</div><div style="text-align:center;margin-bottom:24px;font-size:14px;color:#f28b1a;">体测人数：' + (d.total || 0) + ' 人</div>' +
+                        mkTitle('全班性别分布') + mkImg(genderUrl) +
+                        mkTitle('全班生长指标评价结果分布（表1/表2）') + mkImg(levelPieUrl);
                     wrapper.appendChild(page1);
                     var page1b = document.createElement('div');
                     page1b.style.cssText = 'width:800px;background:#fff;padding:20px 0;page-break-before:always;';
-                    page1b.innerHTML = '<div style="margin-bottom:8px;font-size:15px;">各生长指标评价等级分布</div><img src="' + levelBarUrl + '" style="' + imgStyle + '" />' +
-                        '<div style="margin-bottom:8px;font-size:15px;">儿童营养状况分布（表3）</div><img src="' + nutritionPieUrl + '" style="' + imgStyle + '" />';
+                    page1b.innerHTML = mkTitle('各生长指标评价等级分布') + mkImg(levelBarUrl) +
+                        mkTitle('儿童营养状况分布（表3）') + mkImg(nutritionPieUrl);
                     wrapper.appendChild(page1b);
                     var page1c = document.createElement('div');
                     page1c.style.cssText = 'width:800px;background:#fff;padding:20px 0;page-break-before:always;';
-                    page1c.innerHTML = '<div style="margin-bottom:8px;font-size:15px;">各指标营养状况分布</div><img src="' + nutritionBarUrl + '" style="' + imgStyle + '" />' +
-                        '<div style="margin-bottom:8px;font-size:15px;">身高与体重关系散点图</div><img src="' + scatterUrl + '" style="width:100%;max-width:800px;height:360px;object-fit:contain;display:block;margin:0 auto;" />';
+                    page1c.innerHTML = mkTitle('各指标营养状况分布') + mkImg(nutritionBarUrl) +
+                        mkTitle('身高与体重关系散点图') + mkImg(scatterUrl);
                     wrapper.appendChild(page1c);
+
+                    var page1d = document.createElement('div');
+                    page1d.style.cssText = 'width:800px;background:#fff;padding:20px 0;page-break-before:always;';
+                    page1d.innerHTML = mkTitle('身高百分位曲线图（2～7岁）— 全班叠加') + mkImg(heightPUrl) +
+                        mkTitle('体重百分位曲线图（2～7岁）— 全班叠加') + mkImg(weightPUrl);
+                    wrapper.appendChild(page1d);
+
+                    var page1e = document.createElement('div');
+                    page1e.style.cssText = 'width:800px;background:#fff;padding:20px 0;page-break-before:always;';
+                    page1e.innerHTML = mkTitle('BMI百分位曲线图（2～7岁）— 全班叠加') + mkImg(bmiPUrl) +
+                        mkTitle('身高班均 vs 标准值对比') + mkImg(heightCUrl, imgStyleSm);
+                    wrapper.appendChild(page1e);
+
+                    var page1f = document.createElement('div');
+                    page1f.style.cssText = 'width:800px;background:#fff;padding:20px 0;page-break-before:always;';
+                    page1f.innerHTML = mkTitle('体重班均 vs 标准值对比') + mkImg(weightCUrl, imgStyleSm) +
+                        mkTitle('BMI 班均 vs 标准值对比') + mkImg(bmiCUrl, imgStyleSm);
+                    wrapper.appendChild(page1f);
+
+                    var page1g = document.createElement('div');
+                    page1g.style.cssText = 'width:800px;background:#fff;padding:20px 0;page-break-before:always;';
+                    page1g.innerHTML = mkTitle('生长水平综合评价 — 极坐标图') + mkImg(levelPolUrl) +
+                        mkTitle('营养状况综合评价 — 极坐标图') + mkImg(nutritionPolUrl);
+                    wrapper.appendChild(page1g);
 
                     var page2 = document.createElement('div');
                     page2.style.cssText = 'width:800px;background:#fff;page-break-before:always;';
@@ -602,35 +953,35 @@
                     }
 
                     function doPdf() {
-                        html2canvas(page0, { scale: 1.5, useCORS: true, allowTaint: true }).then(function(c0) {
-                            html2canvas(page1, { scale: 1.5, useCORS: true, allowTaint: true }).then(function(c1) {
-                                html2canvas(page1b, { scale: 1.5, useCORS: true, allowTaint: true }).then(function(c1b) {
-                                    html2canvas(page1c, { scale: 1.5, useCORS: true, allowTaint: true }).then(function(c1c) {
-                                        html2canvas(page2, { scale: 1.5, useCORS: true, allowTaint: true }).then(function(c2) {
-                                            html2canvas(page3, { scale: 1.5, useCORS: true, allowTaint: true }).then(function(c3) {
-                                                var pdf = new JsPDF('p', 'mm', 'a4');
-                                                var w = pdf.internal.pageSize.getWidth();
-                                                var h = pdf.internal.pageSize.getHeight();
-                                                function addPageFit(canvas) {
-                                                    var r = canvas.width / canvas.height;
-                                                    var pageR = w / h;
-                                                    var imgW, imgH;
-                                                    if (r > pageR) { imgW = w; imgH = w / r; } else { imgH = h; imgW = h * r; }
-                                                    pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, imgW, imgH);
-                                                }
-                                                addPageFit(c0);
-                                                pdf.addPage(); addPageFit(c1);
-                                                pdf.addPage(); addPageFit(c1b);
-                                                pdf.addPage(); addPageFit(c1c);
-                                                pdf.addPage(); addPageFit(c2);
-                                                pdf.addPage(); addPageFit(c3);
-                                                pdf.save(filename);
-                                                if (wrapper.parentNode) document.body.removeChild(wrapper);
-                                            }).catch(function() { if (wrapper.parentNode) document.body.removeChild(wrapper); });
-                                        }).catch(function() { if (wrapper.parentNode) document.body.removeChild(wrapper); });
-                                    }).catch(function() { if (wrapper.parentNode) document.body.removeChild(wrapper); });
-                                }).catch(function() { if (wrapper.parentNode) document.body.removeChild(wrapper); });
-                            }).catch(function() { if (wrapper.parentNode) document.body.removeChild(wrapper); });
+                        var allPages = [page0, page1, page1b, page1c, page1d, page1e, page1f, page1g, page2, page3];
+                        var canvasOpt = { scale: 1.5, useCORS: true, allowTaint: true };
+                        var p = Promise.resolve([]);
+                        allPages.forEach(function(pg) {
+                            p = p.then(function(cs) {
+                                return html2canvas(pg, canvasOpt).then(function(c) { return cs.concat([c]); });
+                            });
+                        });
+                        p.then(function(canvases) {
+                            var pdf = new JsPDF('p', 'mm', 'a4');
+                            var w = pdf.internal.pageSize.getWidth();
+                            var h = pdf.internal.pageSize.getHeight();
+                            canvases.forEach(function(canvas, i) {
+                                if (i > 0) pdf.addPage();
+                                var r = canvas.width / canvas.height;
+                                var pageR = w / h;
+                                var imgW, imgH;
+                                if (r > pageR) { imgW = w; imgH = w / r; } else { imgH = h; imgW = h * r; }
+                                pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, imgW, imgH);
+                            });
+                            if (isPreview) {
+                                var blob = pdf.output('blob');
+                                var blobUrl = URL.createObjectURL(blob);
+                                window.open(blobUrl, '_blank');
+                                setTimeout(function() { URL.revokeObjectURL(blobUrl); }, 5000);
+                            } else {
+                                pdf.save(filename);
+                            }
+                            if (wrapper.parentNode) document.body.removeChild(wrapper);
                         }).catch(function() { if (wrapper.parentNode) document.body.removeChild(wrapper); });
                     }
                     waitForImages().then(function() { setTimeout(doPdf, 150); });
@@ -640,9 +991,11 @@
             var raw = localStorage.getItem(STORAGE_KEY);
             if (raw) { try { renderReport(raw); } catch (e) { document.getElementById('noData').textContent = '数据解析失败。'; } }
             initTabs();
-            document.getElementById('downloadReportBtn').addEventListener('click', downloadReport);
+            document.getElementById('downloadReportBtn').addEventListener('click', function() { downloadReport(); });
+            var previewBtn = document.getElementById('previewReportBtn');
+            if (previewBtn) previewBtn.addEventListener('click', function() { downloadReport({ preview: true }); });
             window.addEventListener('resize', function() {
-                ['genderPieChart', 'levelPieChart', 'levelBarChart', 'nutritionPieChart', 'nutritionBarChart', 'heightWeightScatterChart'].forEach(function(id) {
+                ['genderPieChart', 'levelPieChart', 'levelBarChart', 'nutritionPieChart', 'nutritionBarChart', 'heightWeightScatterChart', 'heightPercentileChart', 'weightPercentileChart', 'bmiPercentileChart', 'heightCompareBar', 'weightCompareBar', 'bmiCompareBar', 'levelPolarChart', 'nutritionPolarChart'].forEach(function(id) {
                     var el = document.getElementById(id);
                     if (el && typeof echarts !== 'undefined' && echarts.getInstanceByDom(el)) echarts.getInstanceByDom(el).resize();
                 });

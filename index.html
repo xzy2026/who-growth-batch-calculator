@@ -1672,6 +1672,9 @@
                 if (rowData.checkDateStr) row.querySelector('.check-date-input').value = rowData.checkDateStr;
                 if (rowData.weight != null && !isNaN(rowData.weight) && rowData.weight > 0) row.querySelector('.weight-input').value = rowData.weight;
                 if (rowData.height != null && !isNaN(rowData.height) && rowData.height > 0) row.querySelector('.height-input').value = rowData.height;
+                if (rowData.school != null) row.dataset.school = String(rowData.school);
+                if (rowData.gradeName != null) row.dataset.gradeName = String(rowData.gradeName);
+                if (rowData.className != null) row.dataset.className = String(rowData.className);
             }
             return row;
         }
@@ -1735,6 +1738,9 @@
                 gender: getVal('.gender-input'),
                 birthDate: getVal('.birth-date-input'),
                 checkDate: getVal('.check-date-input'),
+                school: (row.dataset && row.dataset.school !== undefined) ? (row.dataset.school || '') : '',
+                gradeName: (row.dataset && row.dataset.gradeName !== undefined) ? (row.dataset.gradeName || '') : '',
+                className: (row.dataset && row.dataset.className !== undefined) ? (row.dataset.className || '') : '',
                 ageText: getText('.age-cell'),
                 weight: isNaN(weight) ? null : weight,
                 height: isNaN(height) ? null : height,
@@ -2557,6 +2563,9 @@
                             }
                             else if (hClean.includes('体重') && !hClean.includes('标准') && !hClean.includes('增值')) colMap.weight = index;
                             else if (hClean.includes('身高') && !hClean.includes('标准') && !hClean.includes('增值')) colMap.height = index;
+                            else if (hClean.includes('学校')) colMap.school = index;
+                            else if (hClean.includes('年级')) colMap.gradeName = index;
+                            else if (hClean.includes('班级')) colMap.className = index;
                         });
 
                         // 如果找到了必需的列，使用这一行作为表头
@@ -2920,7 +2929,10 @@
                                 const h = parseFloat(heightStr);
                                 if (!isNaN(h) && h > 0) heightVal = h;
                             }
-                            rowDataList.push({ name: nameValue, gender, birthDateStr, checkDateStr, weight: weightVal, height: heightVal });
+                            const schoolVal = (colMap.school !== undefined && row[colMap.school] !== undefined && row[colMap.school] !== '') ? String(row[colMap.school]).trim() : '';
+                            const gradeNameVal = (colMap.gradeName !== undefined && row[colMap.gradeName] !== undefined && row[colMap.gradeName] !== '') ? String(row[colMap.gradeName]).trim() : '';
+                            const classNameVal = (colMap.className !== undefined && row[colMap.className] !== undefined && row[colMap.className] !== '') ? String(row[colMap.className]).trim() : '';
+                            rowDataList.push({ name: nameValue, gender, birthDateStr, checkDateStr, weight: weightVal, height: heightVal, school: schoolVal, gradeName: gradeNameVal, className: classNameVal });
                             importedCount++;
                         }
 

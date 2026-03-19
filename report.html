@@ -37,8 +37,11 @@
         .tab.active { color: #366092; font-weight: bold; border-bottom-color: #366092; }
         .panel { display: none; }
         .panel.active { display: block; }
+        .section-main-title { display: flex; align-items: center; gap: 14px; margin: 8px 0 16px 0; }
+        .section-main-title .txt { color: #ff7a00; font-size: 34px; font-weight: 700; line-height: 1; white-space: nowrap; }
+        .section-main-title .line { flex: 1; border-top: 2px solid #f2d4b4; }
         .chart-box { background: #fff; border-radius: 12px; padding: 20px 28px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #eee; }
-        .chart-title { font-size: 15px; margin-bottom: 12px; color: #333; padding: 0 8px; }
+        .chart-title { font-size: 15px; margin-bottom: 12px; color: #f07a00; padding: 0 8px; }
         #radarChart, #barChart { width: 100%; height: 360px; }
         .basic-info { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 24px; margin-bottom: 24px; padding: 16px 20px; background: #f8fafc; border-radius: 12px; border: 1px solid #e8ecf0; font-size: 14px; }
         .basic-info .item { display: flex; gap: 8px; }
@@ -59,8 +62,8 @@
         .indicator-table th { background: #e7f3ff; }
         .eval-table { width: 100%; max-width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 20px; table-layout: fixed; }
         .eval-table th, .eval-table td { border: 1px solid #ddd; padding: 8px 10px; text-align: center; }
-        .eval-table th { background: #366092; color: #fff; }
-        .eval-table th:first-child { width: 160px; min-width: 160px; max-width: 160px; box-sizing: border-box; text-align: left; background: #366092; color: #fff; font-weight: 500; line-height: 1.4; word-break: keep-all; white-space: normal; }
+        .eval-table th { background: #f28b1a; color: #fff; }
+        .eval-table th:first-child { width: 160px; min-width: 160px; max-width: 160px; box-sizing: border-box; text-align: left; background: #f28b1a; color: #fff; font-weight: 500; line-height: 1.4; word-break: keep-all; white-space: normal; }
         .eval-table td.first-col { width: 160px; min-width: 160px; max-width: 160px; box-sizing: border-box; text-align: left; background: #f0f0f0; color: #333; font-weight: 500; line-height: 1.4; word-break: keep-all; white-space: normal; }
         #comprehensiveTable, #comprehensiveTablePrev { table-layout: fixed; width: 100%; box-sizing: border-box; }
         #comprehensiveTable col:nth-child(1), #comprehensiveTablePrev col:nth-child(1) { width: 12%; }
@@ -80,19 +83,19 @@
         .z-good { color: #28a745; font-weight: 500; }
         .z-warn { color: #e69500; font-weight: 500; }
         .z-alert { color: #dc3545; font-weight: 500; }
-        .eval-table-caption { padding: 10px 0 6px 0; font-size: 14px; font-weight: 600; color: #333; }
+        .eval-table-caption { padding: 10px 0 6px 0; font-size: 14px; font-weight: 700; color: #f07a00; }
         .eval-table-wrap { margin-bottom: 16px; }
-        .suggestion-box { background: #f8fcff; border-left: 4px solid #366092; padding: 16px 20px; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.7; color: #333; }
+        .suggestion-box { background: #fff7ef; border-left: 4px solid #f28b1a; padding: 16px 20px; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.7; color: #333; }
         .dimension-block { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e8ecf0; }
         .dimension-block:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
-        .dimension-block h5 { font-size: 15px; color: #366092; margin-bottom: 8px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .dimension-block h5 { font-size: 15px; color: #f07a00; margin-bottom: 8px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
         .dimension-block h5 i { opacity: 0.9; }
-        .dim-analysis { background: #f0f6fc; padding: 10px 14px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; color: #444; line-height: 1.65; }
+        .dim-analysis { background: #fff4e8; padding: 10px 14px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; color: #444; line-height: 1.65; }
         .dim-suggestion { padding-left: 4px; font-size: 13px; color: #333; line-height: 1.7; }
         .dim-suggestion ul { margin: 4px 0 0 0; padding-left: 18px; }
         .dim-suggestion li { margin-bottom: 4px; }
         .advice-card { background: #fff; border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #eee; }
-        .advice-card.highlight { border-color: #366092; background: #f8fcff; }
+        .advice-card.highlight { border-color: #f28b1a; background: #fff7ef; }
         .advice-card h4 { font-size: 15px; margin-bottom: 10px; color: #333; }
         .advice-card ul { margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.9; color: #555; }
         .excellent-badge { text-align: center; padding: 24px; background: linear-gradient(135deg,#e8f5e9,#c8e6c9); border-radius: 12px; margin-bottom: 20px; border: 1px solid #a5d6a7; }
@@ -132,7 +135,7 @@
         .compare-select-wrap select { padding: 8px 12px; font-size: 14px; border: 1px solid #ddd; border-radius: 6px; min-width: 200px; }
         .compare-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 20px; }
         .compare-table th, .compare-table td { border: 1px solid #ddd; padding: 10px 12px; text-align: center; }
-        .compare-table th { background: #366092; color: #fff; white-space: nowrap; }
+        .compare-table th { background: #f28b1a; color: #fff; white-space: nowrap; }
         .compare-table th:first-child, .compare-table td:first-child { width: 200px; min-width: 200px; white-space: nowrap; }
         .compare-table .change-up { color: #28a745; }
         .compare-table .change-down { color: #dc3545; }
@@ -162,6 +165,13 @@
                     <div class="tab" data-tab="suggestion">方案建议</div>
                 </div>
                 <div id="panelOverview" class="panel active">
+                    <div class="section-main-title">
+                        <span class="txt">/ 图表趋势分析 /</span>
+                        <span class="line"></span>
+                    </div>
+                    <div class="reference-tables-note" style="font-size:12px;color:#666;margin:4px 0 18px 2px;">
+                        本系统参照中华人民共和国卫生行业标准（WS/T 423-2022）
+                    </div>
                     <div class="chart-box">
                         <div class="chart-title">身高百分位曲线图（2～7岁）</div>
                         <p class="reference-tables-note" style="font-size:12px;color:#666;margin-bottom:8px;">图中曲线为参考百分位（P3、P15、P50、P85、P97），圆点为两次测查数据。</p>
@@ -233,6 +243,10 @@
                         <div id="hwScatterChart2" class="hw-scatter-chart" style="width:100%;height:360px;display:none;margin-top:20px;"></div>
                         <div class="chart-legend" id="scatterLegend"></div>
                     </div>
+                    <div class="section-main-title" style="margin-top:6px;">
+                        <span class="txt">/ 评估标准表格 /</span>
+                        <span class="line"></span>
+                    </div>
                     <div class="chart-box" id="overviewTablesBlock">
                         <div class="eval-table-caption">表1 儿童生长水平的百分位数评价方法</div>
                         <div class="eval-table-wrap" id="collapseTable1">
@@ -264,6 +278,10 @@
                     </div>
                 </div>
                 <div id="panelSuggestion" class="panel">
+                    <div class="section-main-title">
+                        <span class="txt">/ 个性化方案建议 /</span>
+                        <span class="line"></span>
+                    </div>
                     <div class="chart-box">
                         <div class="chart-title"><i class="fa-solid fa-lightbulb"></i> 健康建议</div>
                     <div class="suggestion-box" id="suggestionBox"></div>
@@ -2258,7 +2276,7 @@
                 }
                 if (!childName && title && title.textContent && title.textContent.indexOf('·') !== -1) childName = title.textContent.split('·')[0].trim();
                 var reportDate = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
-                var coverHtml = '<div style="width:800px;min-height:1050px;background:linear-gradient(180deg,#fff9f4 0%,#fff4ea 58%,#ffecd9 100%);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:60px 20px 60px;box-sizing:border-box;position:relative;overflow:hidden;">' +
+                var coverHtml = '<div style="width:800px;height:1132px;background:linear-gradient(180deg,#fff9f4 0%,#fff4ea 58%,#ffecd9 100%);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:60px 20px 60px;box-sizing:border-box;position:relative;overflow:hidden;">' +
                     '<div style="position:absolute;left:-120px;top:640px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle at 35% 35%, rgba(255,177,113,0.35) 0%, rgba(255,177,113,0.18) 45%, rgba(255,177,113,0.02) 100%);"></div>' +
                     '<div style="position:absolute;right:-160px;bottom:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle at 35% 35%, rgba(255,153,84,0.28) 0%, rgba(255,153,84,0.12) 50%, rgba(255,153,84,0.01) 100%);"></div>' +
                     '<div style="width:100%;max-width:100%;text-align:center;">' +
@@ -2271,7 +2289,7 @@
                     '<img src="assets/logo.jpg" alt="" style="height:96px;width:auto;border-radius:12px;box-shadow:0 6px 14px rgba(233,131,42,0.18);" onerror="this.style.display=\'none\'">' +
                     '</div></div>';
                 var page0 = document.createElement('div');
-                page0.style.cssText = 'width:800px;background:#fff;';
+                page0.style.cssText = 'width:800px;height:1132px;background:#fff;overflow:hidden;';
                 page0.innerHTML = coverHtml;
                 wrapper.appendChild(page0);
 
@@ -2281,8 +2299,18 @@
                 var imgStylePolar = 'width:100%;max-width:800px;height:auto;display:block;margin:0 auto 10px auto;';
                 var imgStyleSunburst = 'width:100%;max-width:780px;height:auto;display:block;margin:0 auto 10px auto;';
                 var imgStyleScatter = 'width:100%;max-width:780px;height:auto;display:block;margin:0 auto 10px auto;';
+                var pdfChartTitleColor = '#f07a00';
+                var makePdfSectionTitle = function(text) {
+                    return '<div style="display:flex;align-items:center;gap:14px;margin:6px 0 18px 0;">' +
+                        '<span style="color:#ff7a00;font-size:28px;font-weight:700;line-height:1;white-space:nowrap;">/ ' + text + ' /</span>' +
+                        '<span style="flex:1;border-top:2px solid #f2d4b4;"></span>' +
+                        '</div>';
+                };
                 var page1Parts = [];
                 if (basicHtml) page1Parts.push('<div class="basic-info" style="margin-bottom:20px;padding:14px 18px;background:#f8fafc;border-radius:8px;border:1px solid #e8ecf0;">' + basicHtml + '</div>');
+                var stdRefNoteHtml = '<div style="font-size:12px;color:#666;margin:2px 0 18px 2px;">本系统参照中华人民共和国卫生行业标准（WS/T 423-2022）</div>';
+                page1Parts.push(stdRefNoteHtml);
+                page1Parts.push(makePdfSectionTitle('图表趋势分析'));
                 var compareTableBox = document.getElementById('compareTableBox');
                 var compareTableHtml = (compareTableBox && compareTableBox.style.display !== 'none' && compareTableBox.innerHTML) ? compareTableBox.innerHTML : '';
 
@@ -2299,7 +2327,7 @@
                 function mkChartBlock(title, imgUrl, imgStyle, extraHtml, estHeight, opts) {
                     if (!imgUrl) return null;
                     return {
-                        html: '<div style="margin-bottom:28px;page-break-inside:avoid;"><div style="margin-bottom:12px;font-size:15px;">' + title + '</div><img src="' + imgUrl + '" style="' + imgStyle + '" />' + (extraHtml || '') + '</div>',
+                        html: '<div style="margin-bottom:44px;page-break-inside:avoid;"><div style="margin-bottom:12px;font-size:15px;color:' + pdfChartTitleColor + ';font-weight:700;">' + title + '</div><img src="' + imgUrl + '" style="' + imgStyle + '" />' + (extraHtml || '') + '</div>',
                         est: estHeight || 320,
                         forceSingle: !!(opts && opts.forceSingle)
                     };
@@ -2313,7 +2341,7 @@
                         var div = document.createElement('div');
                         div.className = 'pdf-page-break';
                         div.style.cssText = chartPageStyle;
-                        div.innerHTML = current.map(function(b) { return b.html; }).join('');
+                        div.innerHTML = '<div style="min-height:860px;display:flex;flex-direction:column;justify-content:flex-start;padding-top:96px;box-sizing:border-box;">' + current.map(function(b) { return b.html; }).join('') + '</div>';
                         wrapper.appendChild(div);
                         chartPageDivs.push(div);
                         current = [];
@@ -2347,8 +2375,8 @@
                 b = mkChartBlock('体重对比（单位：kg）', chartUrls.weightUrl, imgStyleCompare, '', 300); if (b) compareBlocks.push(b);
                 b = mkChartBlock('BMI百分位曲线图（2～7岁）', chartUrls.bmiPercentileUrl, imgStylePercentile, '', 300); if (b) compareBlocks.push(b);
                 b = mkChartBlock('BMI 对比（单位：kg/m²）', chartUrls.bmiUrl, imgStyleCompare, '', 280); if (b) compareBlocks.push(b);
-                var firstPageHeight = basicHtml ? 190 : 0;
-                while (compareBlocks.length > 0 && firstPageHeight + compareBlocks[0].est <= 820) {
+                var firstPageHeight = (basicHtml ? 190 : 0) + 26 + 42;
+                while (compareBlocks.length > 0 && firstPageHeight + compareBlocks[0].est <= 920) {
                     var firstBlock = compareBlocks.shift();
                     page1Parts.push(firstBlock.html);
                     firstPageHeight += firstBlock.est;
@@ -2358,7 +2386,7 @@
                 var chartBlocks = [];
                 b = mkChartBlock('儿童生长水平评价', chartUrls.barUrl, imgStyleLevel, barLegendHtml, 330); if (b) chartBlocks.push(b);
                 if (chartUrls.polarUrl) {
-                    var levelPolarBlock = '<div style="margin-bottom:18px;font-size:15px;text-align:center;">儿童生长水平环形图（表1/表2）</div><div style="text-align:center;margin:0 -14px;"><div style="position:relative;display:inline-block;">' + ((chartUrls.levelPolarLabelsHtml || '').trim() ? '<div style="position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;font-size:12px;">' + chartUrls.levelPolarLabelsHtml + '</div>' : '') + '<img src="' + chartUrls.polarUrl + '" style="' + imgStylePolar + ';display:block;" /></div></div>';
+                    var levelPolarBlock = '<div style="margin-bottom:18px;font-size:15px;text-align:center;color:' + pdfChartTitleColor + ';font-weight:700;">儿童生长水平环形图（表1/表2）</div><div style="text-align:center;margin:0 -14px;"><div style="position:relative;display:inline-block;">' + ((chartUrls.levelPolarLabelsHtml || '').trim() ? '<div style="position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;font-size:12px;">' + chartUrls.levelPolarLabelsHtml + '</div>' : '') + '<img src="' + chartUrls.polarUrl + '" style="' + imgStylePolar + ';display:block;" /></div></div>';
                     chartBlocks.push({ html: '<div style="margin-bottom:18px;page-break-inside:avoid;">' + levelPolarBlock + '</div>', est: 410 });
                 }
                 var levelSunburstNoteHtml = '<p style="font-size:12px;color:#666;margin-bottom:8px;line-height:1.5;">内环为测查时点（本次/上次），外环为年龄别体重、年龄别身高、身高别体重、年龄别BMI；评价结果：上、中上、中、中下、下（表1 百分位数法）。</p>';
@@ -2367,7 +2395,7 @@
                 b = mkChartBlock('儿童生长水平层级图（表1 百分位数法）', chartUrls.levelSunburstUrl, imgStyleSunburstSingle, levelSunburstNoteHtml + levelSunburstLegendHtml, 620, { forceSingle: true }); if (b) chartBlocks.push(b);
                 b = mkChartBlock('营养状况对比（表3 标准差法）', chartUrls.nutritionBarUrl, imgStyleLevel, barLegendHtml, 330); if (b) chartBlocks.push(b);
                 if (chartUrls.nutritionPolarUrl) {
-                    var nutritionPolarBlock = '<div style="margin-bottom:18px;font-size:15px;text-align:center;">营养状况环形图（表3 标准差法）</div><div style="text-align:center;margin:0 -14px;"><div style="position:relative;display:inline-block;">' + ((chartUrls.nutritionPolarLabelsHtml || '').trim() ? '<div style="position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;font-size:12px;">' + chartUrls.nutritionPolarLabelsHtml + '</div>' : '') + '<img src="' + chartUrls.nutritionPolarUrl + '" style="' + imgStylePolar + ';display:block;" /></div></div>';
+                    var nutritionPolarBlock = '<div style="margin-bottom:18px;font-size:15px;text-align:center;color:' + pdfChartTitleColor + ';font-weight:700;">营养状况环形图（表3 标准差法）</div><div style="text-align:center;margin:0 -14px;"><div style="position:relative;display:inline-block;">' + ((chartUrls.nutritionPolarLabelsHtml || '').trim() ? '<div style="position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;font-size:12px;">' + chartUrls.nutritionPolarLabelsHtml + '</div>' : '') + '<img src="' + chartUrls.nutritionPolarUrl + '" style="' + imgStylePolar + ';display:block;" /></div></div>';
                     chartBlocks.push({ html: '<div style="margin-bottom:18px;page-break-inside:avoid;">' + nutritionPolarBlock + '</div>', est: 410 });
                 }
                 var sunburstNoteHtml = '<p style="font-size:12px;color:#666;margin-bottom:8px;line-height:1.5;">内环为测查时点（本次/上次），外环为四项营养指标；外层扇形颜色表示评价结果，依据表3。</p>';
@@ -2384,9 +2412,9 @@
                 page2b.className = 'pdf-page-break';
                 page2b.style.cssText = pageTablesStyle;
                 if (refTablesHtml) {
-                    page2b.innerHTML = '<div style="padding:0 0 24px 0;">' + refTablesHtml + '</div>';
+                    page2b.innerHTML = makePdfSectionTitle('评估标准表格') + '<div style="padding:0 0 24px 0;">' + refTablesHtml + '</div>';
                 } else {
-                    page2b.innerHTML = '<div style="padding:24px;">（无参考表数据）</div>';
+                    page2b.innerHTML = makePdfSectionTitle('评估标准表格') + '<div style="padding:24px;">（无参考表数据）</div>';
                 }
                 wrapper.appendChild(page2b);
 
@@ -2404,14 +2432,14 @@
                     pageCompare = document.createElement('div');
                     pageCompare.className = 'pdf-page-break';
                     pageCompare.style.cssText = pageTablesStyle;
-                    pageCompare.innerHTML = '<div style="margin-bottom:14px;font-size:16px;font-weight:bold;">两次测查对比</div><div style="padding:20px;background:#fff;border-radius:12px;border:1px solid #eee;">' + compareTableHtml + '</div>';
+                    pageCompare.innerHTML = '<div style="margin-bottom:14px;font-size:16px;font-weight:bold;color:' + pdfChartTitleColor + ';">两次测查对比</div><div style="padding:20px;background:#fff;border-radius:12px;border:1px solid #eee;">' + compareTableHtml + '</div>';
                     wrapper.appendChild(pageCompare);
                 }
 
                 var disclaimerHtml = '<div style="margin-top:40px;padding-top:20px;border-top:1px solid #eee;font-size:12px;color:#94a3b8;text-align:center;line-height:1.6;">本报告参照 WS/T 423-2022，数据分析仅供参考，不作为诊断医疗依据。如有疑问请咨询售后。</div>';
                 var pdfPageMinHeight = 1120;
                 var pdfFooterDisclaimer = '本报告参照 WS/T 423-2022，数据分析仅供参考，不作为诊断医疗依据。如有疑问请咨询售后。';
-                var suggestionBaseStyle = 'background:#f8fcff;border-left:4px solid #366092;padding:16px 20px;border-radius:0 8px 8px 0;font-size:14px;line-height:1.7;color:#333;';
+                var suggestionBaseStyle = 'background:#fff7ef;border-left:4px solid #f28b1a;padding:16px 20px;border-radius:0 8px 8px 0;font-size:14px;line-height:1.7;color:#333;';
                 var suggestionPageStyle = 'width:800px;background:#fff;padding:24px 20px 40px 20px;font-size:14px;line-height:1.7;box-sizing:border-box;';
                 var introEl = suggestionBox.querySelector('p');
                 var blockEls = suggestionBox.querySelectorAll('.dimension-block');
@@ -2420,21 +2448,21 @@
                     var page3a = document.createElement('div');
                     page3a.className = 'pdf-page-break';
                     page3a.style.cssText = suggestionPageStyle + ' page-break-before:always;';
-                    page3a.innerHTML = '<div style="margin-bottom:16px;font-size:16px;font-weight:bold;">健康建议</div>' +
+                    page3a.innerHTML = makePdfSectionTitle('个性化方案建议') + '<div style="margin-bottom:16px;font-size:16px;font-weight:bold;color:#f07a00;">健康建议</div>' +
                         '<div class="suggestion-box" style="' + suggestionBaseStyle + '">' + introEl.outerHTML + blockEls[0].outerHTML + blockEls[1].outerHTML + '</div>';
                     wrapper.appendChild(page3a);
                     suggestionPages.push(page3a);
                     var page3b = document.createElement('div');
                     page3b.className = 'pdf-page-break';
                     page3b.style.cssText = suggestionPageStyle + ' page-break-before:always;';
-                    page3b.innerHTML = '<div style="margin-bottom:16px;font-size:15px;font-weight:600;color:#366092;">方案建议（续）</div>' +
+                    page3b.innerHTML = '<div style="margin-bottom:16px;font-size:15px;font-weight:600;color:#f07a00;">方案建议（续）</div>' +
                         '<div class="suggestion-box" style="' + suggestionBaseStyle + '">' + blockEls[2].outerHTML + blockEls[3].outerHTML + '</div>';
                     wrapper.appendChild(page3b);
                     suggestionPages.push(page3b);
                     var page3c = document.createElement('div');
                     page3c.className = 'pdf-page-break';
                     page3c.style.cssText = suggestionPageStyle + ' page-break-before:always;';
-                    page3c.innerHTML = '<div style="margin-bottom:16px;font-size:15px;font-weight:600;color:#366092;">方案建议（续）</div>' +
+                    page3c.innerHTML = '<div style="margin-bottom:16px;font-size:15px;font-weight:600;color:#f07a00;">方案建议（续）</div>' +
                         '<div class="suggestion-box" style="' + suggestionBaseStyle + '">' + blockEls[4].outerHTML + '</div>';
                     wrapper.appendChild(page3c);
                     suggestionPages.push(page3c);
@@ -2444,7 +2472,7 @@
                         page3d.style.cssText = suggestionPageStyle + ' page-break-before:always;';
                         var page3dContent = '';
                         for (var bi = 5; bi < blockEls.length; bi++) page3dContent += blockEls[bi].outerHTML;
-                        page3d.innerHTML = '<div style="margin-bottom:16px;font-size:15px;font-weight:600;color:#366092;">方案建议（续）</div>' +
+                        page3d.innerHTML = '<div style="margin-bottom:16px;font-size:15px;font-weight:600;color:#f07a00;">方案建议（续）</div>' +
                             '<div class="suggestion-box" style="' + suggestionBaseStyle + '">' + page3dContent + '</div>';
                         wrapper.appendChild(page3d);
                         suggestionPages.push(page3d);
@@ -2457,11 +2485,11 @@
                     var suggestionChartBox = panelSuggestion ? panelSuggestion.querySelector('.chart-box') : null;
                     var suggestionFullHtml = suggestionChartBox ? suggestionChartBox.innerHTML : '';
                     if (suggestionFullHtml) {
-                        page3.innerHTML = '<div style="padding:0 24px 24px 24px;font-size:14px;line-height:1.7;">' + suggestionFullHtml + '</div>';
+                        page3.innerHTML = makePdfSectionTitle('个性化方案建议') + '<div style="padding:0 24px 24px 24px;font-size:14px;line-height:1.7;">' + suggestionFullHtml + '</div>';
                     } else {
                         var suggestionText = (suggestionBox.innerText || suggestionBox.textContent || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-                        page3.innerHTML = '<div style="margin-bottom:12px;font-size:16px;font-weight:bold;">方案建议</div>' +
-                            '<div style="background:#e7f3ff;border-left:4px solid #366092;padding:16px 20px;font-size:14px;line-height:1.8;">' + suggestionText + '</div>';
+                        page3.innerHTML = makePdfSectionTitle('个性化方案建议') + '<div style="margin-bottom:12px;font-size:16px;font-weight:bold;color:#f07a00;">方案建议</div>' +
+                            '<div style="background:#fff7ef;border-left:4px solid #f28b1a;padding:16px 20px;font-size:14px;line-height:1.8;">' + suggestionText + '</div>';
                     }
                     wrapper.appendChild(page3);
                     suggestionPages = [page3];
@@ -2475,16 +2503,20 @@
                     var footer = document.createElement('div');
                     footer.style.cssText = 'position:absolute;left:0;right:0;bottom:0;padding:10px 0 8px 0;text-align:center;font-size:12px;color:#94a3b8;line-height:1.6;border-top:1px solid #eee;background:#fff;';
                     var isLast = idx === contentPages.length - 1;
-                    var brandBarHtml = '<div style="margin-top:8px;padding:10px 26px;background:linear-gradient(90deg,#ff8f00 0%,#ff7a00 55%,#ff9f2d 100%);color:#fff;display:flex;align-items:center;justify-content:flex-start;gap:14px;">' +
+                    var brandBarHtml = '<div style="margin-top:8px;padding:12px 26px 14px 26px;background:linear-gradient(90deg,#ff8f00 0%,#ff7a00 55%,#ff9f2d 100%);color:#fff;">' +
+                        '<div style="display:flex;align-items:center;justify-content:flex-start;gap:14px;">' +
                         '<div style="width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;overflow:hidden;flex:0 0 46px;">' +
                         '<img src="assets/logo.jpg" alt="" style="width:40px;height:40px;object-fit:cover;border-radius:10px;" onerror="this.parentNode.innerHTML=\'<span style=&quot;font-size:22px;line-height:1;&quot;>◉</span>\';">' +
                         '</div>' +
-                        '<div style="text-align:left;">' +
+                        '<div style="text-align:left;flex:1;">' +
                         '<div style="font-size:34px;font-weight:700;letter-spacing:1px;line-height:1.1;">享智云智慧体测</div>' +
                         '<div style="font-size:12px;opacity:0.95;margin-top:4px;">专注孩子运动，赋能体教融合，为中国宝宝快乐健康成长护航</div>' +
+                        '<div style="margin-top:6px;font-size:11px;line-height:1.55;opacity:0.98;">' + pdfFooterDisclaimer + '</div>' +
                         '</div>' +
+                        '</div>' +
+                        '<div style="margin-top:4px;font-size:11px;opacity:0.98;text-align:center;">' + (idx + 1) + '页</div>' +
                         '</div>';
-                    footer.innerHTML = (isLast ? '<div style="margin-bottom:6px;">' + pdfFooterDisclaimer + '</div>' : '') + '<div style="font-size:11px;color:#888;">' + (idx + 1) + '页</div>' + (isLast ? brandBarHtml : '');
+                    footer.innerHTML = isLast ? brandBarHtml : '<div style="font-size:11px;color:#888;">' + (idx + 1) + '页</div>';
                     div.appendChild(footer);
                 });
 

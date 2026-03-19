@@ -42,6 +42,7 @@
         .section-main-title .line { flex: 1; border-top: 2px solid #f2d4b4; }
         .chart-box { background: #fff; border-radius: 12px; padding: 20px 28px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #eee; }
         .chart-title { font-size: 15px; margin-bottom: 12px; color: #f07a00; padding: 0 8px; }
+        .chart-title.below-legend { text-align: center; margin: 12px 0 0 0; padding: 0; }
         #radarChart, #barChart { width: 100%; height: 360px; }
         .basic-info { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 24px; margin-bottom: 24px; padding: 16px 20px; background: #f8fafc; border-radius: 12px; border: 1px solid #e8ecf0; font-size: 14px; }
         .basic-info .item { display: flex; gap: 8px; }
@@ -2153,6 +2154,58 @@
                 }
             }
             function initCollapseToggles() { /* 表1/表2/表3 已取消折叠，始终展开 */ }
+            function moveTitleAfter(titleEl, targetEl) {
+                if (!titleEl || !targetEl || !targetEl.parentNode) return;
+                targetEl.parentNode.insertBefore(titleEl, targetEl.nextSibling);
+                titleEl.classList.add('below-legend');
+            }
+            function applyChartTitleLayout() {
+                var chartMap = [
+                    ['heightPercentileChart', null],
+                    ['heightCompareChart', null],
+                    ['weightPercentileChart', null],
+                    ['weightCompareChart', null],
+                    ['bmiPercentileChart', null],
+                    ['bmiCompareChart', null],
+                    ['levelPieChart', null],
+                    ['hwScatterChart', 'scatterLegend']
+                ];
+                chartMap.forEach(function(pair) {
+                    var chartEl = document.getElementById(pair[0]);
+                    if (!chartEl) return;
+                    var box = chartEl.closest('.chart-box');
+                    if (!box) return;
+                    var title = box.querySelector(':scope > .chart-title');
+                    if (!title) return;
+                    var anchor = pair[1] ? document.getElementById(pair[1]) : chartEl;
+                    moveTitleAfter(title, anchor);
+                });
+                var levelBox = document.getElementById('levelBarChart');
+                if (levelBox) {
+                    var levelChartBox = levelBox.closest('.chart-box');
+                    var levelTitle = levelChartBox ? levelChartBox.querySelector(':scope > .chart-title') : null;
+                    moveTitleAfter(levelTitle, document.getElementById('levelBarLegend') || levelBox);
+                }
+                var nutritionBox = document.getElementById('nutritionBarChartPersonal');
+                if (nutritionBox) {
+                    var nutritionChartBox = nutritionBox.closest('.chart-box');
+                    var nutritionTitle = nutritionChartBox ? nutritionChartBox.querySelector(':scope > .chart-title') : null;
+                    moveTitleAfter(nutritionTitle, document.getElementById('nutritionBarLegend') || nutritionBox);
+                }
+                [
+                    ['levelSunburstWrap', 'levelSunburstChart', 'levelSunburstLegend'],
+                    ['nutritionSunburstWrap', 'nutritionSunburstChart', 'nutritionSunburstLegend']
+                ].forEach(function(cfg) {
+                    var wrap = document.getElementById(cfg[0]);
+                    if (!wrap) return;
+                    var title = wrap.querySelector(':scope > .chart-title');
+                    moveTitleAfter(title, document.getElementById(cfg[2]) || document.getElementById(cfg[1]));
+                });
+                var levelPolarWrap = document.getElementById('levelPolarWrap');
+                moveTitleAfter(levelPolarWrap ? levelPolarWrap.querySelector(':scope > .chart-title') : null, document.getElementById('levelPolarLegend') || document.getElementById('levelPolarChart'));
+                var nutritionPolarWrap = document.getElementById('nutritionPolarWrap');
+                moveTitleAfter(nutritionPolarWrap ? nutritionPolarWrap.querySelector(':scope > .chart-title') : null, document.getElementById('nutritionPolarLegend') || document.getElementById('nutritionPolarChart'));
+            }
             function initTabs() {
                 document.querySelectorAll('.tab').forEach(function(tab) {
                     tab.addEventListener('click', function() {
@@ -2327,7 +2380,7 @@
                 function mkChartBlock(title, imgUrl, imgStyle, extraHtml, estHeight, opts) {
                     if (!imgUrl) return null;
                     return {
-                        html: '<div style="margin-bottom:44px;page-break-inside:avoid;"><div style="margin-bottom:12px;font-size:15px;color:' + pdfChartTitleColor + ';font-weight:700;">' + title + '</div><img src="' + imgUrl + '" style="' + imgStyle + '" />' + (extraHtml || '') + '</div>',
+                        html: '<div style="margin-bottom:64px;page-break-inside:avoid;"><img src="' + imgUrl + '" style="' + imgStyle + '" />' + (extraHtml || '') + '<div style="margin-top:12px;font-size:15px;color:' + pdfChartTitleColor + ';font-weight:700;text-align:center;">' + title + '</div></div>',
                         est: estHeight || 320,
                         forceSingle: !!(opts && opts.forceSingle)
                     };
@@ -2341,7 +2394,7 @@
                         var div = document.createElement('div');
                         div.className = 'pdf-page-break';
                         div.style.cssText = chartPageStyle;
-                        div.innerHTML = '<div style="min-height:860px;display:flex;flex-direction:column;justify-content:flex-start;padding-top:96px;box-sizing:border-box;">' + current.map(function(b) { return b.html; }).join('') + '</div>';
+                        div.innerHTML = '<div style="min-height:860px;display:flex;flex-direction:column;justify-content:flex-start;padding-top:104px;box-sizing:border-box;">' + current.map(function(b) { return b.html; }).join('') + '</div>';
                         wrapper.appendChild(div);
                         chartPageDivs.push(div);
                         current = [];
@@ -2375,19 +2428,23 @@
                 b = mkChartBlock('体重对比（单位：kg）', chartUrls.weightUrl, imgStyleCompare, '', 300); if (b) compareBlocks.push(b);
                 b = mkChartBlock('BMI百分位曲线图（2～7岁）', chartUrls.bmiPercentileUrl, imgStylePercentile, '', 300); if (b) compareBlocks.push(b);
                 b = mkChartBlock('BMI 对比（单位：kg/m²）', chartUrls.bmiUrl, imgStyleCompare, '', 280); if (b) compareBlocks.push(b);
-                var firstPageHeight = (basicHtml ? 190 : 0) + 26 + 42;
+                var firstPageHeight = (basicHtml ? 190 : 0) + 26 + 42 + 16;
+                var firstPageChartParts = [];
                 while (compareBlocks.length > 0 && firstPageHeight + compareBlocks[0].est <= 920) {
                     var firstBlock = compareBlocks.shift();
-                    page1Parts.push(firstBlock.html);
+                    firstPageChartParts.push(firstBlock.html);
                     firstPageHeight += firstBlock.est;
+                }
+                if (firstPageChartParts.length) {
+                    page1Parts.push('<div style="margin-top:48px;">' + firstPageChartParts.join('') + '</div>');
                 }
                 page1.innerHTML = page1Parts.join('');
                 appendPackedPages(compareBlocks, 860);
                 var chartBlocks = [];
                 b = mkChartBlock('儿童生长水平评价', chartUrls.barUrl, imgStyleLevel, barLegendHtml, 330); if (b) chartBlocks.push(b);
                 if (chartUrls.polarUrl) {
-                    var levelPolarBlock = '<div style="margin-bottom:18px;font-size:15px;text-align:center;color:' + pdfChartTitleColor + ';font-weight:700;">儿童生长水平环形图（表1/表2）</div><div style="text-align:center;margin:0 -14px;"><div style="position:relative;display:inline-block;">' + ((chartUrls.levelPolarLabelsHtml || '').trim() ? '<div style="position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;font-size:12px;">' + chartUrls.levelPolarLabelsHtml + '</div>' : '') + '<img src="' + chartUrls.polarUrl + '" style="' + imgStylePolar + ';display:block;" /></div></div>';
-                    chartBlocks.push({ html: '<div style="margin-bottom:18px;page-break-inside:avoid;">' + levelPolarBlock + '</div>', est: 410 });
+                    var levelPolarBlock = '<div style="text-align:center;margin:0 -14px;"><div style="position:relative;display:inline-block;">' + ((chartUrls.levelPolarLabelsHtml || '').trim() ? '<div style="position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;font-size:12px;">' + chartUrls.levelPolarLabelsHtml + '</div>' : '') + '<img src="' + chartUrls.polarUrl + '" style="' + imgStylePolar + ';display:block;" /></div></div>' + ((chartUrls.levelPolarLegendHtml || '').trim() ? ('<div style="margin-top:10px;">' + chartUrls.levelPolarLegendHtml + '</div>') : '') + '<div style="margin-top:12px;font-size:15px;text-align:center;color:' + pdfChartTitleColor + ';font-weight:700;">儿童生长水平环形图（表1/表2）</div>';
+                    chartBlocks.push({ html: '<div style="margin-bottom:54px;page-break-inside:avoid;">' + levelPolarBlock + '</div>', est: 410 });
                 }
                 var levelSunburstNoteHtml = '<p style="font-size:12px;color:#666;margin-bottom:8px;line-height:1.5;">内环为测查时点（本次/上次），外环为年龄别体重、年龄别身高、身高别体重、年龄别BMI；评价结果：上、中上、中、中下、下（表1 百分位数法）。</p>';
                 var levelSunburstLegendHtml = '<div style="display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:10px;font-size:12px;color:#555;justify-content:center;"><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#ed7d31;"></span>上次</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#5b9bd5;"></span>本次</span><span style="color:#ddd;margin:0 2px;">|</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#dc3545;"></span>下</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#e69500;"></span>中下</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#28a745;"></span>中</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#e69500;"></span>中上</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#dc3545;"></span>上</span></div>';
@@ -2395,8 +2452,8 @@
                 b = mkChartBlock('儿童生长水平层级图（表1 百分位数法）', chartUrls.levelSunburstUrl, imgStyleSunburstSingle, levelSunburstNoteHtml + levelSunburstLegendHtml, 620, { forceSingle: true }); if (b) chartBlocks.push(b);
                 b = mkChartBlock('营养状况对比（表3 标准差法）', chartUrls.nutritionBarUrl, imgStyleLevel, barLegendHtml, 330); if (b) chartBlocks.push(b);
                 if (chartUrls.nutritionPolarUrl) {
-                    var nutritionPolarBlock = '<div style="margin-bottom:18px;font-size:15px;text-align:center;color:' + pdfChartTitleColor + ';font-weight:700;">营养状况环形图（表3 标准差法）</div><div style="text-align:center;margin:0 -14px;"><div style="position:relative;display:inline-block;">' + ((chartUrls.nutritionPolarLabelsHtml || '').trim() ? '<div style="position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;font-size:12px;">' + chartUrls.nutritionPolarLabelsHtml + '</div>' : '') + '<img src="' + chartUrls.nutritionPolarUrl + '" style="' + imgStylePolar + ';display:block;" /></div></div>';
-                    chartBlocks.push({ html: '<div style="margin-bottom:18px;page-break-inside:avoid;">' + nutritionPolarBlock + '</div>', est: 410 });
+                    var nutritionPolarBlock = '<div style="text-align:center;margin:0 -14px;"><div style="position:relative;display:inline-block;">' + ((chartUrls.nutritionPolarLabelsHtml || '').trim() ? '<div style="position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;font-size:12px;">' + chartUrls.nutritionPolarLabelsHtml + '</div>' : '') + '<img src="' + chartUrls.nutritionPolarUrl + '" style="' + imgStylePolar + ';display:block;" /></div></div>' + ((chartUrls.nutritionPolarLegendHtml || '').trim() ? ('<div style="margin-top:10px;">' + chartUrls.nutritionPolarLegendHtml + '</div>') : '') + '<div style="margin-top:12px;font-size:15px;text-align:center;color:' + pdfChartTitleColor + ';font-weight:700;">营养状况环形图（表3 标准差法）</div>';
+                    chartBlocks.push({ html: '<div style="margin-bottom:54px;page-break-inside:avoid;">' + nutritionPolarBlock + '</div>', est: 410 });
                 }
                 var sunburstNoteHtml = '<p style="font-size:12px;color:#666;margin-bottom:8px;line-height:1.5;">内环为测查时点（本次/上次），外环为四项营养指标；外层扇形颜色表示评价结果，依据表3。</p>';
                 var sunburstLegendHtml = '<div style="display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:10px;font-size:12px;color:#555;justify-content:center;"><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#ed7d31;"></span>上次</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#5b9bd5;"></span>本次</span><span style="color:#ddd;margin:0 2px;">|</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#dc3545;"></span>低体重</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#5a8fd4;"></span>生长迟缓</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#e69500;"></span>消瘦</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#28a745;"></span>—</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#17a2b8;"></span>超重</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#6f42c1;"></span>肥胖</span></div>';
@@ -2540,6 +2597,10 @@
                     if (!JsPDF) { html2pdf().set({ margin: 12, filename: filename }).from(wrapper).save().then(removeWrapper).catch(removeWrapper); return; }
                     function renderAll() {
                         var allDivs = [page0, page1].concat(chartPageDivs).concat([page2b]).concat(page2c ? [page2c] : []).concat(pageCompare ? [pageCompare] : []).concat(suggestionPages);
+                        var page1OffsetMm = 10;
+                        var chartStartPageIndex = 2;
+                        var chartEndPageIndex = chartStartPageIndex + chartPageDivs.length - 1;
+                        var chartPageOffsetMm = 20;
                         var p = Promise.resolve([]);
                         allDivs.forEach(function(div) {
                             p = p.then(function(cs) {
@@ -2553,10 +2614,10 @@
                             var imgW = w;
                             function addPageCanvas(canvas, pageIndex) {
                                 var imgH = (canvas.height * w) / canvas.width;
-                                var drawH = Math.min(imgH, h);
-                                var baseY = drawH < h ? (h - drawH) / 2 : 0;
-                                var chartPageOffset = pageIndex > 0 ? 8 : 0;
-                                var y = Math.min(Math.max(0, baseY + chartPageOffset), Math.max(0, h - drawH));
+                                var isChartPage = pageIndex >= chartStartPageIndex && pageIndex <= chartEndPageIndex;
+                                var isPage1 = pageIndex === 1;
+                                var y = isChartPage ? chartPageOffsetMm : (isPage1 ? page1OffsetMm : 0);
+                                var drawH = Math.min(imgH, h - y);
                                 pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, y, imgW, drawH);
                             }
                             canvases.forEach(function(c, i) {
@@ -2591,6 +2652,7 @@
             if (raw) {
                 try { renderReport(raw); } catch (e) { document.getElementById('noData').textContent = '报告数据解析失败。'; }
             }
+            applyChartTitleLayout();
             initTabs();
             initCollapseToggles();
             var downloadBtn = document.getElementById('downloadReportBtn');

@@ -40,7 +40,15 @@
         .indicator-card .content { flex: 1; }
         .indicator-card .name { font-size: 15px; font-weight: bold; color: #333; margin-bottom: 4px; }
         .indicator-card .values { font-size: 14px; color: #666; }
-        .suggestion-box { background: #e7f3ff; border-left: 4px solid #366092; padding: 16px 20px; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.8; color: #333; }
+        .suggestion-box { background: #f8fcff; border-left: 4px solid #366092; padding: 16px 20px; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.7; color: #333; }
+        .dimension-block { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e8ecf0; }
+        .dimension-block:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .dimension-block h5 { font-size: 15px; color: #366092; margin-bottom: 8px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .dimension-block h5 i { opacity: 0.9; }
+        .dim-analysis { background: #f0f6fc; padding: 10px 14px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; color: #444; line-height: 1.65; }
+        .dim-suggestion { padding-left: 4px; font-size: 13px; color: #333; line-height: 1.7; }
+        .dim-suggestion ul { margin: 4px 0 0 0; padding-left: 18px; }
+        .dim-suggestion li { margin-bottom: 4px; }
         .back-row { text-align: center; margin-top: 24px; }
         .back-btn { display: inline-block; padding: 10px 24px; background: #366092; color: #fff; text-decoration: none; border-radius: 8px; font-size: 14px; border: none; cursor: pointer; margin-left: 8px; }
         .back-btn:hover { background: #4a7ba7; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(54,96,146,0.35); }
@@ -52,6 +60,7 @@
         .stat-bar a { color: #366092; text-decoration: none; }
         .stat-bar a:hover { text-decoration: underline; }
         .teacher-msg { margin-top: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; font-size: 14px; color: #666; }
+        .warm-msg { text-align: center; font-style: italic; margin-top: 24px; background: #fafbfc; }
         .advice-card { background: #fff; border-radius: 10px; padding: 14px 18px; margin-bottom: 12px; border: 1px solid #eee; }
         .advice-card.highlight { border-color: #366092; background: #f8fcff; }
         .advice-card h4 { font-size: 14px; margin-bottom: 8px; color: #333; }
@@ -229,13 +238,45 @@
                 if (total === 0) return '';
                 var pGood = counts.good / total;
                 var pFail = counts.fail / total;
-                if (pGood >= 0.7) {
-                    return '本批次儿童生长状况整体良好，大部分儿童各项指标处于理想范围。建议继续保持均衡营养与适度运动：保证优质蛋白、蔬菜水果、谷物的合理搭配，规律三餐，减少高油高糖零食与含糖饮料；每天保证适量户外活动，如跑跳、球类、骑车等有氧锻炼，保持规律作息与充足睡眠。坚持定期生长发育监测即可。';
-                }
-                if (pFail >= 0.2) {
-                    return '本批次中有较多儿童存在明显生长偏离，建议组织集中健康评估，到儿保科或营养科进行专业检查。日常可先从生活方式调整：饮食保证营养均衡，不暴饮暴食、不挑食偏食，合理搭配蛋白质、主食、蔬菜，减少高油高糖食物。运动以温和、可持续为主，如快走、慢跑、跳绳、游泳等，根据孩子身体情况循序渐进。早发现、早指导、科学干预，有助于儿童健康成长。';
-                }
-                return '本批次部分儿童存在生长指标未达理想状态，可能存在偏瘦、超重、生长偏慢等情况。建议关注饮食与运动：规律三餐，保证足量优质蛋白摄入，控制油炸食品、甜品、含糖饮料；每周至少5天中等强度活动，如快走、跳绳、游泳、球类等，每天户外活动不少于1小时。可到儿保科或营养科做专业咨询，在专业指导下调整生活习惯，多数儿童能逐步回归正常生长轨迹。';
+                if (pGood >= 0.7) return '本批次儿童生长状况整体良好，大部分儿童各项指标处于理想范围。';
+                if (pFail >= 0.2) return '本批次中有较多儿童存在明显生长偏离，建议组织集中健康评估，到儿保科或营养科进行专业检查。';
+                return '本批次部分儿童存在生长指标未达理想状态，可能存在偏瘦、超重、生长偏慢等情况。可到儿保科或营养科做专业咨询，在专业指导下调整生活习惯。';
+            }
+            function getBatchSuggestionHtml(counts) {
+                var intro = getBatchSuggestion(counts);
+                if (!intro) return '';
+                var dietBlock = '<div class="dimension-block"><h5><i class="fa-solid fa-utensils"></i> 三、膳食与生长发育</h5><div class="dim-analysis"><strong>分析：</strong>合理的膳食能够为孩子提供充足的能量和营养，满足其生长发育的需求，增强免疫力，预防疾病。蛋白质是身体发育的重要物质基础：富含优质蛋白的食物如鱼虾、蛋类、奶类等，是孩子骨骼与肌肉生长的关键原料；新鲜的蔬菜和水果则能提供丰富的维生素和矿物质，促进新陈代谢，其中深色蔬菜、奶类、鱼类等还能提供骨骼发育所需的钙和维生素D。若长期营养不良或缺乏关键营养素（如钙、维生素D、优质蛋白），骨骼发育可能受限，即使遗传身高潜力较高也难以充分实现。家长在孩子的膳食营养方面起着关键作用，保证饮食多样化、搭配合理，才能为生长提供稳定支撑。</div><div class="dim-suggestion"><strong>建议：</strong><ul><li><strong>多样化与搭配：</strong>保证孩子饮食多样化，做到荤素搭配、粗细结合。每天为孩子提供谷薯类、蔬菜水果、动物性食物及奶类、大豆和坚果等四类食物中的三类及以上。</li><li><strong>优质蛋白与关键营养素：</strong>规律三餐，保证足量优质蛋白（如牛奶、鱼类、蛋类、豆类）以及钙、维生素D的摄入，深色蔬菜、适量日照也有助于维生素D的合成。</li><li><strong>控制不健康饮食：</strong>控制孩子对高盐、高糖和高脂肪食物的摄入，少喝含糖饮料，少吃高油高糖高盐零食，避免暴饮暴食或挑食偏食。</li><li><strong>培养良好习惯：</strong>鼓励孩子参与食物的选择和制作，提高他们的营养素养，建立对均衡饮食的认知。</li><li><strong>偏瘦或生长偏慢时：</strong>可适当增加总热量与优质蛋白，如早餐增加鸡蛋/牛奶/坚果，午餐主食与肉类搭配充足；必要时在儿保或营养科指导下评估是否需补充锌、钙等。</li></ul></div></div>';
+                var sportBlock = '<div class="dimension-block"><h5><i class="fa-solid fa-person-running"></i> 二、运动与生长发育</h5><div class="dim-analysis"><strong>分析：</strong>运动对儿童身高有着显著的影响。适当的运动可以促进生长激素的分泌——研究显示，运动后血液中的生长激素水平可提升至静息状态的2-4倍，尤其在夜间睡眠中仍会持续作用，对青春期前儿童效果更显著。运动还能刺激骨骼生长：跳跃、篮球、跳绳等产生纵向压力的运动，能对长骨末端的骺软骨（生长板）形成良性刺激，加速软骨细胞分裂；拉伸类运动（如瑜伽、拉伸操）可增加关节活动范围，有氧运动（如游泳、慢跑）则能增强心肺功能，为身体提供充足氧气。此外，运动可加强肌肉力量，使身体更加挺拔，改善体态。需要强调的是，运动对身高的影响主要体现在青春期前及青春期的骨骼发育阶段；身高主要由遗传和营养决定，运动更多是辅助作用。同时需注意：过度运动或不当冲击可能损伤生长板，反而抑制发育，因此要避免长期大重量举铁、马拉松等超负荷运动。</div><div class="dim-suggestion"><strong>建议：</strong><ul><li><strong>推荐运动类型：</strong>游泳、跳绳、单杠悬垂、羽毛球等全身性、非负重运动；跳跃类（跳绳、篮球）、拉伸类（拉伸操、瑜伽）、有氧类（游泳、慢跑）都适合促进生长。</li><li><strong>频率与时长：</strong>每周3-5次，每次30-60分钟；每天可进行30分钟以上的跳跃类或户外活动，刺激骨骼生长与生长激素分泌。</li><li><strong>户外与多样性：</strong>每天保证适量户外活动，多进行跑跳、球类、骑车等有氧锻炼，兼顾兴趣与可持续性。</li><li><strong>需要避免：</strong>长期大重量举铁、马拉松等超负荷运动可能压迫骨骼或损伤生长板，儿童青少年（骨骼未闭合阶段）应以中等强度、可持续的运动为主。</li><li><strong>体态与习惯：</strong>运动以温和、可持续为原则，根据孩子身体情况循序渐进，培养长期运动习惯比短期加量更重要。</li></ul></div></div>';
+                var geneBlock = '<div class="dimension-block"><h5><i class="fa-solid fa-dna"></i> 一、基因（先天）与生长发育</h5><div class="dim-analysis"><strong>分析：</strong>小儿生长发育受遗传因素影响显著，主要体现在身高、体型、成熟速度等方面。父母身高是预测儿童成年身高的关键指标，遗传公式（如父母平均身高±6.5cm）常用于估算儿童身高范围，但实际生长可能因后天环境而波动。基因通过调控生长板活性、生长激素受体敏感性等，影响骨骼纵向生长；部分遗传性疾病（如某些染色体或内分泌异常）若未及时干预，也可能导致发育迟缓。儿童达到坐、爬、走等大运动里程碑的年龄存在个体差异，其中部分与遗传相关。需要明确的是，遗传并非唯一因素：营养、睡眠、运动、情绪、疾病等都会与基因共同作用，最终影响发育结果——即使遗传身高潜力较高，若长期营养不良或缺乏关键营养素，骨骼发育可能受限；反之，通过科学的后天干预，可以在遗传潜力范围内尽量发挥生长空间。</div><div class="dim-suggestion"><strong>建议：</strong><ul><li><strong>理性看待遗传：</strong>遗传决定了大致的生长趋势和潜力范围，不必与同龄人简单对比，每个孩子有自己的节奏。</li><li><strong>后天优化空间：</strong>在遗传基础上，保证充足营养（优质蛋白、钙、维生素D）、规律睡眠、适量运动、稳定情绪，有助于孩子达到遗传潜力上限。</li><li><strong>定期监测：</strong>坚持定期监测身高、体重等指标，若持续明显偏离遗传预期或出现发育里程碑延迟，可到儿保科或专科排查是否有疾病或环境因素干扰。</li><li><strong>特殊情况：</strong>若家族中有遗传性发育相关疾病史，或孩子有特殊面容、智力与体格发育不一致等情况，建议及早专科评估。</li></ul></div></div>';
+                var sleepBlock = '<div class="dimension-block"><h5><i class="fa-solid fa-moon"></i> 四、休息（睡眠）与生长发育</h5><div class="dim-analysis"><strong>分析：</strong>睡眠与生长发育关系密切。生长激素的分泌主要在儿童睡眠时进行，约80%的生长激素在睡眠中分泌，因此儿童休息质量很大程度影响到生长发育。不同年龄对睡眠时长的需求不同：三岁之前的儿童每天休息时间建议在十三小时左右，三岁到五岁约十一个小时，十岁之前的小学生建议达到十个小时左右；且应尽量保证儿童最晚在九点多之前进入睡眠状态。若长期睡眠不足或晚睡早起，除了会影响生长激素分泌、错失骨骼生长的关键窗口期，还会对儿童的大脑智力发育、心理精神状态产生负面影响，并可能导致早上精神不佳、食欲下降，形成恶性循环；长时间休息不良还可能造成免疫力降低、记忆力下降。保证儿童睡眠的合理充足，需要依靠家长的正确管控。</div><div class="dim-suggestion"><strong>建议：</strong><ul><li><strong>保证时长与节律：</strong>按年龄保证充足睡眠（学龄前约10-11小时，学龄儿童约10小时，青春期约8-10小时），尽量固定作息，晚9点前入睡。</li><li><strong>睡前环境：</strong>睡前避免电子设备、剧烈运动或过于兴奋的活动；晚上早点结束剧烈运动，饮食上避免太刺激、难消化的食物，以便孩子在合理时间内顺利入眠。</li><li><strong>养成习惯：</strong>建立固定的睡前程序（如洗漱、阅读、熄灯时间），养成良好睡眠习惯，有利于稳定生物钟。</li><li><strong>家长示范与管控：</strong>家长可带头规律作息，并温和坚定地执行睡眠时间，避免因溺爱或疏忽导致孩子长期晚睡。</li></ul></div></div>';
+                var emotionBlock = '<div class="dimension-block"><h5><i class="fa-solid fa-face-smile"></i> 五、情绪与生长发育</h5><div class="dim-analysis"><strong>分析：</strong>情绪会从多个方面影响身高发育。生长激素是促进骨骼发育的关键物质，主要由深度睡眠时分泌；长期处于紧张、焦虑或抑郁状态时，人体会分泌过量的皮质醇（压力激素），抑制生长激素的合成与释放——研究表明，长期高压环境下生活的儿童，生长激素水平可能降低30%以上。情绪问题还常伴随入睡困难、睡眠浅等，而深度睡眠正是生长激素分泌的高峰期，若长期睡眠不足（如每晚少于7小时），可能错失骨骼生长的关键窗口期。此外，负面情绪会影响食欲和消化功能：焦虑可能引发暴饮暴食或厌食，导致营养摄入不均衡；压力还会减少肠道对钙、维生素D等骨骼必需营养的吸收率。需要澄清的是，偶尔的情绪波动不会显著影响身高，只有长期（超过3个月）的负面情绪才需警惕；且情绪对身高的影响通常在遗传潜力范围内波动，不会完全改变遗传决定的生长上限。</div><div class="dim-suggestion"><strong>建议：</strong><ul><li><strong>心理健康与支持：</strong>建立家庭支持系统，通过沟通缓解压力；培养兴趣爱好（如运动、艺术）帮助孩子释放情绪。若情绪问题持续超过2周，建议寻求心理咨询或医学帮助。</li><li><strong>作息与睡眠：</strong>保证充足睡眠（如青春期儿童每天8-10小时），固定作息时间，睡前避免电子设备刺激，有助于减少焦虑对睡眠的干扰。</li><li><strong>饮食与运动：</strong>保证蛋白质、钙、维生素D的摄入（如牛奶、鱼类、深色蔬菜）；每天30分钟以上的跳跃类运动（如篮球、跳绳）既可刺激骨骼生长，也有助于情绪宣泄。</li><li><strong>不必过度焦虑：</strong>短期情绪波动无碍身高，家长保持平和、给予陪伴与理解，往往比单纯强调"长高"更能帮助孩子稳定情绪、健康成长。</li></ul></div></div>';
+                var kindergartenManageBlock = '<div class="dimension-block">' +
+                    '<h5><i class="fa-solid fa-school"></i> 幼儿园身高体重管理</h5>' +
+                    '<div class="dim-analysis">' +
+                    '<strong>一、分层级干预策略管理</strong><br>' +
+                    '<strong>① 肥胖儿童管理</strong><br>' +
+                    '<strong>饮食调整：</strong>减少高糖高脂食物（如油炸食品、碳酸饮料），增加蔬果及优质蛋白（鱼虾、豆制品）；用餐顺序改为"先喝汤→再吃菜→后主食"，控制进食速度。<br>' +
+                    '<strong>运动处方：</strong>每日保证1小时户外活动，针对性设计跳绳、慢跑等有氧运动。<br>' +
+                    '<strong>睡眠优化：</strong>确保每日睡眠11~12小时，调整作息避免晚于22点入睡，促进生长激素分泌。<br><br>' +
+                    '<strong>② 低体重/发育迟缓儿童干预</strong><br>' +
+                    '<strong>营养强化：</strong>增加主食热量及植物油摄入，补充牛肉、牛奶等高蛋白食物；改善挑食习惯，少食多餐。<br>' +
+                    '<strong>消化促进：</strong>结合运动改善肠胃功能，如餐后轻度活动。<br><br>' +
+                    '<strong>二、建立个性化健康档案与追踪</strong><br>' +
+                    '<strong>专案管理：</strong>对异常指标儿童建立专项档案（如肥胖儿、贫血儿），每1~3个月复测数据，动态调整方案。<br>' +
+                    '<strong>跨部门协作：</strong>联合妇幼保健院开展体检，对龋齿、视力问题同步干预，形成全面健康报告。<br>' +
+                    '<strong>技术应用：</strong>可通过运动手环数据分析生活习惯（如久坐时间），制定睡眠改善计划（如睡前热牛奶、捏脊助眠）。<br><br>' +
+                    '<strong>三、家园共育机制</strong><br>' +
+                    '<strong>及时反馈：</strong>测量结果同步家长，解读发育曲线并提供居家建议（如控制电子产品使用≤1小时/天）。<br>' +
+                    '<strong>联合行动：</strong>为家长提供"健康小贴士"，如肥胖儿家庭食谱、低体重儿营养餐单，确保家园饮食标准一致。<br>' +
+                    '<strong>行为矫正：</strong>引导家长参与运动计划（如亲子徒步）、建立规律作息，避免过度代劳（如减少抱行/推车）。<br><br>' +
+                    '<strong>四、系统化培养健康习惯</strong><br>' +
+                    '<strong>融入课程：</strong>将体测、柔韧性测试纳入常规活动，提升身体机能。<br>' +
+                    '<strong>心理关怀：</strong>关注肥胖儿自卑倾向，通过团体游戏增强自信，避免心理问题加剧。<br>' +
+                    '<strong>环境创设：</strong>优化户外场地，增加攀爬、球类设施，自然促进运动量。<br><br>' +
+                    '<strong>五、总结</strong><br>' +
+                    '幼儿园身高体重管理以定期监测为基础，通过分层级干预、家园协同、个性化追踪三大核心手段，确保儿童科学发育。' +
+                    '</div></div>';
+                return '<p style="margin-bottom:16px;">' + intro + ' 以下从五个维度（基因、运动、膳食、休息、情绪）为您分析并给出建议。</p>' + geneBlock + sportBlock + dietBlock + sleepBlock + emotionBlock + kindergartenManageBlock;
             }
 
             function renderReport(raw) {
@@ -414,7 +455,7 @@
                     cardHtml += '<div class="indicator-card"><div class="icon">📊</div><div class="content"><div class="name">' + indNames[i] + '</div><div class="values">平均 Z 分：' + avg + ' · 等级分布：' + levelStr + '</div></div></div>';
                 }
                 document.getElementById('cardList').innerHTML = cardHtml;
-                document.getElementById('suggestionBox').textContent = getBatchSuggestion(counts);
+                document.getElementById('suggestionBox').innerHTML = getBatchSuggestionHtml(counts);
 
                 var failReasonCounts = { heightShort: 0, overweight: 0, underweight: 0 };
                 rows.forEach(function(row) {
@@ -426,14 +467,7 @@
                     }
                 });
                 var batchAdv = document.getElementById('batchAdviceCards');
-                if (batchAdv && counts.fail > 0) {
-                    var rc = failReasonCounts;
-                    var order = [{k:'overweight',n:'超重/肥胖'},{k:'heightShort',n:'身高偏矮'},{k:'underweight',n:'消瘦/低体重'}];
-                    order.sort(function(a,b){ return (rc[b.k]||0) - (rc[a.k]||0); });
-                    var top2 = order.slice(0,2).map(function(x){return x.k;});
-                    var hl = function(k){ return top2.indexOf(k)!==-1 ? ' advice-card highlight' : ' advice-card'; };
-                    batchAdv.innerHTML = '<div class="advice-card'+hl('underweight')+'"><h4>偏瘦宝宝专属建议</h4><ul><li>早餐增加鸡蛋/牛奶/坚果</li><li>午餐主食加倍，搭配肉类</li><li>睡前可喝一小杯酸奶</li></ul></div><div class="advice-card'+hl('overweight')+'"><h4>超重风险预警</h4><ul><li>戒掉含糖饮料，改喝白水</li><li>零食换成水果/黄瓜条</li><li>饭后散步15分钟再坐下</li></ul></div><div class="advice-card'+hl('heightShort')+'"><h4>生长偏慢怎么办？</h4><ul><li>确保每晚9点前入睡</li><li>每天晒太阳15分钟促维生素D</li><li>咨询医生是否需补锌/钙</li></ul></div>';
-                } else if (batchAdv) { batchAdv.innerHTML = ''; }
+                if (batchAdv) batchAdv.innerHTML = '';
 
                 window._batchReportData = { total: total, indNames: indNames, genderMale: genderMale, genderFemale: genderFemale, levelPieCounts: levelPieCounts, indLevelCounts: indLevelCounts };
             }

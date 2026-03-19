@@ -86,6 +86,9 @@
         .z-alert { color: #dc3545; font-weight: 500; }
         .eval-table-caption { padding: 10px 0 6px 0; font-size: 14px; font-weight: 700; color: #f07a00; }
         .eval-table-wrap { margin-bottom: 16px; }
+        #overviewTablesBlock { display: flex; flex-direction: column; justify-content: center; min-height: 70vh; }
+        .overview-tables-inner { width: 100%; }
+        #compareTableBox { display: flex; flex-direction: column; justify-content: center; min-height: 560px; }
         .suggestion-box { background: #fff7ef; border-left: 4px solid #f28b1a; padding: 16px 20px; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.7; color: #333; }
         .dimension-block { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e8ecf0; }
         .dimension-block:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
@@ -140,6 +143,9 @@
         .compare-table th:first-child, .compare-table td:first-child { width: 200px; min-width: 200px; white-space: nowrap; }
         .compare-table .change-up { color: #28a745; }
         .compare-table .change-down { color: #dc3545; }
+        .pdf-page-break table { width: 100%; border-collapse: collapse; page-break-inside: auto; }
+        .pdf-page-break tr { page-break-inside: avoid; page-break-after: auto; }
+        .pdf-page-break thead { display: table-header-group; }
         @media (max-width: 480px) { .container { border-radius: 0; } .content { padding: 16px 24px; } .chart-box, .advice-card { padding: 15px 20px; } .back-btn { padding: 12px 20px; } }
     </style>
 </head>
@@ -249,26 +255,28 @@
                         <span class="line"></span>
                     </div>
                     <div class="chart-box" id="overviewTablesBlock">
-                        <div class="eval-table-caption">表1 儿童生长水平的百分位数评价方法</div>
-                        <div class="eval-table-wrap" id="collapseTable1">
-                            <table class="eval-table" id="table1Percentile"></table>
+                        <div class="overview-tables-inner">
+                            <div class="eval-table-caption">表1 儿童生长水平的百分位数评价方法</div>
+                            <div class="eval-table-wrap" id="collapseTable1">
+                                <table class="eval-table" id="table1Percentile"></table>
+                            </div>
+                            <div class="eval-table-caption">表2 儿童生长水平的标准差评价方法</div>
+                            <div class="eval-table-wrap" id="collapseTable2">
+                                <table class="eval-table" id="table2StdLevel"></table>
+                            </div>
+                            <div class="eval-table-caption">表3 儿童营养状况的标准差评价方法</div>
+                            <div class="eval-table-wrap" id="collapseTable3">
+                                <table class="eval-table" id="table3StdNutrition"></table>
+                            </div>
+                            <p id="referenceTablesNote" class="reference-tables-note" style="display:none; font-size:12px; color:#666; margin-top:8px;"></p>
+                            <div class="chart-title" id="comprehensiveTableTitle">综合评估</div>
+                            <table class="eval-table" id="comprehensiveTable"></table>
+                            <div id="comprehensiveTablePrevWrap" style="display:none; margin-top:24px;">
+                                <div class="chart-title" id="comprehensiveTablePrevTitle">综合评估（测查日期：—）</div>
+                                <table class="eval-table" id="comprehensiveTablePrev"></table>
+                            </div>
+                            <p id="comprehensiveTableNote" class="comprehensive-note" style="display:none; font-size:12px; color:#666; margin-top:8px;"></p>
                         </div>
-                        <div class="eval-table-caption">表2 儿童生长水平的标准差评价方法</div>
-                        <div class="eval-table-wrap" id="collapseTable2">
-                            <table class="eval-table" id="table2StdLevel"></table>
-                        </div>
-                        <div class="eval-table-caption">表3 儿童营养状况的标准差评价方法</div>
-                        <div class="eval-table-wrap" id="collapseTable3">
-                            <table class="eval-table" id="table3StdNutrition"></table>
-                        </div>
-                        <p id="referenceTablesNote" class="reference-tables-note" style="display:none; font-size:12px; color:#666; margin-top:8px;"></p>
-                        <div class="chart-title" id="comprehensiveTableTitle">综合评估</div>
-                        <table class="eval-table" id="comprehensiveTable"></table>
-                        <div id="comprehensiveTablePrevWrap" style="display:none; margin-top:24px;">
-                            <div class="chart-title" id="comprehensiveTablePrevTitle">综合评估（测查日期：—）</div>
-                            <table class="eval-table" id="comprehensiveTablePrev"></table>
-                        </div>
-                        <p id="comprehensiveTableNote" class="comprehensive-note" style="display:none; font-size:12px; color:#666; margin-top:8px;"></p>
                     </div>
                     <div class="chart-box" id="compareTableBox" style="display:none;">
                         <div class="chart-title">两次测查对比</div>
@@ -817,7 +825,7 @@
                 var compareChildWrap = document.getElementById('compareChildWrap');
                 var compareTableBox = document.getElementById('compareTableBox');
                 if (compareChildWrap) compareChildWrap.style.display = 'none';
-                if (compareTableBox) compareTableBox.style.display = isComparison ? 'block' : 'none';
+                if (compareTableBox) compareTableBox.style.display = isComparison ? 'flex' : 'none';
                 if (isComparison && d1) {
                     function fmt(v) { return (v != null && v !== '' && v !== '-') ? v : '—'; }
                     function diffNum(a, b) { var x = parseFloat(a); var y = parseFloat(b); return (isNaN(x) || isNaN(y)) ? null : y - x; }
@@ -2304,14 +2312,24 @@
                 var assessmentHtml = '';
                 var refTablesHtml = '';
                 if (tablesClone) {
+                    var inner = tablesClone.querySelector('.overview-tables-inner');
+                    var iterChildren = inner ? inner.children : tablesClone.children;
                     var refTablesDiv = document.createElement('div');
                     var assessmentDiv = document.createElement('div');
                     assessmentDiv.style.cssText = 'page-break-inside:avoid;';
-                    for (var ti = 0; ti < tablesClone.children.length; ti++) {
-                        var ch = tablesClone.children[ti];
+                    for (var ti = 0; ti < iterChildren.length; ti++) {
+                        var ch = iterChildren[ti];
+                        var isCaption = ch.classList && ch.classList.contains('eval-table-caption');
+                        var isWrap = ch.classList && ch.classList.contains('eval-table-wrap');
                         if (ch.id === 'comprehensiveTableTitle' || ch.id === 'comprehensiveTable' || ch.id === 'comprehensiveTablePrevWrap') {
                             assessmentDiv.appendChild(ch.cloneNode(true));
-                        } else if (ch.id !== 'comprehensiveTableNote') {
+                        } else if (ch.id === 'comprehensiveTableNote') {
+                            // skip
+                        } else if (isCaption && ti + 1 < iterChildren.length && iterChildren[ti + 1].classList && iterChildren[ti + 1].classList.contains('eval-table-wrap')) {
+                            refTablesDiv.appendChild(ch.cloneNode(true));
+                            refTablesDiv.appendChild(iterChildren[ti + 1].cloneNode(true));
+                            ti++;
+                        } else if (!isWrap) {
                             refTablesDiv.appendChild(ch.cloneNode(true));
                         }
                     }
@@ -2464,7 +2482,36 @@
                 }
                 appendPackedPages(chartBlocks, 860);
 
-                var pageTablesStyle = 'width:800px;background:#fff;page-break-before:always;padding:24px 20px 40px 20px;line-height:1.7;font-size:14px;';
+                var pageTablesStyle = 'width:800px;background:#fff;page-break-before:always;padding:24px 20px 40px 20px;line-height:1.7;font-size:14px;display:flex;flex-direction:column;justify-content:center;';
+                var PDF_MAX_HEIGHT = 1050;
+                function splitOverlongPage(originalPage, maxHeight) {
+                    var contentWrapper = originalPage.lastElementChild;
+                    if (!contentWrapper || !contentWrapper.children || contentWrapper.children.length === 0) return [originalPage];
+                    if (originalPage.offsetHeight <= maxHeight) return [originalPage];
+                    var children = Array.from(contentWrapper.children);
+                    var heights = children.map(function(c) { return c.offsetHeight || 0; });
+                    contentWrapper.innerHTML = '';
+                    var style = originalPage.style.cssText;
+                    var className = originalPage.className;
+                    var pages = [originalPage];
+                    var currentPage = originalPage;
+                    var currentHeight = 120;
+                    for (var i = 0; i < children.length; i++) {
+                        if (currentHeight + heights[i] > maxHeight && currentPage.lastElementChild.childNodes.length > 0) {
+                            var newPage = document.createElement('div');
+                            newPage.className = className;
+                            newPage.style.cssText = style;
+                            newPage.innerHTML = '<div style="padding:0 0 24px 0;"></div>';
+                            currentPage.parentNode.insertBefore(newPage, currentPage.nextSibling);
+                            pages.push(newPage);
+                            currentPage = newPage;
+                            currentHeight = 60;
+                        }
+                        currentPage.lastElementChild.appendChild(children[i]);
+                        currentHeight += heights[i];
+                    }
+                    return pages;
+                }
                 var page2b = document.createElement('div');
                 page2b.className = 'pdf-page-break';
                 page2b.style.cssText = pageTablesStyle;
@@ -2480,9 +2527,12 @@
                     page2c = document.createElement('div');
                     page2c.className = 'pdf-page-break';
                     page2c.style.cssText = pageTablesStyle;
-                    page2c.innerHTML = '<div style="padding:0 0 24px 0;page-break-inside:avoid;">' + assessmentHtml + '</div>';
+                    page2c.innerHTML = '<div style="padding:0 0 24px 0;">' + assessmentHtml + '</div>';
                     wrapper.appendChild(page2c);
                 }
+
+                var tablePages = [page2b];
+                var assessmentPages = page2c ? [page2c] : [];
 
                 var pageCompare = null;
                 if (compareTableHtml) {
@@ -2552,7 +2602,11 @@
                     suggestionPages = [page3];
                 }
 
-                var contentPages = [page1].concat(chartPageDivs).concat([page2b]).concat(page2c ? [page2c] : []).concat(pageCompare ? [pageCompare] : []).concat(suggestionPages);
+                document.body.appendChild(wrapper);
+                tablePages = splitOverlongPage(page2b, PDF_MAX_HEIGHT);
+                assessmentPages = page2c ? splitOverlongPage(page2c, PDF_MAX_HEIGHT) : [];
+
+                var contentPages = [page1].concat(chartPageDivs).concat(tablePages).concat(assessmentPages).concat(pageCompare ? [pageCompare] : []).concat(suggestionPages);
                 contentPages.forEach(function(div, idx) {
                     div.style.position = 'relative';
                     div.style.minHeight = pdfPageMinHeight + 'px';
@@ -2577,7 +2631,6 @@
                     div.appendChild(footer);
                 });
 
-                document.body.appendChild(wrapper);
                 var name = (function() {
                     try {
                         var d = localStorage.getItem(STORAGE_KEY);
@@ -2596,7 +2649,7 @@
                     var JsPDF = window.jspdf && window.jspdf.jsPDF ? window.jspdf.jsPDF : (window.jspdf || window.JsPDF);
                     if (!JsPDF) { html2pdf().set({ margin: 12, filename: filename }).from(wrapper).save().then(removeWrapper).catch(removeWrapper); return; }
                     function renderAll() {
-                        var allDivs = [page0, page1].concat(chartPageDivs).concat([page2b]).concat(page2c ? [page2c] : []).concat(pageCompare ? [pageCompare] : []).concat(suggestionPages);
+                        var allDivs = [page0, page1].concat(chartPageDivs).concat(tablePages).concat(assessmentPages).concat(pageCompare ? [pageCompare] : []).concat(suggestionPages);
                         var page1OffsetMm = 10;
                         var chartStartPageIndex = 2;
                         var chartEndPageIndex = chartStartPageIndex + chartPageDivs.length - 1;

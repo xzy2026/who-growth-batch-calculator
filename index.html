@@ -414,8 +414,8 @@
 
             <div class="toolbar">
                 <div class="mode-selector">
-                    <button class="mode-btn active" onclick="setMode('percentile')">百分位数值</button>
-                    <button class="mode-btn" onclick="setMode('std')">标准差数值</button>
+                    <button class="mode-btn active" onclick="setMode('std')">标准差数值</button>
+                    <button class="mode-btn" onclick="setMode('percentile')">百分位数值</button>
                 </div>
                 <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display: none;" onchange="importExcel(event)">
                 <button class="btn btn-info" onclick="document.getElementById('excelFileInput').click()">导入Excel</button>
@@ -424,7 +424,8 @@
                 <button class="btn btn-success" onclick="calculateAll()">批量计算</button>
                 <button class="btn btn-secondary" onclick="exportEvaluationExcel()">导出评价表格</button>
                 <button class="btn btn-warning" onclick="exportExcel()">导出完整Excel</button>
-                <button class="btn btn-info" onclick="openBatchReport()" style="background:#6f42c1;">生成总体报告</button>
+                <button class="btn btn-info" onclick="openClassReport()" style="background:#6f42c1;">生成班级报告</button>
+                <button class="btn btn-info" onclick="openSchoolReport()" style="background:#8b5cf6;">生成园所报告</button>
                 <input type="file" id="compareFile1" accept=".xlsx,.xls" style="display:none" onchange="onCompareFile1(event)">
                 <input type="file" id="compareFile2" accept=".xlsx,.xls" style="display:none" onchange="onCompareFile2(event)">
                 <button class="btn btn-info" onclick="startComparison()" style="background:#0d9488;">两次对比</button>
@@ -481,7 +482,7 @@
     </div>
 
     <script>
-        let currentMode = 'percentile';
+        let currentMode = 'std';
         let rowCount = 0;
 
         // 数据表（完整数据，根据WS/T 423-2022标准）
@@ -1861,16 +1862,31 @@
             return { mode: currentMode, rows: list };
         }
 
-        // 打开总体报告页
-        function openBatchReport() {
+        // 打开班级报告页
+        function openClassReport() {
             const data = getBatchReportData();
             if (!data.rows || data.rows.length === 0) {
-                alert('请先添加数据并点击「批量计算」，再生成总体报告。');
+                alert('请先添加数据并点击「批量计算」，再生成班级报告。');
                 return;
             }
             try {
                 localStorage.setItem('childGrowthBatchReport', JSON.stringify(data));
                 window.open('report-summary.html', '_blank', 'noopener');
+            } catch (e) {
+                alert('无法打开报告页，请检查是否允许弹窗。');
+            }
+        }
+
+        // 打开园所报告页
+        function openSchoolReport() {
+            const data = getBatchReportData();
+            if (!data.rows || data.rows.length === 0) {
+                alert('请先添加数据并点击「批量计算」，再生成园所报告。');
+                return;
+            }
+            try {
+                localStorage.setItem('childGrowthBatchReport', JSON.stringify(data));
+                window.open('report-school.html', '_blank', 'noopener');
             } catch (e) {
                 alert('无法打开报告页，请检查是否允许弹窗。');
             }
@@ -2463,10 +2479,21 @@
 
         }
 
+        // 批量计算完成后写入 localStorage，供总体报告页读取（即使直接打开报告页也能显示）
+        function saveBatchReportToStorage() {
+            try {
+                const data = getBatchReportData();
+                if (data && data.rows && data.rows.length > 0) {
+                    localStorage.setItem('childGrowthBatchReport', JSON.stringify(data));
+                }
+            } catch (e) {}
+        }
+
         // 批量计算
         function calculateAll() {
             const rows = document.querySelectorAll('#tableBody tr');
             rows.forEach(row => calculateRow(row));
+            saveBatchReportToStorage();
             alert(`已计算 ${rows.length} 行数据！`);
         }
 
@@ -2486,6 +2513,7 @@
                 if (index < total) {
                     requestAnimationFrame(runChunk);
                 } else {
+                    saveBatchReportToStorage();
                     if (doneCallback) doneCallback(total);
                 }
             }
@@ -2563,7 +2591,7 @@
                             }
                             else if (hClean.includes('体重') && !hClean.includes('标准') && !hClean.includes('增值')) colMap.weight = index;
                             else if (hClean.includes('身高') && !hClean.includes('标准') && !hClean.includes('增值')) colMap.height = index;
-                            else if (hClean.includes('学校')) colMap.school = index;
+                            else if (hClean.includes('园所') || hClean.includes('学校')) colMap.school = index;
                             else if (hClean.includes('年级')) colMap.gradeName = index;
                             else if (hClean.includes('班级')) colMap.className = index;
                         });

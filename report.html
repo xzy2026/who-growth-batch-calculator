@@ -828,12 +828,16 @@
                 }
                 var basicInfoEl = document.getElementById('basicInfo');
                 if (basicInfoEl) {
+                    /* 双栏网格先行后列：左列 姓名·性别·出生日期，右列 园所·年级·班级 → DOM 顺序为 姓名、园所、性别、年级、出生日期、班级 */
+                    var gradeVal = (data.gradeName != null && String(data.gradeName).trim() !== '') ? String(data.gradeName).trim() : '';
+                    var classVal = (data.className != null && String(data.className).trim() !== '') ? String(data.className).trim() : '';
+                    var schoolVal = (data.school != null && String(data.school).trim() !== '') ? String(data.school).trim() : '';
                     var baseItems = '<div class="item item-name"><span class="label">姓名</span><span class="value">' + (data.name || '—') + '</span></div>';
+                    baseItems += '<div class="item"><span class="label">园所</span><span class="value"' + (schoolVal ? ' data-cover="school"' : '') + '>' + (schoolVal || '—') + '</span></div>';
                     baseItems += '<div class="item"><span class="label">性别</span><span class="value">' + (data.gender || '—') + '</span></div>';
-                    if (data.gradeName != null && String(data.gradeName).trim() !== '') baseItems += '<div class="item"><span class="label">年级</span><span class="value" data-cover="gradeName">' + (data.gradeName || '') + '</span></div>';
-                    if (data.school != null && String(data.school).trim() !== '') baseItems += '<div class="item"><span class="label">园所</span><span class="value" data-cover="school">' + (data.school || '') + '</span></div>';
-                    if (data.className != null && String(data.className).trim() !== '') baseItems += '<div class="item"><span class="label">班级</span><span class="value" data-cover="className">' + (data.className || '') + '</span></div>';
+                    baseItems += '<div class="item"><span class="label">年级</span><span class="value"' + (gradeVal ? ' data-cover="gradeName"' : '') + '>' + (gradeVal || '—') + '</span></div>';
                     baseItems += '<div class="item"><span class="label">出生日期</span><span class="value">' + (data.birthDate || '—') + '</span></div>';
+                    baseItems += '<div class="item"><span class="label">班级</span><span class="value"' + (classVal ? ' data-cover="className"' : '') + '>' + (classVal || '—') + '</span></div>';
                     if (isComparison && d1) {
                         baseItems += '<div class="item"><span class="label">本次测查日期</span><span class="value">' + (data.checkDate || '—') + '（' + (data.ageText || '—') + '）</span></div>';
                         baseItems += '<div class="item"><span class="label">上次测查日期</span><span class="value">' + (d1.checkDate || '—') + '（' + (d1.ageText || '—') + '）</span></div>';

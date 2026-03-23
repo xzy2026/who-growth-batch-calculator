@@ -90,7 +90,6 @@
         .detail-analysis-section-nut { margin-top: 12px; margin-bottom: 32px; }
         .detail-ind-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; padding: 0 8px; }
         .detail-ind-header h3 { font-size: 18px; color: #f07a00; font-weight: 700; margin: 0; }
-        .detail-ind-header .avg-z { font-size: 14px; color: #366092; font-weight: 600; }
         .detail-ind-body { display: flex; flex-direction: column; gap: 16px; align-items: stretch; margin-bottom: 8px; overflow: visible; }
         .detail-list-section-title { font-size: 13px; color: #555; font-weight: 600; margin: 18px 0 10px 4px; }
         /* 单项分析环形图：占满卡片宽度 + 足够高度，避免左右外侧标签被裁切 */
@@ -402,13 +401,35 @@
                 }
                 return String(v).trim();
             }
+            /** 班级展示/筛选键：年级+班级拼接（如 大班 + 一班 → 大班一班） */
+            function rowClassDisplayKey(row) {
+                var g = String(row.gradeName || '').trim();
+                var c = String(row.className || '').trim();
+                if (g && c) return g + c;
+                if (c) return c;
+                if (g) return g;
+                return '';
+            }
             function countDistinctClasses(rows) {
                 var seen = {};
                 rows.forEach(function(r) {
-                    var c = String(r.className || '').trim();
-                    if (c) seen[c] = true;
+                    var k = rowClassDisplayKey(r);
+                    if (k) seen[k] = true;
                 });
                 return Object.keys(seen).length;
+            }
+            /** 班级报告封面「学校」：取本班数据中的学校（多值时用顿号合并） */
+            function getSchoolDisplayFromRows(rows) {
+                if (!rows || !rows.length) return '—';
+                var seen = {};
+                rows.forEach(function(r) {
+                    var s = String((r.school !== undefined && r.school !== null) ? r.school : '').trim();
+                    if (s) seen[s] = true;
+                });
+                var arr = Object.keys(seen);
+                if (!arr.length) return '—';
+                if (arr.length === 1) return arr[0];
+                return arr.sort().join('、');
             }
             /** 测试时间：单日→单日；多日在 30 天内→区间；超过 30 天→众数（并列取最早日期） */
             function computeBatchTestTimeText(rows) {
@@ -521,10 +542,10 @@
                 };
             }
 
-            /** 班级报告：按班级过滤 */
+            /** 班级报告：按年级+班级组合过滤 */
             function filterRowsByScope(allRows, classKey) {
                 if (!classKey) return allRows.slice();
-                return allRows.filter(function(r) { return String(r.className || '').trim() === classKey; });
+                return allRows.filter(function(r) { return rowClassDisplayKey(r) === classKey; });
             }
             function readScopeFromUI() {
                 var sel = document.getElementById('classScopeSelect');
@@ -535,7 +556,42 @@
                 }
                 return { scope: 'class', classKey: classKey };
             }
-            function ensureScopeBarPopulated(data) {
+            /**
+             * 班级下拉排序：不能直接用 sort() 字符串序，否则按 Unicode 码点会变成「一、三、二、四」。
+             * 按「年级等前缀」localeCompare，再按末尾「班号」（阿拉伯数字或中文数字）递增。
+             */
+            function chineseClassNumeralToInt(s) {
+                if (!s) return 0;
+                var map = { '零': 0, '一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9 };
+                if (s.length === 1) return map[s] || 0;
+                if (s.indexOf('十') === -1) return 0;
+                if (s === '十') return 10;
+                var parts = s.split('十');
+                var head = parts[0];
+                var tail = parts[1];
+                var a = head ? map[head] : 1;
+                var b = tail ? map[tail] : 0;
+                return a * 10 + b;
+            }
+            function extractClassKeySortParts(key) {
+                var s = String(key);
+                var m = s.match(/^(.*?)(\d+)班$/);
+                if (m) return { prefix: m[1], num: parseInt(m[2], 10) };
+                m = s.match(/^(.*?)([一二三四五六七八九十]+)班$/);
+                if (m) return { prefix: m[1], num: chineseClassNumeralToInt(m[2]) };
+                return { prefix: s, num: null };
+            }
+            function compareClassDisplayKeys(a, b) {
+                var pa = extractClassKeySortParts(a);
+                var pb = extractClassKeySortParts(b);
+                var c0 = pa.prefix.localeCompare(pb.prefix, 'zh-CN');
+                if (c0 !== 0) return c0;
+                if (pa.num != null && pb.num != null && pa.num !== pb.num) return pa.num - pb.num;
+                if (pa.num != null && pb.num == null) return -1;
+                if (pa.num == null && pb.num != null) return 1;
+                return String(a).localeCompare(String(b), 'zh-CN');
+            }
+            function ensureScopeBarPopulated(data, preferredClassKey) {
                 var bar = document.getElementById('scopeBar');
                 var sel = document.getElementById('classScopeSelect');
                 if (!bar || !sel) return;
@@ -543,16 +599,23 @@
                 var classes = [];
                 var seen = {};
                 allRows.forEach(function(row) {
-                    var c = String(row.className || '').trim();
-                    if (c && !seen[c]) { seen[c] = true; classes.push(c); }
+                    var key = rowClassDisplayKey(row);
+                    if (key && !seen[key]) { seen[key] = true; classes.push(key); }
                 });
-                classes.sort();
+                classes.sort(compareClassDisplayKeys);
                 window.__classScopeList = classes;
                 sel.innerHTML = classes.map(function(c, i) {
                     var safe = String(c).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
                     return '<option value="' + i + '">' + safe + '</option>';
                 }).join('');
-                if (classes.length) sel.value = '0';
+                if (classes.length) {
+                    var pick = 0;
+                    if (preferredClassKey) {
+                        var ix = classes.indexOf(String(preferredClassKey).trim());
+                        if (ix >= 0) pick = ix;
+                    }
+                    sel.value = String(pick);
+                }
                 bar.style.display = classes.length > 0 ? 'flex' : 'none';
             }
             function bindScopeBarOnce() {
@@ -598,11 +661,11 @@
                 var mode = data.mode || 'percentile';
                 if (allRows.length === 0) return;
 
-                ensureScopeBarPopulated(data);
+                ensureScopeBarPopulated(data, scopeOpts && scopeOpts.classKey);
                 bindScopeBarOnce();
                 var classes = window.__classScopeList || [];
                 if (classes.length === 0) {
-                    alert('数据中无班级信息，请先在计算器中为数据补充班级列后再生成班级报告。');
+                    alert('数据中无年级或班级信息，请先在计算器 Excel 中补充「年级」「班级」列后再生成班级报告。');
                     return;
                 }
                 var opts = scopeOpts || readScopeFromUI();
@@ -642,7 +705,6 @@
                 // 表3 营养状况：全班合计及各指标分布
                 var nutritionPieCounts = { '重度低体重': 0, '低体重': 0, '重度生长迟缓': 0, '生长迟缓': 0, '重度消瘦': 0, '消瘦': 0, '—': 0, '超重': 0, '肥胖': 0, '重度肥胖': 0 };
                 var nutritionIndCounts = [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0]];
-                var sumZ = [0,0,0,0], countZ = [0,0,0,0];
                 var counts = { good: 0, pass: 0, fail: 0 };
                 var scatterMale = [], scatterFemale = [];
 
@@ -670,8 +732,6 @@
                         if (levelIdx < 0) levelIdx = 5;
                         levelPieCounts[level] = (levelPieCounts[level] || 0) + 1;
                         indLevelCounts[colIdx][levelIdx]++;
-                        var z = parseValueToZ(ind.value, mode);
-                        if (z !== null) { sumZ[colIdx] += z; countZ[colIdx]++; }
                         var nutIdx = nutritionIndIds.indexOf(ind.id);
                         if (nutIdx >= 0) {
                             var res = (ind.result || '').trim();
@@ -716,7 +776,7 @@
                 }).filter(Boolean);
                 if (levelPieData.length === 0) levelPieData = [{ value: 1, name: '无数据', itemStyle: { color: '#ddd' } }];
                 var levelPieChart = echarts.init(document.getElementById('levelPieChart'));
-                levelPieChart.setOption({ tooltip: { trigger: 'item', formatter: '{b}: {c} 项 ({d}%)' }, legend: { orient: 'horizontal', bottom: 16, left: 'center' }, series: [{ type: 'pie', radius: ['38%', '68%'], center: ['50%', '44%'], data: levelPieData, itemStyle: { borderColor: '#fff', borderWidth: 2 }, label: { show: true, position: 'outside', formatter: '{b}\n{c}项\n{d}%', overflow: 'breakAll', width: 90 }, labelLine: { show: true, length: 18, length2: 20 }, labelLayout: { moveOverlap: 'shiftY' } }] });
+                levelPieChart.setOption({ tooltip: { trigger: 'item', formatter: '{b}: {c} 项 ({d}%)' }, legend: { orient: 'horizontal', bottom: 16, left: 'center' }, series: [{ type: 'pie', radius: ['38%', '68%'], center: ['50%', '44%'], data: levelPieData, itemStyle: { borderColor: '#fff', borderWidth: 2 }, label: { show: true, position: 'outside', alignTo: 'edge', edgeDistance: 16, formatter: '{b}\n{c}项\n{d}%', overflow: 'breakAll', width: 90 }, labelLine: { show: true, length: 20, length2: 22, smooth: 0.1 } }] });
 
                 // 3. 各生长指标评价等级分布（分组柱状图）
                 var levelBarLegend = levelOrder.filter(function(l) { return l !== '未知' && (levelPieCounts[l] || 0) > 0; });
@@ -861,9 +921,7 @@
                 var wcChart = renderCompareBar('weightCompareBar', '体重', 'kg', cntWM > 0 ? sumWM / cntWM : null, cntWF > 0 ? sumWF / cntWF : null, stdWtM ? stdWtM.mean : 0, stdWtF ? stdWtF.mean : 0, scopeMeta.avgLegendPrefix);
                 var bcChart = renderCompareBar('bmiCompareBar', 'BMI', 'kg/m²', cntBmiM > 0 ? sumBmiM / cntBmiM : null, cntBmiF > 0 ? sumBmiF / cntBmiF : null, stdBmiRowM ? stdBmiRowM.P50 : 0, stdBmiRowF ? stdBmiRowF.P50 : 0, scopeMeta.avgLegendPrefix);
 
-                var avgZ = [];
-                for (var i = 0; i < 4; i++) avgZ.push(countZ[i] > 0 ? sumZ[i] / countZ[i] : 0);
-                renderDetailAnalysis(rows, mode, opts.scope, indIds, indNames, levelOrder, levelColors, indLevelCounts, avgZ, countZ, nutritionIndCounts, nutritionOrder, nutritionColors);
+                renderDetailAnalysis(rows, mode, opts.scope, indIds, indNames, levelOrder, levelColors, indLevelCounts, nutritionIndCounts, nutritionOrder, nutritionColors);
                 document.getElementById('suggestionBox').innerHTML = getBatchSuggestionHtml(counts);
 
                 var extras = document.getElementById('suggestionExtras');
@@ -912,12 +970,14 @@
                     classKey: opts.classKey || '',
                     allTotal: allRows.length,
                     classCount: classCount,
-                    testTimeText: testTimeText
+                    testTimeText: testTimeText,
+                    schoolDisplay: getSchoolDisplayFromRows(rows),
+                    mode: mode
                 };
                 window._extraCharts = { hpChart: hpChart, wpChart: wpChart, bpChart: bpChart, hcChart: hcChart, wcChart: wcChart, bcChart: bcChart };
             }
 
-            function renderDetailAnalysis(rows, mode, scope, indIds, indNames, levelOrder, levelColors, indLevelCounts, avgZ, countZ, nutritionIndCounts, nutritionOrder, nutritionColors) {
+            function renderDetailAnalysis(rows, mode, scope, indIds, indNames, levelOrder, levelColors, indLevelCounts, nutritionIndCounts, nutritionOrder, nutritionColors) {
                 var root = document.getElementById('detailAnalysisRoot');
                 if (!root) return;
                 if (window._detailPieChartInstances) {
@@ -988,7 +1048,6 @@
                 for (var i = 0; i < 4; i++) {
                     var indId = indIds[i];
                     var meta = CORE_INDICATOR_MEANINGS[indId] || { title: indNames[i], core: '', brief: '' };
-                    var avg = countZ[i] > 0 ? avgZ[i].toFixed(3) : '—';
                     var studentsByLevel = { '上': [], '中上': [], '中': [], '中下': [], '下': [], '未知': [] };
                     var studentsByNut = {};
                     nutritionOrder.forEach(function(n) { studentsByNut[n] = []; });
@@ -1009,7 +1068,7 @@
 
                     html += '<div class="detail-indicator-block chart-box detail-analysis-section">';
                     html += '<div class="detail-section-separator"><span class="detail-section-separator-txt">单项分析 · 「' + esc(meta.title) + '」· 表1 / 表2 生长水平（五档）</span></div>';
-                    html += '<div class="detail-ind-header"><h3>' + esc(meta.title) + '</h3><span class="avg-z">平均 Z 分：' + avg + '</span></div>';
+                    html += '<div class="detail-ind-header"><h3>' + esc(meta.title) + '</h3></div>';
                     html += '<div class="detail-ind-body"><div class="detail-pie-wrap" id="detailPie_' + indId + '"></div></div>';
                     html += '<div class="detail-meaning">';
                     html += '<div class="dm-title">含义与评价目的</div>';
@@ -1032,7 +1091,7 @@
                     html += '</div></div>';
                     html += '<div class="detail-indicator-block chart-box detail-analysis-section detail-analysis-section-nut">';
                     html += '<div class="detail-section-separator"><span class="detail-section-separator-txt">单项分析 · 「' + esc(meta.title) + '」· 表3 营养状况（标准差法）</span></div>';
-                    html += '<div class="detail-ind-header"><h3>' + esc(meta.title) + '</h3><span class="avg-z">平均 Z 分：' + avg + '</span></div>';
+                    html += '<div class="detail-ind-header"><h3>' + esc(meta.title) + '</h3></div>';
                     html += '<div class="detail-ind-body"><div class="detail-pie-wrap detail-nut-pie-wrap" id="detailNutPie_' + indId + '"></div></div>';
                     html += '<div class="detail-list-section-title">表3 营养状况名单</div>';
                     html += '<div class="detail-nut-student-lists">';
@@ -1141,21 +1200,26 @@
                     var wrapper = document.createElement('div');
                     wrapper.style.cssText = 'position:fixed;top:0;left:0;z-index:99999;width:800px;max-height:100vh;overflow:auto;font-family:Microsoft YaHei,Arial,sans-serif;font-size:14px;color:#333;background:#fff;padding:20px;box-sizing:border-box;';
 
-                    var reportDate = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+                    var reportDateOnly = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+                    function escPdf(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+                    var clsName = escPdf(d.classKey || '—');
+                    var schoolTxt = escPdf((d.schoolDisplay != null && d.schoolDisplay !== '') ? d.schoolDisplay : '—');
+                    /** PDF 封面正文区：单列居中（详细分项见第 2 页「基本信息」） */
+                    var coverDetailBlock = '<p style="font-size:28px;font-weight:600;color:#f07a00;margin:0 0 32px 0;">班级：' + clsName + '</p>' +
+                        '<p style="font-size:24px;color:#f28b1a;margin:0 0 8px 0;">学校：' + schoolTxt + '</p>' +
+                        '<p style="font-size:24px;color:#f28b1a;margin:0 0 8px 0;">学生人数：' + (d.total || 0) + ' 人</p>' +
+                        '<p style="font-size:24px;color:#f28b1a;margin:0 0 8px 0;">测试时间：' + escPdf(d.testTimeText || '—') + '</p>' +
+                        '<p style="font-size:24px;color:#f28b1a;margin:0 0 56px 0;">报告生成时间：' + escPdf(reportDateOnly) + '</p>';
                     var coverHtml = '<div style="width:800px;height:1132px;background:linear-gradient(180deg,#fff9f4 0%,#fff4ea 58%,#ffecd9 100%);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:60px 20px 60px;box-sizing:border-box;position:relative;overflow:hidden;">' +
                         '<div style="position:absolute;left:-120px;top:640px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle at 35% 35%, rgba(255,177,113,0.35) 0%, rgba(255,177,113,0.18) 45%, rgba(255,177,113,0.02) 100%);"></div>' +
                         '<div style="position:absolute;right:-160px;bottom:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle at 35% 35%, rgba(255,153,84,0.28) 0%, rgba(255,153,84,0.12) 50%, rgba(255,153,84,0.01) 100%);"></div>' +
                         '<div style="width:100%;max-width:100%;text-align:center;">' +
-                        '<h1 style="font-size:52px;font-weight:bold;color:#ff7a00;margin:0 0 36px 0;letter-spacing:2px;">生长评价总体报告</h1>' +
-                        '<h2 style="font-size:36px;font-weight:bold;color:#f28b1a;margin:0 0 24px 0;letter-spacing:1px;">享智云 · 7岁以下儿童生长标准</h2>' +
+                        '<h1 style="font-size:52px;font-weight:bold;color:#ff7a00;margin:0 0 36px 0;letter-spacing:2px;">享智云<sup style="font-size:0.45em;vertical-align:top;">®</sup>儿童健康成长</h1>' +
+                        '<h2 style="font-size:36px;font-weight:bold;color:#f28b1a;margin:0 0 16px 0;letter-spacing:1px;">身高/体重 AI数智报告书</h2>' +
+                        '<p style="font-size:32px;font-weight:bold;color:#f28b1a;margin:0 0 24px 0;letter-spacing:1px;">（班级报告）</p>' +
                         '</div>' +
-                        '<div style="width:100%;max-width:100%;text-align:center;margin-top:300px;">' +
-                        '<p style="font-size:24px;font-weight:600;color:#f07a00;margin:0 0 16px 0;">班级数：' + (d.classCount != null ? d.classCount : 0) + ' 个</p>' +
-                        '<p style="font-size:28px;font-weight:600;color:#f07a00;margin:0 0 16px 0;">学生人数：' + (d.total || 0) + ' 人</p>' +
-                        '<p style="font-size:20px;font-weight:600;color:#d97706;margin:0 0 20px 0;">测试时间：' + (d.testTimeText || '—') + '</p>' +
-                        '<p style="font-size:17px;color:#555;margin:0 0 20px 0;line-height:1.55;">' + (d.rangeLine || '') + '</p>' +
-                        '<p style="font-size:20px;color:#666;margin:0 0 8px 0;">报告生成日期：' + reportDate + '</p>' +
-                        '<p style="font-size:13px;color:#999;margin:0 0 40px 0;">（报告生成时间为导出当日；「测试时间」为测查日期汇总）</p>' +
+                        '<div style="width:100%;max-width:100%;text-align:center;margin-top:380px;">' +
+                        coverDetailBlock +
                         '<img src="assets/logo-report.jpg" alt="" style="height:96px;width:auto;border-radius:12px;box-shadow:0 6px 14px rgba(233,131,42,0.18);" onerror="this.style.display=\'none\'">' +
                         '</div></div>';
                     var page0 = document.createElement('div');
@@ -1170,19 +1234,43 @@
                     var imgStyleBar = 'width:100%;max-width:800px;height:360px;object-fit:contain;display:block;margin:0 auto 2px auto;';
                     function mkTitleBelow(t, marginTop) { var mt = (marginTop != null ? marginTop : 24) + 'px'; return '<div style="margin-top:' + mt + ';margin-bottom:0;font-size:15px;font-weight:700;color:#f07a00;text-align:center;">' + t + '</div>'; }
                     function mkImg(url, style) { return url ? '<img src="' + url + '" style="' + (style || imgStyle) + '" />' : ''; }
+                    /** 基本信息行：标签定宽 + 空一格 + 值左对齐（各列独立对齐） */
+                    function pdfKvRow(label, value, o) {
+                        o = o || {};
+                        var mb = o.mb != null ? o.mb : '6px';
+                        var fs = o.fs || '15px';
+                        var fw = o.fw ? ('font-weight:' + o.fw + ';') : '';
+                        var col = o.color || '#f28b1a';
+                        var lw = o.labelW || '9em';
+                        return '<div style="display:flex;align-items:flex-start;margin:0 0 ' + mb + ' 0;font-size:' + fs + ';color:' + col + ';' + fw + '">' +
+                            '<span style="flex:0 0 ' + lw + ';text-align:left;white-space:nowrap;">' + label + '</span>' +
+                            '<span style="flex:1;padding-left:1em;text-align:left;word-break:break-word;">' + value + '</span></div>';
+                    }
 
                     var page1 = document.createElement('div');
                     page1.style.cssText = 'width:800px;background:#fff;padding:20px 56px;box-sizing:border-box;';
                     var glPdf = d.groupLabel || '全园';
                     page1.innerHTML = '<div style="display:flex;align-items:center;gap:14px;margin:8px 0 16px 0;"><span style="color:#ff7a00;font-size:34px;font-weight:700;line-height:1;white-space:nowrap;">/ 基本信息 /</span><span style="flex:1;border-top:2px solid #f2d4b4;"></span></div>' +
-                        '<div style="background:#f7fbff;border:1px solid #d8e6f5;border-radius:12px;padding:18px 20px;margin-bottom:22px;">' +
-                        '<div style="text-align:center;margin-bottom:14px;font-size:24px;font-weight:700;color:#f07a00;">生长评价总体报告' + (d.reportTitleSuffix || '') + '</div>' +
-                        '<div style="font-size:15px;color:#555;line-height:1.95;">' +
-                        '<div style="display:flex;align-items:baseline;"><span style="display:inline-block;min-width:72px;">班级数：</span><strong style="color:#333;padding-left:2em;">' + (d.classCount != null ? d.classCount : 0) + '</strong><span style="padding-left:0.35em;">个</span></div>' +
-                        '<div style="display:flex;align-items:baseline;"><span style="display:inline-block;min-width:72px;">学生人数：</span><strong style="color:#333;padding-left:2em;">' + (d.total || 0) + '</strong><span style="padding-left:0.35em;">人</span></div>' +
-                        '<div style="display:flex;align-items:baseline;"><span style="display:inline-block;min-width:72px;">测试时间：</span><strong style="color:#d97706;padding-left:2em;">' + (d.testTimeText || '—') + '</strong></div>' +
-                        '<div style="display:flex;align-items:baseline;"><span style="display:inline-block;min-width:72px;">统计范围：</span><strong style="color:#333;padding-left:2em;">' + ((d.rangeLine || '—').replace(/^统计范围[：:]\s*/, '')) + '</strong></div>' +
-                        '</div></div>' +
+                        '<div style="background:linear-gradient(180deg,#fff9f4 0%,#fff4ea 100%);border:1px solid #f2d4b4;border-radius:12px;padding:20px 22px;margin-bottom:22px;">' +
+                        '<div style="text-align:center;margin-bottom:18px;line-height:1.45;">' +
+                        '<div style="font-size:28px;font-weight:bold;color:#ff7a00;letter-spacing:1px;">享智云<sup style="font-size:0.45em;vertical-align:top;">®</sup>儿童健康成长</div>' +
+                        '<div style="font-size:22px;font-weight:bold;color:#f28b1a;margin-top:10px;">身高/体重 AI数智报告书</div>' +
+                        '<div style="font-size:18px;font-weight:bold;color:#f28b1a;margin-top:8px;">（班级报告）</div></div>' +
+                        '<div style="font-size:15px;line-height:1.75;text-align:left;">' +
+                        '<div style="display:flex;flex-wrap:wrap;gap:16px 28px;align-items:flex-start;justify-content:space-between;">' +
+                        '<div style="flex:1;min-width:240px;text-align:left;">' +
+                        pdfKvRow('班级：', escPdf(d.classKey || '—'), { mb: '8px', fs: '16px', fw: '600', color: '#f07a00', labelW: '9em' }) +
+                        pdfKvRow('学校：', escPdf((d.schoolDisplay != null && d.schoolDisplay !== '') ? d.schoolDisplay : '—'), { labelW: '9em' }) +
+                        pdfKvRow('学生人数：', (d.total || 0) + ' 人', { labelW: '9em' }) +
+                        pdfKvRow('测试时间：', escPdf(d.testTimeText || '—'), { labelW: '9em' }) +
+                        pdfKvRow('报告生成时间：', escPdf(reportDateOnly), { mb: '0', labelW: '9em' }) +
+                        '</div>' +
+                        '<div style="flex:1;min-width:240px;text-align:left;">' +
+                        pdfKvRow('男生人数：', (d.genderMale != null ? d.genderMale : 0) + ' 人', { labelW: '7em' }) +
+                        pdfKvRow('女生人数：', (d.genderFemale != null ? d.genderFemale : 0) + ' 人', { labelW: '7em' }) +
+                        pdfKvRow('测量内容：', '身高、体重、BMI', { labelW: '7em' }) +
+                        pdfKvRow('评价指标：', '年龄别体重、年龄别身高、身高别体重、年龄别BMI', { mb: '0', labelW: '7em' }) +
+                        '</div></div></div></div>' +
                         makeSectionTitle('图表趋势分析') +
                         mkImg(genderUrl, imgStylePie) + mkTitleBelow(glPdf + '性别分布');
                     wrapper.appendChild(page1);

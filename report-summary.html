@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>生长评价总体报告 - 享智云</title>
+    <title>生长评价班级报告 - 享智云</title>
     <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
@@ -115,12 +115,12 @@
         <div class="header">
             <img src="assets/logo.jpg" alt="Logo" class="header-logo" onerror="this.style.display='none'">
             <div>
-                <h1>生长评价总体报告</h1>
+                <h1>生长评价班级报告</h1>
                 <p>享智云 · 7岁以下儿童生长标准（WS/T 423-2022）</p>
             </div>
         </div>
         <div class="content" id="reportContent">
-            <div class="no-data" id="noData">暂无总体报告数据，请从计算器页面点击「生成总体报告」。</div>
+            <div class="no-data" id="noData">暂无班级报告数据，请从计算器页面点击「生成班级报告」。</div>
             <div id="reportBody" style="display: none;">
                 <div class="report-title" id="reportTitle">—— 生长评价总体报告 ——</div>
                 <div class="stat-bar" id="statBar" style="display:none;">
@@ -131,10 +131,8 @@
                 <div class="stats-row" id="statsRow">学生人数：0 人</div>
                 <div class="stats-row" id="statsRowMeta" style="display:none;font-size:15px;color:#555;line-height:1.85;margin-top:6px;"></div>
                 <div class="scope-bar" id="scopeBar" aria-label="报告统计范围">
-                    <span style="font-weight:600;color:#366092;">报告范围</span>
-                    <label><input type="radio" name="reportScope" value="school" checked> 园所（全园）</label>
-                    <label><input type="radio" name="reportScope" value="class"> 班级</label>
-                    <select id="classScopeSelect" title="选择班级" style="display:none;padding:6px 10px;border-radius:6px;border:1px solid #bcd;min-width:200px;font-size:14px;"></select>
+                    <span style="font-weight:600;color:#366092;">选择班级</span>
+                    <select id="classScopeSelect" title="选择班级" style="padding:6px 10px;border-radius:6px;border:1px solid #bcd;min-width:200px;font-size:14px;"></select>
                     <span id="scopeHint" style="font-size:13px;color:#666;flex:1 1 100%;"></span>
                 </div>
                 <div class="tabs">
@@ -523,26 +521,19 @@
                 };
             }
 
-            /** 园所（全园）/ 班级 两版共用同一套人数占比与图表模版 */
-            function filterRowsByScope(allRows, scope, classKey) {
-                if (scope !== 'class' || !classKey) return allRows.slice();
+            /** 班级报告：按班级过滤 */
+            function filterRowsByScope(allRows, classKey) {
+                if (!classKey) return allRows.slice();
                 return allRows.filter(function(r) { return String(r.className || '').trim() === classKey; });
             }
             function readScopeFromUI() {
-                var r = document.querySelector('input[name="reportScope"]:checked');
-                var scope = (r && r.value) || 'school';
                 var sel = document.getElementById('classScopeSelect');
                 var classKey = '';
-                if (scope === 'class' && sel && window.__classScopeList && window.__classScopeList.length) {
+                if (sel && window.__classScopeList && window.__classScopeList.length) {
                     var idx = parseInt(sel.value, 10);
                     if (!isNaN(idx) && window.__classScopeList[idx] !== undefined) classKey = window.__classScopeList[idx];
                 }
-                return { scope: scope, classKey: classKey };
-            }
-            function updateClassSelectVisibility() {
-                var sel = document.getElementById('classScopeSelect');
-                var scope = (document.querySelector('input[name="reportScope"]:checked') || {}).value;
-                if (sel) sel.style.display = scope === 'class' ? 'inline-block' : 'none';
+                return { scope: 'class', classKey: classKey };
             }
             function ensureScopeBarPopulated(data) {
                 var bar = document.getElementById('scopeBar');
@@ -561,18 +552,15 @@
                     var safe = String(c).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
                     return '<option value="' + i + '">' + safe + '</option>';
                 }).join('');
-                var classRadio = document.querySelector('input[name="reportScope"][value="class"]');
-                if (classRadio) classRadio.disabled = classes.length === 0;
-                bar.style.display = 'flex';
-                updateClassSelectVisibility();
+                if (classes.length) sel.value = '0';
+                bar.style.display = classes.length > 0 ? 'flex' : 'none';
             }
             function bindScopeBarOnce() {
                 if (window.__scopeBarBound) return;
                 window.__scopeBarBound = true;
-                var bar = document.getElementById('scopeBar');
-                if (!bar) return;
-                bar.addEventListener('change', function() {
-                    updateClassSelectVisibility();
+                var sel = document.getElementById('classScopeSelect');
+                if (!sel) return;
+                sel.addEventListener('change', function() {
                     if (window._batchReportRaw) renderReport(window._batchReportRaw, readScopeFromUI());
                 });
             }
@@ -612,20 +600,22 @@
 
                 ensureScopeBarPopulated(data);
                 bindScopeBarOnce();
+                var classes = window.__classScopeList || [];
+                if (classes.length === 0) {
+                    alert('数据中无班级信息，请先在计算器中为数据补充班级列后再生成班级报告。');
+                    return;
+                }
                 var opts = scopeOpts || readScopeFromUI();
-                var rows = filterRowsByScope(allRows, opts.scope, opts.classKey);
+                var rows = filterRowsByScope(allRows, opts.classKey);
                 if (rows.length === 0) {
-                    alert('当前所选班级没有符合条件的儿童数据，已自动切换为园所（全园）统计。');
-                    var schoolRadio = document.querySelector('input[name="reportScope"][value="school"]');
-                    if (schoolRadio) schoolRadio.checked = true;
-                    updateClassSelectVisibility();
-                    rows = allRows.slice();
-                    opts = { scope: 'school', classKey: '' };
+                    alert('当前所选班级没有符合条件的儿童数据，请选择其他班级。');
+                    return;
                 }
 
                 var scopeMeta = buildScopeMeta(opts.scope, opts.classKey, allRows, rows);
                 applyScopeChartTitles(scopeMeta);
-                document.getElementById('reportTitle').textContent = '—— 生长评价总体报告' + scopeMeta.reportTitleSuffix + ' ——';
+                var titleEl = document.getElementById('reportTitle');
+                titleEl.textContent = '—— 生长评价班级报告' + scopeMeta.reportTitleSuffix + ' ——';
                 var classCount = countDistinctClasses(rows);
                 var testTimeText = computeBatchTestTimeText(rows);
                 var metaEl = document.getElementById('statsRowMeta');

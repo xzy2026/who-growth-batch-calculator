@@ -829,11 +829,11 @@
                 var basicInfoEl = document.getElementById('basicInfo');
                 if (basicInfoEl) {
                     var baseItems = '<div class="item item-name"><span class="label">姓名</span><span class="value">' + (data.name || '—') + '</span></div>';
-                    if (data.className != null && String(data.className).trim() !== '') baseItems += '<div class="item"><span class="label">班级</span><span class="value" data-cover="className">' + (data.className || '') + '</span></div>';
+                    baseItems += '<div class="item"><span class="label">性别</span><span class="value">' + (data.gender || '—') + '</span></div>';
                     if (data.gradeName != null && String(data.gradeName).trim() !== '') baseItems += '<div class="item"><span class="label">年级</span><span class="value" data-cover="gradeName">' + (data.gradeName || '') + '</span></div>';
                     if (data.school != null && String(data.school).trim() !== '') baseItems += '<div class="item"><span class="label">园所</span><span class="value" data-cover="school">' + (data.school || '') + '</span></div>';
-                    baseItems += '<div class="item"><span class="label">性别</span><span class="value">' + (data.gender || '—') + '</span></div>' +
-                        '<div class="item"><span class="label">出生日期</span><span class="value">' + (data.birthDate || '—') + '</span></div>';
+                    if (data.className != null && String(data.className).trim() !== '') baseItems += '<div class="item"><span class="label">班级</span><span class="value" data-cover="className">' + (data.className || '') + '</span></div>';
+                    baseItems += '<div class="item"><span class="label">出生日期</span><span class="value">' + (data.birthDate || '—') + '</span></div>';
                     if (isComparison && d1) {
                         baseItems += '<div class="item"><span class="label">本次测查日期</span><span class="value">' + (data.checkDate || '—') + '（' + (data.ageText || '—') + '）</span></div>';
                         baseItems += '<div class="item"><span class="label">上次测查日期</span><span class="value">' + (d1.checkDate || '—') + '（' + (d1.ageText || '—') + '）</span></div>';

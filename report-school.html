@@ -81,6 +81,15 @@
         .advice-card.highlight { border-color: #f28b1a; background: #fff7ef; }
         .advice-card h4 { font-size: 14px; margin-bottom: 8px; color: #333; }
         .advice-card ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.8; color: #555; }
+        .advice-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 16px; }
+        .suggestion-kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-top: 14px; }
+        .suggestion-kpi { background: #fff; border: 1px solid #f2d4b4; border-radius: 10px; padding: 12px 14px; }
+        .suggestion-kpi .kpi-label { font-size: 12px; color: #6b7280; margin-bottom: 6px; }
+        .suggestion-kpi .kpi-value { font-size: 20px; color: #f07a00; font-weight: 700; }
+        .action-list { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.8; color: #4b5563; }
+        .action-list li { margin-bottom: 6px; }
+        .focus-badge { display: inline-block; margin: 0 8px 8px 0; padding: 6px 12px; border-radius: 999px; background: #eef5fb; color: #35506b; font-size: 12px; }
+        .schedule-note { margin-top: 14px; padding: 12px 14px; border-radius: 8px; background: #f8fafc; color: #55606d; font-size: 13px; line-height: 1.75; }
         .detail-analysis-note { font-size: 12px; color: #666; line-height: 1.65; margin: 4px 0 20px 2px; }
         .detail-indicator-block { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #e8ecf0; overflow: visible; }
         .detail-indicator-block.chart-box { overflow: visible; padding-left: 20px; padding-right: 20px; }
@@ -90,7 +99,6 @@
         .detail-analysis-section-nut { margin-top: 12px; margin-bottom: 32px; }
         .detail-ind-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; padding: 0 8px; }
         .detail-ind-header h3 { font-size: 18px; color: #f07a00; font-weight: 700; margin: 0; }
-        .detail-ind-header .avg-z { font-size: 14px; color: #366092; font-weight: 600; }
         .detail-ind-body { display: flex; flex-direction: column; gap: 16px; align-items: stretch; margin-bottom: 8px; overflow: visible; }
         .detail-list-section-title { font-size: 13px; color: #555; font-weight: 600; margin: 18px 0 10px 4px; }
         /* 单项分析环形图：占满卡片宽度 + 足够高度，避免左右外侧标签被裁切 */
@@ -105,6 +113,20 @@
         .detail-level-block .lvl-line { font-size: 13px; line-height: 1.9; color: #333; word-break: break-all; }
         .detail-foot-block { margin-top: 28px; padding: 16px 18px; background: #fff8f0; border: 1px solid #f2d4b4; border-radius: 10px; font-size: 12px; line-height: 1.75; color: #555; }
         .detail-foot-block h4 { color: #f07a00; font-size: 14px; margin: 0 0 10px 0; }
+        .page-intro { margin: 0 0 18px 0; padding: 16px 18px; background: linear-gradient(135deg, #f8fbff 0%, #eef5fb 100%); border: 1px solid #d8e6f5; border-radius: 12px; font-size: 14px; line-height: 1.8; color: #35506b; }
+        .section-block-label { margin: 10px 0 14px 0; padding: 10px 14px; background: #f7f9fc; border-left: 4px solid #366092; border-radius: 8px; font-size: 14px; font-weight: 700; color: #366092; }
+        .mgmt-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+        .mgmt-table th, .mgmt-table td { border: 1px solid #d9e2ec; padding: 10px 12px; text-align: center; }
+        .mgmt-table th { background: #eef5fb; color: #35506b; font-weight: 700; }
+        .mgmt-table td:first-child, .mgmt-table th:first-child { text-align: left; }
+        .mgmt-note { margin-top: 12px; font-size: 13px; line-height: 1.8; color: #55606d; background: #f8fafc; border-radius: 8px; padding: 12px 14px; }
+        .risk-up { color: #c62828; font-weight: 700; }
+        .risk-mid { color: #ef6c00; font-weight: 700; }
+        .risk-low { color: #2e7d32; font-weight: 700; }
+        .focus-class-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 14px; }
+        .focus-class-card { border: 1px solid #e4ebf3; border-radius: 10px; background: #fbfdff; padding: 14px 16px; }
+        .focus-class-card h4 { margin: 0 0 8px 0; font-size: 15px; color: #35506b; }
+        .focus-class-card p { margin: 4px 0; font-size: 13px; color: #4b5563; line-height: 1.7; }
         @media (max-width: 480px) { .container { border-radius: 0; } .content { padding: 16px; } .stat-bar { flex-direction: column; } .detail-indicator-block.chart-box { padding-left: 12px; padding-right: 12px; } .detail-pie-wrap { height: 420px; min-height: 360px; margin: 0 auto; } }
         .no-data { text-align: center; padding: 40px 20px; color: #999; }
         .footer { padding: 16px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #eee; }
@@ -115,14 +137,14 @@
         <div class="header">
             <img src="assets/logo.jpg" alt="Logo" class="header-logo" onerror="this.style.display='none'">
             <div>
-                <h1>生长评价园所报告</h1>
+                <h1>园所健康成长报告</h1>
                 <p>享智云 · 7岁以下儿童生长标准（WS/T 423-2022）</p>
             </div>
         </div>
         <div class="content" id="reportContent">
             <div class="no-data" id="noData">暂无园所报告数据，请从计算器页面点击「生成园所报告」。</div>
             <div id="reportBody" style="display: none;">
-                <div class="report-title" id="reportTitle">—— 生长评价园所报告（全园）——</div>
+                <div class="report-title" id="reportTitle">—— 园所健康成长报告（全园）——</div>
                 <div class="stat-bar" id="statBar" style="display:none;">
                     <div class="item">总人数 <span class="num" id="statTotal">0</span> 人</div>
                     <div class="item">男生 <span class="num" id="statMale">0</span> 人</div>
@@ -131,85 +153,92 @@
                 <div class="stats-row" id="statsRow">学生人数：0 人</div>
                 <div class="stats-row" id="statsRowMeta" style="display:none;font-size:15px;color:#555;line-height:1.85;margin-top:6px;"></div>
                 <div class="tabs">
-                    <div class="tab active" data-tab="overview">概况分析</div>
-                    <div class="tab" data-tab="detail">单项分析</div>
-                    <div class="tab" data-tab="suggestion">方案建议</div>
+                    <div class="tab active" data-tab="overview">园所概览</div>
+                    <div class="tab" data-tab="detail">班级与重点指标</div>
+                    <div class="tab" data-tab="suggestion">管理建议</div>
                 </div>
                 <div id="panelOverview" class="panel active">
-                    <div class="section-main-title"><span class="txt">/ 图表趋势分析 /</span><span class="line"></span></div>
+                    <div class="section-main-title"><span class="txt">/ 园所概览 /</span><span class="line"></span></div>
+                    <div class="page-intro">本页面面向园长、保健老师和班主任。建议优先阅读“总体风险”和“园所平均与标准”，快速判断全园情况；散点与百分位叠加图作为补充参考，不作为首页首要判断依据。</div>
                     <div class="reference-tables-note" style="font-size:12px;color:#666;margin:4px 0 18px 2px;">本系统参照中华人民共和国卫生行业标准（WS/T 423-2022）</div>
+                    <div class="section-block-label">园所概览</div>
                     <div class="chart-box">
-                        <div class="chart-title" id="chartTitleGender">全园性别分布</div>
+                        <div class="chart-title" id="chartTitleGender">儿童结构概览：性别分布</div>
                         <div id="genderPieChart"></div>
                     </div>
+                    <div class="section-block-label">总体风险</div>
                     <div class="chart-box">
-                        <div class="chart-title" id="chartTitleLevelPie">全园生长指标评价结果分布</div>
+                        <div class="chart-title" id="chartTitleLevelPie">总体生长水平分布</div>
                         <p class="chart-subtitle">（基于年龄别体重、年龄别身高、身高别体重、年龄别BMI）</p>
                         <div id="levelPieChart"></div>
                     </div>
                     <div class="chart-box">
-                        <div class="chart-title">各生长指标评价等级分布</div>
+                        <div class="chart-title">四项核心指标等级分布</div>
                         <div id="levelBarChart"></div>
                         <div class="chart-legend" id="levelBarLegend"></div>
                     </div>
                     <div class="chart-box">
-                        <div class="chart-title" id="chartTitleNutritionPie">全园儿童营养状况分布（表3 标准差评价方法）</div>
+                        <div class="chart-title" id="chartTitleNutritionPie">总体营养风险分布（表3 标准差评价方法）</div>
                         <p class="chart-subtitle">（基于年龄别体重、年龄别身高、身高别体重、年龄别BMI）</p>
                         <div id="nutritionPieChart"></div>
                     </div>
                     <div class="chart-box">
-                        <div class="chart-title">各指标营养状况分布</div>
+                        <div class="chart-title">四项核心指标营养风险分布</div>
                         <div id="nutritionBarChart"></div>
                     </div>
+                    <div class="section-block-label">园所平均与标准</div>
                     <div class="chart-box">
-                        <div class="chart-title">身高与体重关系散点图</div>
+                        <div class="chart-title" id="chartTitleHeightCmp">园所平均身高 vs 参考标准</div>
+                        <div id="heightCompareBar" class="compare-bar-chart"></div>
+                    </div>
+                    <div class="chart-box">
+                        <div class="chart-title" id="chartTitleWeightCmp">园所平均体重 vs 参考标准</div>
+                        <div id="weightCompareBar" class="compare-bar-chart"></div>
+                    </div>
+                    <div class="chart-box">
+                        <div class="chart-title" id="chartTitleBmiCmp">园所平均 BMI vs 参考标准</div>
+                        <div id="bmiCompareBar" class="compare-bar-chart"></div>
+                    </div>
+                    <div class="section-block-label">补充参考</div>
+                    <div class="page-intro" style="margin-top:0;">以下图表用于补充观察儿童群体分布和个体落点，适合保健老师深入查看，不建议作为园长首页决策的第一阅读层。</div>
+                    <div class="chart-box">
+                        <div class="chart-title">群体分布观察：身高与体重关系</div>
                         <div id="heightWeightScatterChart"></div>
                         <div class="chart-legend" id="scatterLegend">
                             <span class="legend-item"><span class="legend-dot" style="background:#5b9bd5;"></span> 男</span>
                             <span class="legend-item"><span class="legend-dot" style="background:#70ad47;"></span> 女</span>
                         </div>
                     </div>
+                    <div class="section-block-label">标准对照</div>
                     <div class="chart-box">
-                        <div class="chart-title" id="chartTitleHeightPct">身高百分位曲线图（2～7岁）— 全园叠加</div>
+                        <div class="chart-title" id="chartTitleHeightPct">群体轨迹参考：身高百分位叠加</div>
                         <p class="chart-subtitle" id="chartSubHeightPct">曲线为参考百分位（P3、P15、P50、P85、P97），圆点为每位儿童实测值。</p>
                         <div id="heightPercentileChart" class="percentile-chart"></div>
                     </div>
                     <div class="chart-box">
-                        <div class="chart-title" id="chartTitleWeightPct">体重百分位曲线图（2～7岁）— 全园叠加</div>
+                        <div class="chart-title" id="chartTitleWeightPct">群体轨迹参考：体重百分位叠加</div>
                         <p class="chart-subtitle" id="chartSubWeightPct">曲线为参考百分位（P3、P15、P50、P85、P97），圆点为每位儿童实测值。</p>
                         <div id="weightPercentileChart" class="percentile-chart"></div>
                     </div>
                     <div class="chart-box">
-                        <div class="chart-title" id="chartTitleBmiPct">BMI百分位曲线图（2～7岁）— 全园叠加</div>
+                        <div class="chart-title" id="chartTitleBmiPct">群体轨迹参考：BMI百分位叠加</div>
                         <p class="chart-subtitle" id="chartSubBmiPct">曲线为参考百分位（P3、P15、P50、P85、P97），圆点为每位儿童实测值。</p>
                         <div id="bmiPercentileChart" class="percentile-chart"></div>
                     </div>
-                    <div class="chart-box">
-                        <div class="chart-title" id="chartTitleHeightCmp">全园平均身高 vs 标准值对比</div>
-                        <div id="heightCompareBar" class="compare-bar-chart"></div>
-                    </div>
-                    <div class="chart-box">
-                        <div class="chart-title" id="chartTitleWeightCmp">全园平均体重 vs 标准值对比</div>
-                        <div id="weightCompareBar" class="compare-bar-chart"></div>
-                    </div>
-                    <div class="chart-box">
-                        <div class="chart-title" id="chartTitleBmiCmp">全园平均 BMI vs 标准值对比</div>
-                        <div id="bmiCompareBar" class="compare-bar-chart"></div>
-                    </div>
                 </div>
                 <div id="panelDetail" class="panel">
-                    <div class="section-main-title"><span class="txt">/ 单项分析 /</span><span class="line"></span></div>
-                    <p class="detail-analysis-note">以下按指标分两块展示：<strong>表1/表2</strong> 生长水平五档与 <strong>表3</strong> 营养状况各占独立卡片，并带分隔标题。名单：园所为<strong>姓名</strong>与<strong>年级·班级</strong>；班级为<strong>姓名</strong>与<strong>性别</strong>。下载 PDF 时单项分析页按「五档 → 表3」交替顺序逐块排版。</p>
+                    <div class="section-main-title"><span class="txt">/ 班级与重点指标 /</span><span class="line"></span></div>
+                    <p class="detail-analysis-note">本页保留按指标拆解的分析内容，作为园所管理的第二层阅读。建议优先关注异常儿童集中度、重点班级名单以及四项核心指标中的结构性偏差，而不是按个人报告方式逐个阅读。</p>
                     <div id="detailAnalysisRoot"></div>
                 </div>
                 <div id="panelSuggestion" class="panel">
-                    <div class="section-main-title"><span class="txt">/ 个性化方案建议 /</span><span class="line"></span></div>
+                    <div class="section-main-title"><span class="txt">/ 园所管理建议 /</span><span class="line"></span></div>
                     <div class="chart-box">
-                        <div class="chart-title"><i class="fa-solid fa-lightbulb"></i> 健康建议</div>
+                        <div class="chart-title"><i class="fa-solid fa-lightbulb"></i> 管理建议</div>
                         <div class="suggestion-box" id="suggestionBox"></div>
                         <div id="batchAdviceCards" style="margin-top:16px;"></div>
                         <div id="suggestionExtras"></div>
-                        <p class="teacher-msg"><i class="fa-solid fa-chalkboard-teacher"></i> 老师提示：多数孩子通过调整生活习惯都能回归正常轨迹，请放心！</p>
+                        <p class="teacher-msg"><i class="fa-solid fa-chalkboard-teacher"></i> 管理提示：本页建议优先服务园长、保健老师和班主任的复测安排、重点班级跟进和家园沟通。</p>
                     </div>
                 </div>
                 <div class="back-row">
@@ -357,6 +386,99 @@
                     '幼儿园身高体重管理以定期监测为基础，通过分层级干预、家园协同、个性化追踪三大核心手段，确保儿童科学发育。' +
                     '</div></div>';
                 return '<p style="margin-bottom:16px;">' + intro + ' 以下从五个维度（基因、运动、膳食、休息、情绪）为您分析并给出建议。</p>' + geneBlock + sportBlock + dietBlock + sleepBlock + emotionBlock + kindergartenManageBlock;
+            }
+
+            function buildSchoolSuggestion(rows, counts, classCount, testTimeText, mode) {
+                function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+                function classKey(row) {
+                    var grade = (row.gradeName || '').trim();
+                    var cls = (row.className || '').trim();
+                    return [grade, cls].filter(Boolean).join('·') || '未分班';
+                }
+                var grouped = {};
+                rows.forEach(function(row) {
+                    var key = classKey(row);
+                    if (!grouped[key]) grouped[key] = { name: key, total: 0, growthWarn: 0, nutritionWarn: 0, focus: 0 };
+                    var item = grouped[key];
+                    item.total++;
+                    var growthFlag = false;
+                    var nutritionFlag = false;
+                    (row.indicators || []).forEach(function(ind) {
+                        var value = (ind.value || '').trim();
+                        var level = getGrowthLevelFromValue(value, mode || 'percentile');
+                        var result = (ind.result || '').trim();
+                        if (level === '下' || level === '中下') growthFlag = true;
+                        if (result && result !== '-' && result !== '—' && result !== '正常' && result !== '中') nutritionFlag = true;
+                    });
+                    if (growthFlag) item.growthWarn++;
+                    if (nutritionFlag) item.nutritionWarn++;
+                    if (growthFlag || nutritionFlag) item.focus++;
+                });
+                var classRows = Object.keys(grouped).map(function(key) {
+                    var item = grouped[key];
+                    item.growthRate = item.total ? item.growthWarn / item.total * 100 : 0;
+                    item.nutritionRate = item.total ? item.nutritionWarn / item.total * 100 : 0;
+                    item.riskScore = Math.round(item.growthRate * 0.6 + item.nutritionRate * 0.4 + item.focus);
+                    return item;
+                }).sort(function(a, b) { return b.riskScore - a.riskScore; });
+
+                var topClasses = classRows.slice(0, 3);
+                var abnormalRate = rows.length ? ((counts.fail + counts.pass) / rows.length * 100) : 0;
+                var severeRate = rows.length ? (counts.fail / rows.length * 100) : 0;
+                var focusClassCount = classRows.filter(function(item) { return item.riskScore >= 10; }).length;
+                var intro = getBatchSuggestion(counts) || '本次园所测评结果可用于识别整体风险分布、重点班级和后续复测安排。';
+
+                var summaryHtml = '<p style="margin-bottom:12px;">' + intro + '</p>' +
+                    '<p>本页将测评结果转换成园所可以执行的动作，重点回答“哪些班先跟进、哪些儿童先复测、哪些信息先与家长沟通”。</p>' +
+                    '<div class="suggestion-kpi-row">' +
+                    '<div class="suggestion-kpi"><div class="kpi-label">班级总数</div><div class="kpi-value">' + classCount + '</div></div>' +
+                    '<div class="suggestion-kpi"><div class="kpi-label">异常检出率</div><div class="kpi-value">' + abnormalRate.toFixed(1) + '%</div></div>' +
+                    '<div class="suggestion-kpi"><div class="kpi-label">重点班级数</div><div class="kpi-value">' + focusClassCount + '</div></div>' +
+                    '<div class="suggestion-kpi"><div class="kpi-label">优先跟进比例</div><div class="kpi-value">' + severeRate.toFixed(1) + '%</div></div>' +
+                    '</div>';
+
+                var schoolActions = [
+                    '将风险排名靠前的班级纳入本月重点观察，优先安排保健老师复核测量数据。',
+                    '按园级口径建立异常指标台账，避免把园所报告再次拆回个人报告。',
+                    '下一轮测评前先统一老师录入口径，重点检查班级、月龄和复测日期字段。'
+                ];
+                var classActions = topClasses.length ? topClasses.map(function(item) {
+                    return esc(item.name) + '：生长异常率 ' + item.growthRate.toFixed(1) + '%，营养风险率 ' + item.nutritionRate.toFixed(1) + '%，建议班主任与保健老师联合跟进。';
+                }) : ['当前无重点班级。'];
+                var parentActions = [
+                    '家园沟通优先围绕低体重、消瘦、超重、肥胖四类风险，不做过长的原理解释。',
+                    '给重点班级家长输出统一通知，明确复测时间、家庭饮食配合和作息观察要求。',
+                    '对连续两次异常儿童保留沟通记录，必要时建议儿保或营养门诊进一步评估。'
+                ];
+                var followupActions = [
+                    '建议 2 至 4 周内完成重点儿童复测，并核实身高、体重和月龄记录。',
+                    '下次全园测评前先完成未测儿童补测，避免整体结论受样本缺失影响。',
+                    '当前统计时间：' + esc(testTimeText || '本批次测量') + '，后续建议保持相近时间窗口便于横向对比。'
+                ];
+                function makeCard(title, list, highlight) {
+                    var items = list.map(function(text) { return '<li>' + text + '</li>'; }).join('');
+                    return '<div class="advice-card' + (highlight ? ' highlight' : '') + '"><h4>' + title + '</h4><ul class="action-list">' + items + '</ul></div>';
+                }
+                var cardsHtml = '<div class="advice-grid">' +
+                    makeCard('园级管理建议', schoolActions, true) +
+                    makeCard('班级跟进建议', classActions, false) +
+                    makeCard('家园沟通建议', parentActions, false) +
+                    makeCard('后续测评安排', followupActions, false) +
+                    '</div>';
+
+                var focusBadges = topClasses.map(function(item) {
+                    return '<span class="focus-badge">' + esc(item.name) + ' · 风险分 ' + item.riskScore + '</span>';
+                }).join('');
+                if (!focusBadges) focusBadges = '<span class="focus-badge">当前无重点班级</span>';
+                var extrasHtml = '<div class="related-training-wrap"><div class="chart-title">重点班级</div><div>' + focusBadges + '</div></div>' +
+                    '<div class="schedule-note">执行顺序建议：先核对数据质量，再做重点班级复测，最后输出家园沟通清单。这样园所报告才会和个人报告、班级报告形成分层闭环。</div>';
+
+                return {
+                    summaryHtml: summaryHtml,
+                    cardsHtml: cardsHtml,
+                    extrasHtml: extrasHtml,
+                    teacherText: '管理提示：本页优先服务园长、保健老师和班主任的班级跟进、复测安排与家园沟通。'
+                };
             }
 
             var Z_FOR_P = { P3: -1.88, P15: -1.04, P50: 0, P85: 1.04, P97: 1.88 };
@@ -520,7 +642,7 @@
             function buildScopeMeta(allRows, filteredRows) {
                 return {
                     groupLabel: '全园',
-                    avgLegendPrefix: '全园平均',
+                    avgLegendPrefix: '园所平均',
                     rangeLine: '统计范围：园所全园',
                     reportTitleSuffix: '（全园）'
                 };
@@ -529,15 +651,15 @@
                 var gl = meta.groupLabel;
                 var avgP = meta.avgLegendPrefix;
                 function setText(id, text) { var el = document.getElementById(id); if (el) el.textContent = text; }
-                setText('chartTitleGender', gl + '性别分布');
-                setText('chartTitleLevelPie', gl + '生长指标评价结果分布');
-                setText('chartTitleNutritionPie', gl + '儿童营养状况分布（表3 标准差评价方法）');
-                setText('chartTitleHeightPct', '身高百分位曲线图（2～7岁）— ' + gl + '叠加');
-                setText('chartTitleWeightPct', '体重百分位曲线图（2～7岁）— ' + gl + '叠加');
-                setText('chartTitleBmiPct', 'BMI百分位曲线图（2～7岁）— ' + gl + '叠加');
-                setText('chartTitleHeightCmp', avgP + '身高 vs 标准值对比');
-                setText('chartTitleWeightCmp', avgP + '体重 vs 标准值对比');
-                setText('chartTitleBmiCmp', avgP + 'BMI vs 标准值对比');
+                setText('chartTitleGender', '儿童结构概览：' + gl + '性别分布');
+                setText('chartTitleLevelPie', gl + '总体生长水平分布');
+                setText('chartTitleNutritionPie', gl + '总体营养风险分布（表3 标准差评价方法）');
+                setText('chartTitleHeightPct', '群体轨迹参考：身高百分位叠加');
+                setText('chartTitleWeightPct', '群体轨迹参考：体重百分位叠加');
+                setText('chartTitleBmiPct', '群体轨迹参考：BMI百分位叠加');
+                setText('chartTitleHeightCmp', avgP + '身高 vs 参考标准');
+                setText('chartTitleWeightCmp', avgP + '体重 vs 参考标准');
+                setText('chartTitleBmiCmp', avgP + 'BMI vs 参考标准');
             }
 
             function renderReport(raw) {
@@ -552,7 +674,7 @@
                 var scopeMeta = buildScopeMeta(allRows, rows);
                 applyScopeChartTitles(scopeMeta);
                 var titleEl = document.getElementById('reportTitle');
-                titleEl.textContent = '—— 生长评价园所报告（全园）——';
+                titleEl.textContent = '—— 园所健康成长报告（全园）——';
                 var classCount = countDistinctClasses(rows);
                 var testTimeText = computeBatchTestTimeText(rows);
                 var metaEl = document.getElementById('statsRowMeta');
@@ -579,7 +701,6 @@
                 // 表3 营养状况：全班合计及各指标分布
                 var nutritionPieCounts = { '重度低体重': 0, '低体重': 0, '重度生长迟缓': 0, '生长迟缓': 0, '重度消瘦': 0, '消瘦': 0, '—': 0, '超重': 0, '肥胖': 0, '重度肥胖': 0 };
                 var nutritionIndCounts = [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0]];
-                var sumZ = [0,0,0,0], countZ = [0,0,0,0];
                 var counts = { good: 0, pass: 0, fail: 0 };
                 var scatterMale = [], scatterFemale = [];
 
@@ -607,8 +728,6 @@
                         if (levelIdx < 0) levelIdx = 5;
                         levelPieCounts[level] = (levelPieCounts[level] || 0) + 1;
                         indLevelCounts[colIdx][levelIdx]++;
-                        var z = parseValueToZ(ind.value, mode);
-                        if (z !== null) { sumZ[colIdx] += z; countZ[colIdx]++; }
                         var nutIdx = nutritionIndIds.indexOf(ind.id);
                         if (nutIdx >= 0) {
                             var res = (ind.result || '').trim();
@@ -653,7 +772,7 @@
                 }).filter(Boolean);
                 if (levelPieData.length === 0) levelPieData = [{ value: 1, name: '无数据', itemStyle: { color: '#ddd' } }];
                 var levelPieChart = echarts.init(document.getElementById('levelPieChart'));
-                levelPieChart.setOption({ tooltip: { trigger: 'item', formatter: '{b}: {c} 项 ({d}%)' }, legend: { orient: 'horizontal', bottom: 16, left: 'center' }, series: [{ type: 'pie', radius: ['38%', '68%'], center: ['50%', '44%'], data: levelPieData, itemStyle: { borderColor: '#fff', borderWidth: 2 }, label: { show: true, position: 'outside', formatter: '{b}\n{c}项\n{d}%', overflow: 'breakAll', width: 90 }, labelLine: { show: true, length: 18, length2: 20 }, labelLayout: { moveOverlap: 'shiftY' } }] });
+                levelPieChart.setOption({ tooltip: { trigger: 'item', formatter: '{b}: {c} 项 ({d}%)' }, legend: { orient: 'horizontal', bottom: 16, left: 'center' }, series: [{ type: 'pie', radius: ['38%', '68%'], center: ['50%', '44%'], data: levelPieData, itemStyle: { borderColor: '#fff', borderWidth: 2 }, label: { show: true, position: 'outside', alignTo: 'edge', edgeDistance: 16, formatter: '{b}\n{c}项\n{d}%', overflow: 'breakAll', width: 90 }, labelLine: { show: true, length: 20, length2: 22, smooth: 0.1 } }] });
 
                 // 3. 各生长指标评价等级分布（分组柱状图）
                 var levelBarLegend = levelOrder.filter(function(l) { return l !== '未知' && (levelPieCounts[l] || 0) > 0; });
@@ -798,10 +917,9 @@
                 var wcChart = renderCompareBar('weightCompareBar', '体重', 'kg', cntWM > 0 ? sumWM / cntWM : null, cntWF > 0 ? sumWF / cntWF : null, stdWtM ? stdWtM.mean : 0, stdWtF ? stdWtF.mean : 0, scopeMeta.avgLegendPrefix);
                 var bcChart = renderCompareBar('bmiCompareBar', 'BMI', 'kg/m²', cntBmiM > 0 ? sumBmiM / cntBmiM : null, cntBmiF > 0 ? sumBmiF / cntBmiF : null, stdBmiRowM ? stdBmiRowM.P50 : 0, stdBmiRowF ? stdBmiRowF.P50 : 0, scopeMeta.avgLegendPrefix);
 
-                var avgZ = [];
-                for (var i = 0; i < 4; i++) avgZ.push(countZ[i] > 0 ? sumZ[i] / countZ[i] : 0);
-                renderDetailAnalysis(rows, mode, opts.scope, indIds, indNames, levelOrder, levelColors, indLevelCounts, avgZ, countZ, nutritionIndCounts, nutritionOrder, nutritionColors);
-                document.getElementById('suggestionBox').innerHTML = getBatchSuggestionHtml(counts);
+                renderDetailAnalysis(rows, mode, opts.scope, indIds, indNames, levelOrder, levelColors, indLevelCounts, nutritionIndCounts, nutritionOrder, nutritionColors);
+                var suggestionData = buildSchoolSuggestion(rows, counts, classCount, testTimeText, mode);
+                document.getElementById('suggestionBox').innerHTML = suggestionData.summaryHtml;
 
                 var extras = document.getElementById('suggestionExtras');
                 if (extras) {
@@ -822,6 +940,12 @@
                     extras.innerHTML = '<div class="related-training-wrap"><div class="chart-title">推荐方案</div><div class="related-training-tags">' + tagsHtml + '</div></div>';
                 }
 
+                var batchAdviceEl = document.getElementById('batchAdviceCards');
+                if (batchAdviceEl) batchAdviceEl.innerHTML = suggestionData.cardsHtml;
+                if (extras) extras.innerHTML = suggestionData.extrasHtml;
+                var teacherMsg = document.querySelector('#panelSuggestion .teacher-msg');
+                if (teacherMsg) teacherMsg.innerHTML = '<i class="fa-solid fa-chalkboard-teacher"></i> ' + suggestionData.teacherText;
+
                 var failReasonCounts = { heightShort: 0, overweight: 0, underweight: 0 };
                 rows.forEach(function(row) {
                     if (getTierLevel(row) === 'fail') {
@@ -831,9 +955,6 @@
                         });
                     }
                 });
-                var batchAdv = document.getElementById('batchAdviceCards');
-                if (batchAdv) batchAdv.innerHTML = '';
-
                 window._batchReportData = {
                     total: total,
                     indNames: indNames,
@@ -854,7 +975,7 @@
                 window._extraCharts = { hpChart: hpChart, wpChart: wpChart, bpChart: bpChart, hcChart: hcChart, wcChart: wcChart, bcChart: bcChart };
             }
 
-            function renderDetailAnalysis(rows, mode, scope, indIds, indNames, levelOrder, levelColors, indLevelCounts, avgZ, countZ, nutritionIndCounts, nutritionOrder, nutritionColors) {
+            function renderDetailAnalysis(rows, mode, scope, indIds, indNames, levelOrder, levelColors, indLevelCounts, nutritionIndCounts, nutritionOrder, nutritionColors) {
                 var root = document.getElementById('detailAnalysisRoot');
                 if (!root) return;
                 if (window._detailPieChartInstances) {
@@ -862,155 +983,157 @@
                 }
                 window._detailPieChartInstances = [];
                 function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+                function toClassKey(row) {
+                    var grade = (row.gradeName || '').trim();
+                    var cls = (row.className || '').trim();
+                    var joined = [grade, cls].filter(Boolean).join('·');
+                    return joined || '未分班';
+                }
+                function getIndicatorMap(row) {
+                    var map = {};
+                    (row.indicators || []).forEach(function(ind) { map[ind.id] = ind; });
+                    return map;
+                }
+                function riskClass(score) {
+                    if (score >= 20) return 'risk-up';
+                    if (score >= 10) return 'risk-mid';
+                    return 'risk-low';
+                }
+                function riskText(score) {
+                    if (score >= 20) return '高关注';
+                    if (score >= 10) return '中关注';
+                    return '常规观察';
+                }
 
-                function mountDetailPie(domId, pd, legendScroll) {
-                    var pieDom = document.getElementById(domId);
-                    if (!pieDom || typeof echarts === 'undefined') return;
-                    var ch = echarts.init(pieDom);
-                    var leg = {
-                        orient: 'horizontal',
-                        bottom: 4,
-                        left: 'center',
-                        icon: 'rect',
-                        itemWidth: 12,
-                        itemHeight: 12,
-                        itemGap: legendScroll ? 8 : 14,
-                        textStyle: { fontSize: legendScroll ? 10 : 11, color: '#333' },
-                        data: pd.map(function(d) { return d.name; })
-                    };
-                    if (legendScroll) {
-                        leg.type = 'scroll';
-                        leg.pageButtonItemGap = 4;
-                        leg.pageIconSize = 10;
+                var classes = {};
+                rows.forEach(function(row) {
+                    var key = toClassKey(row);
+                    if (!classes[key]) {
+                        classes[key] = {
+                            name: key,
+                            total: 0,
+                            male: 0,
+                            female: 0,
+                            ageSum: 0,
+                            ageCount: 0,
+                            heightSum: 0,
+                            heightCount: 0,
+                            weightSum: 0,
+                            weightCount: 0,
+                            bmiSum: 0,
+                            bmiCount: 0,
+                            growthWarn: 0,
+                            nutritionWarn: 0,
+                            focusKids: [],
+                            indicatorWarn: { ageWeight: 0, ageHeight: 0, heightWeight: 0, ageBmi: 0 }
+                        };
                     }
-                    ch.setOption({
-                        tooltip: {
-                            trigger: 'item',
-                            formatter: function(p) {
-                                return p.name + ': ' + p.value + ' 人 (' + p.percent.toFixed(2) + '%)';
-                            }
-                        },
-                        legend: leg,
-                        series: [{
-                            type: 'pie',
-                            radius: ['34%', '54%'],
-                            center: ['50%', '44%'],
-                            data: pd,
-                            itemStyle: { borderColor: '#fff', borderWidth: 2 },
-                            minShowLabelAngle: 0,
-                            avoidLabelOverlap: true,
-                            labelLayout: { hideOverlap: false, moveOverlap: 'shiftY' },
-                            label: {
-                                show: true,
-                                color: '#333',
-                                fontSize: legendScroll ? 10 : 12,
-                                overflow: 'none',
-                                distanceToLabelLine: 10,
-                                formatter: function(p) {
-                                    return p.name + ': ' + p.value + '人 (' + p.percent.toFixed(2) + '%)';
-                                }
-                            },
-                            labelLine: {
-                                length: 14,
-                                length2: 22,
-                                smooth: 0.12,
-                                lineStyle: { color: '#999', width: 1 }
-                            }
-                        }]
+                    var cls = classes[key];
+                    cls.total++;
+                    if ((row.gender || '').trim() === '男') cls.male++;
+                    else if ((row.gender || '').trim() === '女') cls.female++;
+
+                    var age = parseFloat(row.ageMonths);
+                    if (!isNaN(age)) { cls.ageSum += age; cls.ageCount++; }
+                    var h = parseFloat(row.height);
+                    if (!isNaN(h)) { cls.heightSum += h; cls.heightCount++; }
+                    var w = parseFloat(row.weight);
+                    if (!isNaN(w)) { cls.weightSum += w; cls.weightCount++; }
+                    var b = parseFloat(row.bmi);
+                    if (!isNaN(b)) { cls.bmiSum += b; cls.bmiCount++; }
+
+                    var indicatorMap = getIndicatorMap(row);
+                    var growthFlag = false;
+                    var nutritionFlag = false;
+                    indIds.forEach(function(indId) {
+                        var ind = indicatorMap[indId];
+                        if (!ind) return;
+                        var level = getGrowthLevelFromValue((ind.value || '').trim(), mode);
+                        if (level === '下' || level === '中下') {
+                            cls.indicatorWarn[indId]++;
+                            growthFlag = true;
+                        }
+                        var res = (ind.result || '').trim();
+                        if (res && res !== '-' && res !== '—' && res !== '正常' && res !== '中') {
+                            nutritionFlag = true;
+                        }
                     });
-                    window._detailPieChartInstances.push(ch);
+                    if (growthFlag) cls.growthWarn++;
+                    if (nutritionFlag) cls.nutritionWarn++;
+                    if (growthFlag || nutritionFlag) {
+                        cls.focusKids.push({ name: (row.name || '—').trim() || '—', gender: (row.gender || '—').trim() || '—' });
+                    }
+                });
+
+                var classRows = Object.keys(classes).map(function(key) {
+                    var cls = classes[key];
+                    cls.avgAge = cls.ageCount ? (cls.ageSum / cls.ageCount) : null;
+                    cls.avgHeight = cls.heightCount ? (cls.heightSum / cls.heightCount) : null;
+                    cls.avgWeight = cls.weightCount ? (cls.weightSum / cls.weightCount) : null;
+                    cls.avgBmi = cls.bmiCount ? (cls.bmiSum / cls.bmiCount) : null;
+                    cls.growthRate = cls.total ? (cls.growthWarn / cls.total * 100) : 0;
+                    cls.nutritionRate = cls.total ? (cls.nutritionWarn / cls.total * 100) : 0;
+                    cls.riskScore = Math.round(cls.growthRate * 0.6 + cls.nutritionRate * 0.4 + cls.focusKids.length);
+                    return cls;
+                }).sort(function(a, b) { return a.name.localeCompare(b.name, 'zh-CN'); });
+
+                var topRisk = classRows.slice().sort(function(a, b) { return b.riskScore - a.riskScore; }).slice(0, 5);
+                var topGrowth = classRows.slice().sort(function(a, b) { return b.growthRate - a.growthRate; }).slice(0, 3);
+                var topNutrition = classRows.slice().sort(function(a, b) { return b.nutritionRate - a.nutritionRate; }).slice(0, 3);
+                function toTop3Cells(list, formatter) {
+                    var arr = list.slice(0, 3).map(function(item) { return '<td>' + formatter(item) + '</td>'; });
+                    while (arr.length < 3) arr.push('<td>—</td>');
+                    return arr.join('');
                 }
 
                 var html = '';
-                for (var i = 0; i < 4; i++) {
-                    var indId = indIds[i];
-                    var meta = CORE_INDICATOR_MEANINGS[indId] || { title: indNames[i], core: '', brief: '' };
-                    var avg = countZ[i] > 0 ? avgZ[i].toFixed(3) : '—';
-                    var studentsByLevel = { '上': [], '中上': [], '中': [], '中下': [], '下': [], '未知': [] };
-                    var studentsByNut = {};
-                    nutritionOrder.forEach(function(n) { studentsByNut[n] = []; });
-                    rows.forEach(function(row) {
-                        var ind = (row.indicators || []).filter(function(ix) { return ix.id === indId; })[0];
-                        if (!ind) return;
-                        var valStr = (ind.value || '').trim();
-                        var level = getGrowthLevelFromValue(valStr, mode);
-                        if (!level || levelOrder.indexOf(level) < 0) level = '未知';
-                        var name = esc((row.name || '—').trim() || '—');
-                        var suffix = scope === 'class' ? (' [' + esc((row.gender || '').trim() || '—') + ']') : (' [' + esc([(row.gradeName || '').trim(), (row.className || '').trim()].filter(Boolean).join('·') || '—') + ']');
-                        studentsByLevel[level].push({ name: name, suffix: suffix });
-                        var res = (ind.result || '').trim();
-                        var nut = (res === '' || res === '-') ? '—' : res;
-                        if (nutritionOrder.indexOf(nut) < 0) nut = '—';
-                        studentsByNut[nut].push({ name: name, suffix: suffix });
-                    });
+                html += '<div class="detail-indicator-block chart-box detail-analysis-section">';
+                html += '<div class="detail-section-separator"><span class="detail-section-separator-txt">班级健康总表</span></div>';
+                html += '<div class="mgmt-note">先看每个班的人数、男女结构、平均体格和异常率。对园所管理来说，这一张表比单个儿童名单更重要。</div>';
+                html += '<table class="mgmt-table"><thead><tr><th>班级</th><th>人数</th><th>男/女</th><th>平均月龄</th><th>平均身高</th><th>平均体重</th><th>平均BMI</th><th>生长异常率</th><th>营养风险率</th><th>重点关注人数</th></tr></thead><tbody>';
+                classRows.forEach(function(cls) {
+                    html += '<tr><td>' + esc(cls.name) + '</td><td>' + cls.total + '</td><td>' + cls.male + '/' + cls.female + '</td><td>' + (cls.avgAge != null ? cls.avgAge.toFixed(1) : '—') + '</td><td>' + (cls.avgHeight != null ? cls.avgHeight.toFixed(1) : '—') + '</td><td>' + (cls.avgWeight != null ? cls.avgWeight.toFixed(1) : '—') + '</td><td>' + (cls.avgBmi != null ? cls.avgBmi.toFixed(1) : '—') + '</td><td>' + cls.growthRate.toFixed(1) + '%</td><td>' + cls.nutritionRate.toFixed(1) + '%</td><td>' + cls.focusKids.length + '</td></tr>';
+                });
+                html += '</tbody></table></div>';
 
-                    html += '<div class="detail-indicator-block chart-box detail-analysis-section">';
-                    html += '<div class="detail-section-separator"><span class="detail-section-separator-txt">单项分析 · 「' + esc(meta.title) + '」· 表1 / 表2 生长水平（五档）</span></div>';
-                    html += '<div class="detail-ind-header"><h3>' + esc(meta.title) + '</h3><span class="avg-z">平均 Z 分：' + avg + '</span></div>';
-                    html += '<div class="detail-ind-body"><div class="detail-pie-wrap" id="detailPie_' + indId + '"></div></div>';
-                    html += '<div class="detail-meaning">';
-                    html += '<div class="dm-title">含义与评价目的</div>';
-                    html += '<div class="dm-core">' + esc(meta.core) + '</div>';
-                    html += '<div class="dm-brief">' + esc(meta.brief) + '</div>';
+                html += '<div class="detail-indicator-block chart-box detail-analysis-section">';
+                html += '<div class="detail-section-separator"><span class="detail-section-separator-txt">班级风险排名</span></div>';
+                html += '<div class="mgmt-note">综合风险分由生长异常率、营养风险率和重点关注人数加权得到，用于帮助园长快速定位需要优先跟进的班级。</div>';
+                html += '<table class="mgmt-table"><thead><tr><th>排名</th><th>班级</th><th>综合风险分</th><th>管理等级</th><th>生长异常率</th><th>营养风险率</th><th>重点关注人数</th></tr></thead><tbody>';
+                topRisk.forEach(function(cls, idx) {
+                    html += '<tr><td>' + (idx + 1) + '</td><td>' + esc(cls.name) + '</td><td>' + cls.riskScore + '</td><td class="' + riskClass(cls.riskScore) + '">' + riskText(cls.riskScore) + '</td><td>' + cls.growthRate.toFixed(1) + '%</td><td>' + cls.nutritionRate.toFixed(1) + '%</td><td>' + cls.focusKids.length + '</td></tr>';
+                });
+                html += '</tbody></table>';
+                html += '<table class="mgmt-table" style="margin-top:16px;"><thead><tr><th>维度</th><th>第1位</th><th>第2位</th><th>第3位</th></tr></thead><tbody>';
+                html += '<tr><td>生长异常率</td>' + toTop3Cells(topGrowth, function(cls) { return esc(cls.name) + '（' + cls.growthRate.toFixed(1) + '%）'; }) + '</tr>';
+                html += '<tr><td>营养风险率</td>' + toTop3Cells(topNutrition, function(cls) { return esc(cls.name) + '（' + cls.nutritionRate.toFixed(1) + '%）'; }) + '</tr>';
+                html += '</tbody></table></div>';
+
+                html += '<div class="detail-indicator-block chart-box detail-analysis-section">';
+                html += '<div class="detail-section-separator"><span class="detail-section-separator-txt">重点班级观察</span></div>';
+                html += '<div class="mgmt-note">建议先关注综合风险最高的班级，再结合四项核心指标中哪个维度异常更集中，安排复测和家园沟通。</div>';
+                html += '<div class="focus-class-grid">';
+                topRisk.slice(0, 3).forEach(function(cls) {
+                    var dominant = indIds.map(function(indId, idx) {
+                        return { name: indNames[idx], count: cls.indicatorWarn[indId] || 0 };
+                    }).sort(function(a, b) { return b.count - a.count; })[0];
+                    var focusList = cls.focusKids.slice(0, 6).map(function(it) { return esc(it.name) + '（' + esc(it.gender) + '）'; }).join('、');
+                    html += '<div class="focus-class-card">';
+                    html += '<h4>' + esc(cls.name) + '</h4>';
+                    html += '<p>综合风险：<span class="' + riskClass(cls.riskScore) + '">' + riskText(cls.riskScore) + '</span>（' + cls.riskScore + '）</p>';
+                    html += '<p>生长异常率：' + cls.growthRate.toFixed(1) + '%</p>';
+                    html += '<p>营养风险率：' + cls.nutritionRate.toFixed(1) + '%</p>';
+                    html += '<p>重点指标：' + esc(dominant.name) + '（' + dominant.count + '人）</p>';
+                    html += '<p>关注名单：' + (focusList || '暂无') + '</p>';
                     html += '</div>';
-                    html += '<div class="detail-list-section-title">表1 / 表2 分档名单</div>';
-                    html += '<div class="detail-student-lists">';
-                    levelOrder.forEach(function(l) {
-                        var list = studentsByLevel[l] || [];
-                        if (list.length === 0) return;
-                        var borderCol = levelColors[l] || '#999';
-                        var namesHtml = list.map(function(it) {
-                            return '<span style="color:' + borderCol + ';">' + it.name + it.suffix + '</span>';
-                        }).join('；');
-                        html += '<div class="detail-level-block" style="border-left-color:' + borderCol + ';">';
-                        html += '<div class="lvl-name">' + l + '（' + list.length + ' 人）</div>';
-                        html += '<div class="lvl-line">' + namesHtml + '</div></div>';
-                    });
-                    html += '</div></div>';
-                    html += '<div class="detail-indicator-block chart-box detail-analysis-section detail-analysis-section-nut">';
-                    html += '<div class="detail-section-separator"><span class="detail-section-separator-txt">单项分析 · 「' + esc(meta.title) + '」· 表3 营养状况（标准差法）</span></div>';
-                    html += '<div class="detail-ind-header"><h3>' + esc(meta.title) + '</h3><span class="avg-z">平均 Z 分：' + avg + '</span></div>';
-                    html += '<div class="detail-ind-body"><div class="detail-pie-wrap detail-nut-pie-wrap" id="detailNutPie_' + indId + '"></div></div>';
-                    html += '<div class="detail-list-section-title">表3 营养状况名单</div>';
-                    html += '<div class="detail-nut-student-lists">';
-                    nutritionOrder.forEach(function(n) {
-                        var list = studentsByNut[n] || [];
-                        if (list.length === 0) return;
-                        var borderCol = nutritionColors[n] || '#999';
-                        var nutLabel = n === '—' ? '—（表内未标注区间）' : n;
-                        var namesHtml = list.map(function(it) {
-                            return '<span style="color:' + borderCol + ';">' + it.name + it.suffix + '</span>';
-                        }).join('；');
-                        html += '<div class="detail-level-block" style="border-left-color:' + borderCol + ';">';
-                        html += '<div class="lvl-name">' + nutLabel + '（' + list.length + ' 人）</div>';
-                        html += '<div class="lvl-line">' + namesHtml + '</div></div>';
-                    });
-                    html += '</div></div>';
-                }
-                html += '<div class="detail-foot-block">';
-                html += '<h4>📜 官方标准</h4>';
-                html += '<p>上述评价指标均基于《7岁以下儿童生长标准》（WS/T 423—2022），由国家卫生健康委员会发布，首都儿科研究所牵头起草。标准中包含男女童百分位数和标准差单位数值表，可将生长水平评价为「上、中上、中、中下、下」五档；表3 为儿童营养状况的标准差评价方法。</p>';
-                html += '<h4>💡 温馨提示</h4>';
-                html += '<p>本报告数据仅供参考，不作为诊断依据。若指标异常或存在疑虑，请咨询儿科或儿童保健医生进行综合评估。</p></div>';
-                root.innerHTML = html;
+                });
+                html += '</div></div>';
 
-                for (var j = 0; j < 4; j++) {
-                    var indId = indIds[j];
-                    var pdL = [];
-                    levelOrder.forEach(function(l) {
-                        var n = indLevelCounts[j][levelOrder.indexOf(l)] || 0;
-                        if (n > 0) pdL.push({ value: n, name: l, itemStyle: { color: levelColors[l] || '#999' } });
-                    });
-                    if (pdL.length === 0) pdL = [{ value: 1, name: '无数据', itemStyle: { color: '#ddd' } }];
-                    mountDetailPie('detailPie_' + indId, pdL, false);
-                    var pdN = [];
-                    nutritionOrder.forEach(function(n) {
-                        var c = nutritionIndCounts[j][nutritionOrder.indexOf(n)] || 0;
-                        if (c > 0) pdN.push({ value: c, name: n, itemStyle: { color: nutritionColors[n] || '#999' } });
-                    });
-                    if (pdN.length === 0) pdN = [{ value: 1, name: '无数据', itemStyle: { color: '#ddd' } }];
-                    mountDetailPie('detailNutPie_' + indId, pdN, true);
-                }
+                html += '<div class="detail-foot-block">';
+                html += '<h4>园所阅读建议</h4>';
+                html += '<p>建议先看班级健康总表，再看风险排名和重点班级观察。若同一班级同时在生长异常率和营养风险率上偏高，应优先安排复测、班级观察和家园沟通。</p>';
+                html += '</div>';
+                root.innerHTML = html;
             }
 
             function initTabs() {
@@ -1113,48 +1236,48 @@
                     var glPdf = d.groupLabel || '全园';
                     page1.innerHTML = '<div style="display:flex;align-items:center;gap:14px;margin:8px 0 16px 0;"><span style="color:#ff7a00;font-size:34px;font-weight:700;line-height:1;white-space:nowrap;">/ 基本信息 /</span><span style="flex:1;border-top:2px solid #f2d4b4;"></span></div>' +
                         '<div style="background:#f7fbff;border:1px solid #d8e6f5;border-radius:12px;padding:18px 20px;margin-bottom:22px;">' +
-                        '<div style="text-align:center;margin-bottom:14px;font-size:24px;font-weight:700;color:#f07a00;">生长评价总体报告' + (d.reportTitleSuffix || '') + '</div>' +
+                        '<div style="text-align:center;margin-bottom:14px;font-size:24px;font-weight:700;color:#f07a00;">园所健康成长报告' + (d.reportTitleSuffix || '') + '</div>' +
                         '<div style="font-size:15px;color:#555;line-height:1.95;">' +
                         '<div style="display:flex;align-items:baseline;"><span style="display:inline-block;min-width:72px;">班级数：</span><strong style="color:#333;padding-left:2em;">' + (d.classCount != null ? d.classCount : 0) + '</strong><span style="padding-left:0.35em;">个</span></div>' +
                         '<div style="display:flex;align-items:baseline;"><span style="display:inline-block;min-width:72px;">学生人数：</span><strong style="color:#333;padding-left:2em;">' + (d.total || 0) + '</strong><span style="padding-left:0.35em;">人</span></div>' +
                         '<div style="display:flex;align-items:baseline;"><span style="display:inline-block;min-width:72px;">测试时间：</span><strong style="color:#d97706;padding-left:2em;">' + (d.testTimeText || '—') + '</strong></div>' +
                         '<div style="display:flex;align-items:baseline;"><span style="display:inline-block;min-width:72px;">统计范围：</span><strong style="color:#333;padding-left:2em;">' + ((d.rangeLine || '—').replace(/^统计范围[：:]\s*/, '')) + '</strong></div>' +
                         '</div></div>' +
-                        makeSectionTitle('图表趋势分析') +
-                        mkImg(genderUrl, imgStylePie) + mkTitleBelow(glPdf + '性别分布');
+                        makeSectionTitle('园所概览') +
+                        mkImg(genderUrl, imgStylePie) + mkTitleBelow('儿童结构概览：' + glPdf + '性别分布');
                     wrapper.appendChild(page1);
                     var page1b = document.createElement('div');
                     page1b.style.cssText = 'width:800px;background:#fff;padding:20px 0;page-break-before:always;';
-                    page1b.innerHTML = mkImg(levelPieUrl, imgStylePie520) + mkTitleBelow(glPdf + '生长指标评价结果分布（表1/表2）') + '<div style="height:54px;"></div>' +
-                        mkImg(levelBarUrl, imgStyleBar) + mkTitleBelow('各生长指标评价等级分布', 4);
+                    page1b.innerHTML = mkImg(levelPieUrl, imgStylePie520) + mkTitleBelow(glPdf + '总体生长水平分布（表1/表2）') + '<div style="height:54px;"></div>' +
+                        mkImg(levelBarUrl, imgStyleBar) + mkTitleBelow('四项核心指标等级分布', 4);
                     wrapper.appendChild(page1b);
                     var page1c = document.createElement('div');
                     page1c.style.cssText = 'width:800px;background:#fff;padding:20px 0;page-break-before:always;';
-                    page1c.innerHTML = mkImg(nutritionPieUrl, imgStylePie520) + mkTitleBelow(glPdf + '儿童营养状况分布（表3）') + '<div style="height:54px;"></div>' +
-                        mkImg(nutritionBarUrl, imgStyleBar) + mkTitleBelow('各指标营养状况分布', 4);
+                    page1c.innerHTML = mkImg(nutritionPieUrl, imgStylePie520) + mkTitleBelow(glPdf + '总体营养风险分布（表3）') + '<div style="height:54px;"></div>' +
+                        mkImg(nutritionBarUrl, imgStyleBar) + mkTitleBelow('四项核心指标营养风险分布', 4);
                     wrapper.appendChild(page1c);
 
                     var page1d = document.createElement('div');
                     page1d.style.cssText = 'width:800px;background:#fff;padding:20px 0;page-break-before:always;';
-                    page1d.innerHTML = mkImg(scatterUrl) + mkTitleBelow('身高与体重关系散点图') + '<div style="height:54px;"></div>' +
-                        mkImg(heightPUrl) + mkTitleBelow('身高百分位曲线图（2～7岁）— ' + glPdf + '叠加');
+                    page1d.innerHTML = mkImg(heightCUrl, imgStyleSm) + mkTitleBelow((d.avgLegendPrefix || '园所平均') + '身高 vs 参考标准') + '<div style="height:54px;"></div>' +
+                        mkImg(weightCUrl, imgStyleSm) + mkTitleBelow((d.avgLegendPrefix || '园所平均') + '体重 vs 参考标准');
                     wrapper.appendChild(page1d);
 
                     var page1e = document.createElement('div');
                     page1e.style.cssText = 'width:800px;background:#fff;padding:20px 0;page-break-before:always;';
-                    page1e.innerHTML = mkImg(weightPUrl) + mkTitleBelow('体重百分位曲线图（2～7岁）— ' + glPdf + '叠加') + '<div style="height:54px;"></div>' +
-                        mkImg(bmiPUrl) + mkTitleBelow('BMI百分位曲线图（2～7岁）— ' + glPdf + '叠加');
+                    page1e.innerHTML = mkImg(bmiCUrl, imgStyleSm) + mkTitleBelow((d.avgLegendPrefix || '园所平均') + 'BMI vs 参考标准') + '<div style="height:54px;"></div>' +
+                        mkImg(scatterUrl) + mkTitleBelow('补充参考：身高与体重关系散点图');
                     wrapper.appendChild(page1e);
 
                     var page1f = document.createElement('div');
                     page1f.style.cssText = 'width:800px;background:#fff;padding:20px 0;page-break-before:always;';
-                    page1f.innerHTML = mkImg(heightCUrl, imgStyleSm) + mkTitleBelow((d.avgLegendPrefix || '全园平均') + '身高 vs 标准值对比') + '<div style="height:54px;"></div>' +
-                        mkImg(weightCUrl, imgStyleSm) + mkTitleBelow((d.avgLegendPrefix || '全园平均') + '体重 vs 标准值对比');
+                    page1f.innerHTML = mkImg(heightPUrl) + mkTitleBelow('补充参考：身高百分位曲线图（2～7岁）— ' + glPdf + '叠加') + '<div style="height:54px;"></div>' +
+                        mkImg(weightPUrl) + mkTitleBelow('补充参考：体重百分位曲线图（2～7岁）— ' + glPdf + '叠加');
                     wrapper.appendChild(page1f);
 
                     var page1g = document.createElement('div');
                     page1g.style.cssText = 'width:800px;background:#fff;padding:20px 0;page-break-before:always;';
-                    page1g.innerHTML = mkImg(bmiCUrl, imgStyleSm) + mkTitleBelow((d.avgLegendPrefix || '全园平均') + 'BMI vs 标准值对比');
+                    page1g.innerHTML = mkImg(bmiPUrl) + mkTitleBelow('补充参考：BMI百分位曲线图（2～7岁）— ' + glPdf + '叠加');
                     wrapper.appendChild(page1g);
 
                     var suggestionPageStyle = 'width:800px;min-height:1120px;background:#fff;page-break-before:always;padding:24px 20px 40px 20px;font-size:14px;line-height:1.7;box-sizing:border-box;';

@@ -1760,12 +1760,35 @@
                                         });
                                     });
                                 }
+                                // 非对比：外环占整圆四象限（与 sort:null、默认 startAngle 顺时针一致），勿用右半圆 rightAngles
+                                function drawFullRingSingleOuterLabels(sideData) {
+                                    if (!sideData || !sideData.children) return;
+                                    var fullAnglesDeg = [45, -45, -135, 135];
+                                    var rowYFrac = [0.25, 0.75, 0.75, 0.25];
+                                    for (var fri = 0; fri < 4; fri++) {
+                                        var child = sideData.children[fri];
+                                        if (!child) continue;
+                                        var ang = fullAnglesDeg[fri] * Math.PI / 180;
+                                        var sx = cx + rOuter * Math.cos(ang);
+                                        var sy = cy - rOuter * Math.sin(ang);
+                                        var isLeftBox = fri >= 2;
+                                        var boxX = isLeftBox ? 40 : (w - labelW - 40);
+                                        var rowY = h * rowYFrac[fri];
+                                        var targetX = isLeftBox ? (boxX + labelW) : boxX;
+                                        var color = (child.itemStyle && child.itemStyle.color) ? child.itemStyle.color : '#8C8D8E';
+                                        elements.push({ type: 'line', shape: { x1: sx, y1: sy, x2: targetX, y2: rowY }, style: { stroke: color, lineWidth: 1, lineDash: [4, 2], opacity: 0.6 } });
+                                        elements.push({ type: 'circle', shape: { cx: sx, cy: sy, r: 3 }, style: { fill: color } });
+                                        elements.push({ type: 'rect', shape: { x: boxX, y: rowY - labelH / 2, width: labelW, height: labelH, r: 4 }, style: { fill: '#fff', stroke: color, lineWidth: 1, shadowBlur: 4, shadowColor: 'rgba(0,0,0,0.1)' } });
+                                        var txt = (child._indName || child.name || '') + '\n值: ' + (child._valStr || '—') + '\n评价: ' + (child._res || '—');
+                                        elements.push({ type: 'text', left: boxX + 12, top: rowY - labelH / 2 + 10, style: { text: txt, fontSize: 12, lineHeight: 20, fill: '#333' } });
+                                    }
+                                }
                                 if (isComp) {
                                     // 左侧（上次）在 Sunburst 上是镜像顺序，需要反向映射到标签行，避免文案与扇区错连
                                     drawSide(data[1], leftAngles, true, [3, 2, 1, 0]);
                                     drawSide(data[0], rightAngles, false, [0, 1, 2, 3]);
                                 } else if (data && data[0]) {
-                                    drawSide(data[0], rightAngles, false, [0, 1, 2, 3]);
+                                    drawFullRingSingleOuterLabels(data[0]);
                                 }
                                 return elements;
                             }
@@ -2084,11 +2107,34 @@
                                         });
                                     });
                                 }
+                                // 非对比：外环整圆四象限，与半圆对比模式的 rightAngles 不同
+                                function drawFullRingSingleOuterLabels(sideData) {
+                                    if (!sideData || !sideData.children) return;
+                                    var fullAnglesDeg = [45, -45, -135, 135];
+                                    var rowYFrac = [0.25, 0.75, 0.75, 0.25];
+                                    for (var fri = 0; fri < 4; fri++) {
+                                        var child = sideData.children[fri];
+                                        if (!child) continue;
+                                        var ang = fullAnglesDeg[fri] * Math.PI / 180;
+                                        var sx = cx + rOuter * Math.cos(ang);
+                                        var sy = cy - rOuter * Math.sin(ang);
+                                        var isLeftBox = fri >= 2;
+                                        var boxX = isLeftBox ? 40 : (w - labelW - 40);
+                                        var rowY = h * rowYFrac[fri];
+                                        var targetX = isLeftBox ? (boxX + labelW) : boxX;
+                                        var color = (child.itemStyle && child.itemStyle.color) ? child.itemStyle.color : '#8C8D8E';
+                                        elements.push({ type: 'line', shape: { x1: sx, y1: sy, x2: targetX, y2: rowY }, style: { stroke: color, lineWidth: 1, lineDash: [4, 2], opacity: 0.6 } });
+                                        elements.push({ type: 'circle', shape: { cx: sx, cy: sy, r: 3 }, style: { fill: color } });
+                                        elements.push({ type: 'rect', shape: { x: boxX, y: rowY - labelH / 2, width: labelW, height: labelH, r: 4 }, style: { fill: '#fff', stroke: color, lineWidth: 1, shadowBlur: 4, shadowColor: 'rgba(0,0,0,0.1)' } });
+                                        var txt = (child._indName || child.name || '') + '\n标准分数 ' + (child._zStr || '—') + '\n评价结果：' + (child._res || '—');
+                                        elements.push({ type: 'text', left: boxX + 12, top: rowY - labelH / 2 + 10, style: { text: txt, fontSize: 12, lineHeight: 20, fill: '#333' } });
+                                    }
+                                }
                                 if (isComp) {
                                     drawSide(data[1], leftAngles, true, [3, 2, 1, 0]);
                                     drawSide(data[0], rightAngles, false, [0, 1, 2, 3]);
                                 } else if (data && data[0]) {
-                                    drawSide(data[0], rightAngles, false, [0, 1, 2, 3]);
+                                    drawFullRingSingleOuterLabels(data[0]);
                                 }
                                 return elements;
                             }

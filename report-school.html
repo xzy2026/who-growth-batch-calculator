@@ -647,6 +647,29 @@
                     reportTitleSuffix: '（全园）'
                 };
             }
+            function pickSchoolDisplay(rows, fallback) {
+                var names = [];
+                var seen = {};
+                (rows || []).forEach(function(row) {
+                    var candidates = [
+                        row && row.schoolDisplay,
+                        row && row.schoolName,
+                        row && row.school,
+                        row && row.kindergarten,
+                        row && row['学校'],
+                        row && row['园所']
+                    ];
+                    for (var i = 0; i < candidates.length; i++) {
+                        var v = (candidates[i] == null ? '' : String(candidates[i])).trim();
+                        if (!v || seen[v]) continue;
+                        seen[v] = true;
+                        names.push(v);
+                        break;
+                    }
+                });
+                if (names.length === 0) return (fallback == null ? '—' : String(fallback));
+                return names.join('、');
+            }
             function applyScopeChartTitles(meta) {
                 var gl = meta.groupLabel;
                 var avgP = meta.avgLegendPrefix;
@@ -672,6 +695,7 @@
                 var rows = allRows.slice();
                 var opts = { scope: 'school', classKey: '' };
                 var scopeMeta = buildScopeMeta(allRows, rows);
+                var schoolDisplay = pickSchoolDisplay(rows, data.schoolDisplay || data.schoolName || data.school);
                 applyScopeChartTitles(scopeMeta);
                 var titleEl = document.getElementById('reportTitle');
                 titleEl.textContent = '—— 园所健康成长报告（全园）——';
@@ -970,7 +994,8 @@
                     classKey: opts.classKey || '',
                     allTotal: allRows.length,
                     classCount: classCount,
-                    testTimeText: testTimeText
+                    testTimeText: testTimeText,
+                    schoolDisplay: schoolDisplay
                 };
                 window._extraCharts = { hpChart: hpChart, wpChart: wpChart, bpChart: bpChart, hcChart: hcChart, wcChart: wcChart, bcChart: bcChart };
             }
@@ -1202,20 +1227,22 @@
                     wrapper.style.cssText = 'position:fixed;top:0;left:0;z-index:99999;width:800px;max-height:100vh;overflow:auto;font-family:Microsoft YaHei,Arial,sans-serif;font-size:14px;color:#333;background:#fff;padding:20px;box-sizing:border-box;';
 
                     var reportDate = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+                    var schoolTxt = (d.schoolDisplay != null && d.schoolDisplay !== '') ? d.schoolDisplay : '—';
+                    var classTxt = (d.classCount != null ? (d.classCount + ' 个') : '—');
                     var coverHtml = '<div style="width:800px;height:1132px;background:linear-gradient(180deg,#fff9f4 0%,#fff4ea 58%,#ffecd9 100%);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:60px 20px 60px;box-sizing:border-box;position:relative;overflow:hidden;">' +
                         '<div style="position:absolute;left:-120px;top:640px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle at 35% 35%, rgba(255,177,113,0.35) 0%, rgba(255,177,113,0.18) 45%, rgba(255,177,113,0.02) 100%);"></div>' +
                         '<div style="position:absolute;right:-160px;bottom:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle at 35% 35%, rgba(255,153,84,0.28) 0%, rgba(255,153,84,0.12) 50%, rgba(255,153,84,0.01) 100%);"></div>' +
                         '<div style="width:100%;max-width:100%;text-align:center;">' +
-                        '<h1 style="font-size:52px;font-weight:bold;color:#ff7a00;margin:0 0 36px 0;letter-spacing:2px;">生长评价总体报告</h1>' +
-                        '<h2 style="font-size:36px;font-weight:bold;color:#f28b1a;margin:0 0 24px 0;letter-spacing:1px;">享智云 · 7岁以下儿童生长标准</h2>' +
+                        '<h1 style="font-size:52px;font-weight:bold;color:#ff7a00;margin:0 0 36px 0;letter-spacing:2px;">享智云<sup style="font-size:0.45em;vertical-align:top;">®</sup>儿童健康成长</h1>' +
+                        '<h2 style="font-size:36px;font-weight:bold;color:#f28b1a;margin:0 0 16px 0;letter-spacing:1px;">身高/体重 AI数智报告书</h2>' +
+                        '<p style="font-size:32px;font-weight:bold;color:#f28b1a;margin:0 0 24px 0;letter-spacing:1px;">（园所报告）</p>' +
                         '</div>' +
-                        '<div style="width:100%;max-width:100%;text-align:center;margin-top:300px;">' +
-                        '<p style="font-size:24px;font-weight:600;color:#f07a00;margin:0 0 16px 0;">班级数：' + (d.classCount != null ? d.classCount : 0) + ' 个</p>' +
-                        '<p style="font-size:28px;font-weight:600;color:#f07a00;margin:0 0 16px 0;">学生人数：' + (d.total || 0) + ' 人</p>' +
-                        '<p style="font-size:20px;font-weight:600;color:#d97706;margin:0 0 20px 0;">测试时间：' + (d.testTimeText || '—') + '</p>' +
-                        '<p style="font-size:17px;color:#555;margin:0 0 20px 0;line-height:1.55;">' + (d.rangeLine || '') + '</p>' +
-                        '<p style="font-size:20px;color:#666;margin:0 0 8px 0;">报告生成日期：' + reportDate + '</p>' +
-                        '<p style="font-size:13px;color:#999;margin:0 0 40px 0;">（报告生成时间为导出当日；「测试时间」为测查日期汇总）</p>' +
+                        '<div style="width:100%;max-width:100%;text-align:center;margin-top:380px;">' +
+                        '<p style="font-size:28px;font-weight:600;color:#f07a00;margin:0 0 32px 0;">园所：' + schoolTxt + '</p>' +
+                        '<p style="font-size:24px;color:#f28b1a;margin:0 0 8px 0;">班级：' + classTxt + '</p>' +
+                        '<p style="font-size:24px;color:#f28b1a;margin:0 0 8px 0;">个人数：' + (d.total || 0) + ' 人</p>' +
+                        '<p style="font-size:24px;color:#f28b1a;margin:0 0 8px 0;">测试时间：' + (d.testTimeText || '—') + '</p>' +
+                        '<p style="font-size:24px;color:#f28b1a;margin:0 0 56px 0;">报告生成时间：' + reportDate + '</p>' +
                         '<img src="assets/logo-report.jpg" alt="" style="height:96px;width:auto;border-radius:12px;box-shadow:0 6px 14px rgba(233,131,42,0.18);" onerror="this.style.display=\'none\'">' +
                         '</div></div>';
                     var page0 = document.createElement('div');

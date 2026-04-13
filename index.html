@@ -182,6 +182,94 @@
             background: #8560c9;
         }
 
+        .auth-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: rgba(21, 37, 56, 0.55);
+            backdrop-filter: blur(8px);
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 420px;
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 32px 28px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+        }
+
+        .auth-card h2 {
+            font-size: 24px;
+            color: #1f2d3d;
+            margin-bottom: 10px;
+        }
+
+        .auth-card p {
+            color: #5f6b7a;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        .auth-field {
+            margin-bottom: 14px;
+        }
+
+        .auth-field label {
+            display: block;
+            margin-bottom: 6px;
+            color: #334155;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .auth-field input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .auth-field input:focus {
+            border-color: #366092;
+            box-shadow: 0 0 0 3px rgba(54, 96, 146, 0.12);
+        }
+
+        .auth-error {
+            min-height: 20px;
+            margin: 10px 0 14px;
+            color: #dc3545;
+            font-size: 13px;
+        }
+
+        .auth-hint {
+            margin-top: 12px;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .auth-actions {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .auth-user {
+            font-size: 13px;
+            color: #475569;
+            background: #eef3f8;
+            padding: 8px 12px;
+            border-radius: 999px;
+        }
+
         .table-container {
             overflow-x: auto;
             overflow-y: auto;
@@ -389,7 +477,25 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div id="authOverlay" class="auth-overlay">
+        <div class="auth-card">
+            <h2>账号登录</h2>
+            <p>输入账号和密码后可进入儿童生长标准批量计算器。</p>
+            <div class="auth-field">
+                <label for="loginUsername">账号</label>
+                <input id="loginUsername" type="text" autocomplete="username" placeholder="请输入账号">
+            </div>
+            <div class="auth-field">
+                <label for="loginPassword">密码</label>
+                <input id="loginPassword" type="password" autocomplete="current-password" placeholder="请输入密码">
+            </div>
+            <div id="authError" class="auth-error"></div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="handleLogin()">登录</button>
+            <div class="auth-hint">当前为前端登录门槛方案，修改账号密码请更新页面内的登录配置。</div>
+        </div>
+    </div>
+
+    <div class="container" id="appContainer" style="display: none;">
         <div class="header">
             <img src="assets/logo.jpg" alt="Logo" class="header-logo" onerror="this.style.display='none'">
             <div class="header-content">
@@ -430,6 +536,10 @@
                 <input type="file" id="compareFile2" accept=".xlsx,.xls" style="display:none" onchange="onCompareFile2(event)">
                 <button class="btn btn-info" onclick="startComparison()" style="background:#0d9488;">两次对比</button>
                 <button class="btn btn-danger" onclick="clearAll()">清空所有</button>
+                <div class="auth-actions">
+                    <span id="authUserLabel" class="auth-user">未登录</span>
+                    <button class="btn btn-secondary" onclick="logout()">退出登录</button>
+                </div>
             </div>
 
             <div class="table-container">
@@ -3340,8 +3450,114 @@
         }
 
         // 初始化：添加一行
+        const AUTH_CONFIG = {
+            username: 'admin',
+            passwordHash: 'b3c2d707',
+            storageKey: 'childGrowthAuth'
+        };
+
+        function simpleHash(text) {
+            let hash = 0x811c9dc5;
+            for (const ch of text) {
+                hash ^= ch.charCodeAt(0);
+                hash = Math.imul(hash, 0x01000193) >>> 0;
+            }
+            return hash.toString(16).padStart(8, '0');
+        }
+
+        function getAuthElements() {
+            return {
+                overlay: document.getElementById('authOverlay'),
+                app: document.getElementById('appContainer'),
+                username: document.getElementById('loginUsername'),
+                password: document.getElementById('loginPassword'),
+                error: document.getElementById('authError'),
+                userLabel: document.getElementById('authUserLabel')
+            };
+        }
+
+        function setAuthenticated(username) {
+            localStorage.setItem(AUTH_CONFIG.storageKey, JSON.stringify({
+                username: username,
+                authenticated: true,
+                loginAt: new Date().toISOString()
+            }));
+            const elements = getAuthElements();
+            elements.overlay.style.display = 'none';
+            elements.app.style.display = 'block';
+            elements.userLabel.textContent = '已登录: ' + username;
+            elements.error.textContent = '';
+            elements.password.value = '';
+        }
+
+        function restoreAuth() {
+            const raw = localStorage.getItem(AUTH_CONFIG.storageKey);
+            if (!raw) return false;
+            try {
+                const session = JSON.parse(raw);
+                if (session && session.authenticated && session.username === AUTH_CONFIG.username) {
+                    setAuthenticated(session.username);
+                    return true;
+                }
+            } catch (error) {}
+            localStorage.removeItem(AUTH_CONFIG.storageKey);
+            return false;
+        }
+
+        function handleLogin() {
+            const elements = getAuthElements();
+            const username = elements.username.value.trim();
+            const password = elements.password.value;
+
+            if (!username || !password) {
+                elements.error.textContent = '请输入账号和密码。';
+                return;
+            }
+
+            const passwordHash = simpleHash(password);
+            if (username === AUTH_CONFIG.username && passwordHash === AUTH_CONFIG.passwordHash) {
+                setAuthenticated(username);
+                return;
+            }
+
+            elements.error.textContent = '账号或密码错误。';
+        }
+
+        function logout() {
+            localStorage.removeItem(AUTH_CONFIG.storageKey);
+            const elements = getAuthElements();
+            elements.app.style.display = 'none';
+            elements.overlay.style.display = 'flex';
+            elements.userLabel.textContent = '未登录';
+            elements.password.value = '';
+            elements.error.textContent = '';
+            elements.username.value = '';
+            elements.username.focus();
+        }
+
+        function initAuth() {
+            const elements = getAuthElements();
+            elements.password.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    handleLogin();
+                }
+            });
+            elements.username.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    handleLogin();
+                }
+            });
+            if (!restoreAuth()) {
+                elements.overlay.style.display = 'flex';
+                elements.app.style.display = 'none';
+                elements.username.focus();
+            }
+        }
+
+        // ???????????????
         window.onload = function() {
             addRow();
+            initAuth();
         };
     </script>
 </body>

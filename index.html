@@ -491,7 +491,6 @@
             </div>
             <div id="authError" class="auth-error"></div>
             <button class="btn btn-primary" style="width: 100%;" onclick="handleLogin()">登录</button>
-            <div class="auth-hint">当前为前端登录门槛方案，修改账号密码请更新页面内的登录配置。</div>
         </div>
     </div>
 
@@ -531,7 +530,6 @@
                 <button class="btn btn-secondary" onclick="exportEvaluationExcel()">导出评价表格</button>
                 <button class="btn btn-warning" onclick="exportExcel()">导出完整Excel</button>
                 <button class="btn btn-info" onclick="openClassReport()" style="background:#6f42c1;">生成班级报告</button>
-                <button class="btn btn-info" onclick="openSchoolReport()" style="background:#8b5cf6;">生成园所报告</button>
                 <input type="file" id="compareFile1" accept=".xlsx,.xls" style="display:none" onchange="onCompareFile1(event)">
                 <input type="file" id="compareFile2" accept=".xlsx,.xls" style="display:none" onchange="onCompareFile2(event)">
                 <button class="btn btn-info" onclick="startComparison()" style="background:#0d9488;">两次对比</button>
@@ -3451,8 +3449,8 @@
 
         // 初始化：添加一行
         const AUTH_CONFIG = {
-            username: 'admin',
-            passwordHash: 'b3c2d707',
+            username: 'xzy',
+            passwordHash: '8c54e3a2',
             storageKey: 'childGrowthAuth'
         };
 

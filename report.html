@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>身高、体重报告书 - 享智云</title>
     <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+    <link rel="preload" as="image" href="assets/fengmian-cutout-lite.png?v=20260413c">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/echarts@5/dist/echarts.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -144,9 +145,14 @@
         .back-btn:hover { background: #4a7ba7; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(54,96,146,0.35); }
         .no-data { text-align: center; padding: 40px 20px; color: #999; }
         .footer { padding: 16px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #eee; }
-        .compare-select-wrap { margin-bottom: 20px; }
-        .compare-select-wrap label { margin-right: 10px; font-size: 14px; color: #666; }
-        .compare-select-wrap select { padding: 8px 12px; font-size: 14px; border: 1px solid #ddd; border-radius: 6px; min-width: 200px; }
+        .compare-select-wrap { margin-bottom: 20px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .compare-select-wrap label { font-size: 14px; color: #666; }
+        .compare-select-wrap select,
+        .compare-select-wrap input { padding: 8px 12px; font-size: 14px; border: 1px solid #ddd; border-radius: 6px; min-width: 200px; min-height: 38px; box-sizing: border-box; }
+        .compare-select-wrap input { width: 220px; }
+        .compare-select-wrap input:focus,
+        .compare-select-wrap select:focus { outline: none; border-color: #366092; box-shadow: 0 0 0 2px rgba(54,96,146,0.12); }
+        .compare-select-empty { font-size: 13px; color: #999; display: none; }
         .compare-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 20px; }
         .compare-table th, .compare-table td { border: 1px solid #ddd; padding: 10px 12px; text-align: center; }
         .compare-table th { background: #f28b1a; color: #fff; white-space: nowrap; }
@@ -174,7 +180,9 @@
                 <div id="compareChildWrap" class="compare-select-wrap" style="display:none;margin-bottom:16px;">
                     <label>选择儿童：</label>
                     <select id="compareChildSelect"></select>
-                    </div>
+                    <input type="search" id="compareChildSearch" placeholder="搜索姓名/日期/班级">
+                    <span id="compareChildEmpty" class="compare-select-empty">未找到匹配儿童</span>
+                </div>
                 <div class="report-title" id="reportTitle">—— 身高、体重报告书 ——</div>
                 <div class="section-main-title">
                     <span class="txt">/ 基本信息 /</span>
@@ -920,21 +928,50 @@
                             var compData = JSON.parse(compRaw);
                             var pairs = compData.pairs || [];
                             if (pairs.length > 1 && compareChildWrap) {
-                                compareChildWrap.style.display = 'block';
+                                compareChildWrap.style.display = 'flex';
                                 var sel = document.getElementById('compareChildSelect');
-                                sel.innerHTML = '';
-                                pairs.forEach(function(p, i) {
-                                    var opt = document.createElement('option');
-                                    opt.value = i;
-                                    opt.textContent = (p.name || '—') + ' · ' + (p.birthDate || '—');
-                                    sel.appendChild(opt);
-                                });
+                                var searchInput = document.getElementById('compareChildSearch');
+                                var emptyHint = document.getElementById('compareChildEmpty');
+                                function getPairSearchText(p) {
+                                    var second = p.second || {};
+                                    var first = p.first || {};
+                                    return [
+                                        p.name,
+                                        p.birthDate,
+                                        second.name,
+                                        second.birthDate,
+                                        second.school,
+                                        second.gradeName,
+                                        second.className,
+                                        first.school,
+                                        first.gradeName,
+                                        first.className
+                                    ].join(' ').toLowerCase();
+                                }
+                                function populateChildOptions(keyword) {
+                                    var term = (keyword || '').trim().toLowerCase();
+                                    var selectedValue = sel.value;
+                                    sel.innerHTML = '';
+                                    pairs.forEach(function(p, i) {
+                                        if (term && getPairSearchText(p).indexOf(term) === -1) return;
+                                        var opt = document.createElement('option');
+                                        opt.value = i;
+                                        opt.textContent = (p.name || '—') + ' · ' + (p.birthDate || '—');
+                                        sel.appendChild(opt);
+                                    });
+                                    if (emptyHint) emptyHint.style.display = sel.options.length ? 'none' : 'inline';
+                                    if (sel.options.length) {
+                                        var hasPrevious = Array.prototype.some.call(sel.options, function(opt) { return opt.value === selectedValue; });
+                                        sel.value = hasPrevious ? selectedValue : sel.options[0].value;
+                                    }
+                                }
                                 var currentIdx = 0;
                                 pairs.forEach(function(p, i) {
                                     if ((p.name || '') === (data.name || '') && (p.birthDate || '') === (data.birthDate || '')) currentIdx = i;
                                 });
+                                populateChildOptions(searchInput ? searchInput.value : '');
                                 sel.value = currentIdx;
-                                sel.onchange = function() {
+                                function switchToSelectedChild() {
                                     var idx = parseInt(sel.value, 10);
                                     var p = pairs[idx];
                                     if (!p) return;
@@ -953,7 +990,19 @@
                                     } catch (e) {}
                                     localStorage.setItem(STORAGE_KEY, JSON.stringify(nd));
                                     renderReport(JSON.stringify(nd));
-                                };
+                                }
+                                sel.onchange = switchToSelectedChild;
+                                if (searchInput) {
+                                    searchInput.oninput = function() {
+                                        populateChildOptions(searchInput.value);
+                                    };
+                                    searchInput.onkeydown = function(evt) {
+                                        if (evt.key === 'Enter' && sel.options.length) {
+                                            evt.preventDefault();
+                                            switchToSelectedChild();
+                                        }
+                                    };
+                                }
                             }
                         }
                     } catch (e) {}
@@ -2520,7 +2569,7 @@
                 var gradeNameCover = (basicInfo && basicInfo.querySelector('[data-cover="gradeName"]')) ? (basicInfo.querySelector('[data-cover="gradeName"]').textContent || '').trim() : '';
                 var classNameCover = (basicInfo && basicInfo.querySelector('[data-cover="className"]')) ? (basicInfo.querySelector('[data-cover="className"]').textContent || '').trim() : '';
                 var reportDate = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
-                var coverImageUrl = 'assets/fengmian-cutout.png?v=20260413';
+                var coverImageUrl = 'assets/fengmian-cutout-lite.png?v=20260413c';
                 var coverLogoUrl = 'assets/logo-report.png?v=20260413';
                 var escCover = function(text) {
                     return String(text == null ? '' : text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
@@ -2550,7 +2599,7 @@
                     '<h2 style="font-size:38px;font-weight:700;color:#f28b1a;margin:0 0 54px 0;letter-spacing:1px;">身高/体重 AI数智报告书</h2>' +
                     '</div>' +
                     '<div style="width:100%;display:flex;justify-content:center;position:relative;z-index:1;margin-bottom:22px;">' +
-                    '<img src="' + coverImageUrl + '" alt="" style="width:360px;max-width:100%;height:auto;display:block;filter:drop-shadow(0 12px 20px rgba(232,141,58,0.10));" onerror="this.style.display=\'none\'">' +
+                    '<img src="' + coverImageUrl + '" alt="" loading="eager" fetchpriority="high" decoding="sync" style="width:360px;max-width:100%;height:auto;display:block;filter:drop-shadow(0 12px 20px rgba(232,141,58,0.10));" onerror="this.style.display=\'none\'">' +
                     '</div>' +
                     '<div style="width:100%;text-align:center;position:relative;z-index:1;">' +
                     coverInfoHtml +

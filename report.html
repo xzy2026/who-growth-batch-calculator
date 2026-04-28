@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>身高、体重报告书 - 享智云</title>
     <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
-    <link rel="preload" as="image" href="assets/fengmian-cutout-lite.png?v=20260413c">
+    <link rel="preload" as="image" href="assets/fengmian-cutout.png?v=20260428">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/echarts@5/dist/echarts.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -2569,7 +2569,7 @@
                 var gradeNameCover = (basicInfo && basicInfo.querySelector('[data-cover="gradeName"]')) ? (basicInfo.querySelector('[data-cover="gradeName"]').textContent || '').trim() : '';
                 var classNameCover = (basicInfo && basicInfo.querySelector('[data-cover="className"]')) ? (basicInfo.querySelector('[data-cover="className"]').textContent || '').trim() : '';
                 var reportDate = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
-                var coverImageUrl = 'assets/fengmian-cutout-lite.png?v=20260413c';
+                var coverImageUrl = 'assets/fengmian-cutout.png?v=20260428';
                 var coverLogoUrl = 'assets/logo-report.png?v=20260413';
                 var escCover = function(text) {
                     return String(text == null ? '' : text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
